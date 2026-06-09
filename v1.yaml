@@ -1,0 +1,676 @@
+openapi: 3.1.1
+info:
+  title: kiirlink-server | v1
+  version: 1.0.0
+servers:
+  - url: http://localhost:5129/
+paths:
+  /{shortUrl}:
+    get:
+      tags:
+        - Links
+      operationId: RedirectToOriginalUrl
+      parameters:
+        - name: shortUrl
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/HttpValidationProblemDetails"
+      security:
+        - {}
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      parameters:
+        - name: useCookies
+          in: query
+          schema:
+            type: boolean
+        - name: useSessionCookies
+          in: query
+          schema:
+            type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenResponse"
+      security:
+        - {}
+  /api/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenResponse"
+      security:
+        - {}
+  /api/auth/confirmEmail:
+    get:
+      tags:
+        - Authentication
+      operationId: MapIdentityApi-/api/auth/confirmEmail
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: changedEmail
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/auth/resendConfirmationEmail:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResendConfirmationEmailRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/auth/forgotPassword:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/HttpValidationProblemDetails"
+      security:
+        - {}
+  /api/auth/resetPassword:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/HttpValidationProblemDetails"
+      security:
+        - {}
+  /api/auth/manage/2fa:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TwoFactorRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwoFactorResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/HttpValidationProblemDetails"
+        "404":
+          description: Not Found
+      security:
+        - {}
+  /api/auth/manage/info:
+    get:
+      tags:
+        - Authentication
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InfoResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/HttpValidationProblemDetails"
+        "404":
+          description: Not Found
+      security:
+        - {}
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InfoRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InfoResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/HttpValidationProblemDetails"
+        "404":
+          description: Not Found
+      security:
+        - {}
+  /api/links/shorten:
+    post:
+      tags:
+        - Links
+      operationId: ShortenLongUrl
+      parameters:
+        - name: originalUrl
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: expiresAt
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: isPublic
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/get:
+    get:
+      tags:
+        - Links
+      operationId: GetShortUrls
+      parameters:
+        - name: page
+          in: query
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+        - name: limit
+          in: query
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+        - name: categoryId
+          in: query
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/remove:
+    post:
+      tags:
+        - Links
+      operationId: RemoveShortUrl
+      parameters:
+        - name: linkId
+          in: query
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/{id}/stats:
+    get:
+      tags:
+        - Links
+      operationId: GetLinkStats
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/{id}/activity:
+    get:
+      tags:
+        - Links
+      operationId: GetLinkActivity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/favourites:
+    get:
+      tags:
+        - Links
+      operationId: GetFavourites
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/favourite:
+    post:
+      tags:
+        - Links
+      operationId: AddFavouriteLink
+      parameters:
+        - name: linkId
+          in: query
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/unfavourite:
+    post:
+      tags:
+        - Links
+      operationId: RemoveFavouriteLink
+      parameters:
+        - name: linkId
+          in: query
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/categories:
+    get:
+      tags:
+        - Links
+      operationId: GetCategories
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/category:
+    post:
+      tags:
+        - Links
+      operationId: AddCategory
+      parameters:
+        - name: categoryName
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/category/{id}:
+    delete:
+      tags:
+        - Links
+      operationId: DeleteCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+  /api/links/{id}/category:
+    put:
+      tags:
+        - Links
+      operationId: AssignCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type: integer
+            format: int32
+        - name: categoryId
+          in: query
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+      security:
+        - {}
+components:
+  schemas:
+    AccessTokenResponse:
+      required:
+        - accessToken
+        - expiresIn
+        - refreshToken
+      type: object
+      properties:
+        tokenType:
+          type:
+            - "null"
+            - string
+        accessToken:
+          type: string
+        expiresIn:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - integer
+            - string
+          format: int64
+        refreshToken:
+          type: string
+    ForgotPasswordRequest:
+      required:
+        - email
+      type: object
+      properties:
+        email:
+          type: string
+    HttpValidationProblemDetails:
+      type: object
+      properties:
+        type:
+          type:
+            - "null"
+            - string
+        title:
+          type:
+            - "null"
+            - string
+        status:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - "null"
+            - integer
+            - string
+          format: int32
+        detail:
+          type:
+            - "null"
+            - string
+        instance:
+          type:
+            - "null"
+            - string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    InfoRequest:
+      type: object
+      properties:
+        newEmail:
+          type:
+            - "null"
+            - string
+        newPassword:
+          type:
+            - "null"
+            - string
+        oldPassword:
+          type:
+            - "null"
+            - string
+    InfoResponse:
+      required:
+        - email
+        - isEmailConfirmed
+      type: object
+      properties:
+        email:
+          type: string
+        isEmailConfirmed:
+          type: boolean
+    LoginRequest:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        twoFactorCode:
+          type:
+            - "null"
+            - string
+        twoFactorRecoveryCode:
+          type:
+            - "null"
+            - string
+    RefreshRequest:
+      required:
+        - refreshToken
+      type: object
+      properties:
+        refreshToken:
+          type: string
+    RegisterRequest:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    ResendConfirmationEmailRequest:
+      required:
+        - email
+      type: object
+      properties:
+        email:
+          type: string
+    ResetPasswordRequest:
+      required:
+        - email
+        - resetCode
+        - newPassword
+      type: object
+      properties:
+        email:
+          type: string
+        resetCode:
+          type: string
+        newPassword:
+          type: string
+    TwoFactorRequest:
+      type: object
+      properties:
+        enable:
+          type:
+            - "null"
+            - boolean
+        twoFactorCode:
+          type:
+            - "null"
+            - string
+        resetSharedKey:
+          type: boolean
+        resetRecoveryCodes:
+          type: boolean
+        forgetMachine:
+          type: boolean
+    TwoFactorResponse:
+      required:
+        - sharedKey
+        - recoveryCodesLeft
+        - isTwoFactorEnabled
+        - isMachineRemembered
+      type: object
+      properties:
+        sharedKey:
+          type: string
+        recoveryCodesLeft:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - integer
+            - string
+          format: int32
+        recoveryCodes:
+          type:
+            - "null"
+            - array
+          items:
+            type: string
+        isTwoFactorEnabled:
+          type: boolean
+        isMachineRemembered:
+          type: boolean
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+  - name: Links
+  - name: Authentication

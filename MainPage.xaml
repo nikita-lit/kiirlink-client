@@ -55,6 +55,7 @@
                 </Border>
 
                 <Button
+                    x:Name="ContinueButton"
                     Clicked="OnContinueClicked"
                     Style="{StaticResource PrimaryButton}"
                     Text="CONTINUE" />

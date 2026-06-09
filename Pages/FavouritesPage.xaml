@@ -4,13 +4,14 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
+    xmlns:models="clr-namespace:KiirLink.Models"
     Title="Favourites">
 
     <Grid RowDefinitions="*,Auto">
         <Grid
             Grid.Row="0"
             Padding="24,8,24,10"
-            RowDefinitions="Auto,Auto,Auto,*,Auto"
+            RowDefinitions="Auto,Auto,Auto,*"
             RowSpacing="12">
             <controls:AppHeader Grid.Row="0" />
 
@@ -30,7 +31,11 @@
                             WidthRequest="35" />
                     </Border>
                     <VerticalStackLayout Spacing="-3" VerticalOptions="Center">
-                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="30" Text="5" />
+                        <Label
+                            x:Name="FavCountLabel"
+                            FontFamily="RadioCanadaBigSemiBold"
+                            FontSize="30"
+                            Text="0" />
                         <Label FontFamily="RadioCanadaBigSemiBold" FontSize="11" Text="favourites" TextColor="{StaticResource BrandText}" />
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
@@ -41,26 +46,39 @@
                 Style="{StaticResource SectionTitle}"
                 Text="My favourites" />
 
-            <Grid
+            <CollectionView
+                x:Name="FavouritesCollection"
                 Grid.Row="3"
-                RowDefinitions="*,*,*,*,*"
-                RowSpacing="5">
-                <controls:LinkCard Grid.Row="0" CardTapped="OnLinkCardTapped" IsFavourite="True" />
-                <controls:LinkCard Grid.Row="1" CardTapped="OnLinkCardTapped" IsFavourite="True" />
-                <controls:LinkCard Grid.Row="2" CardTapped="OnLinkCardTapped" IsFavourite="True" />
-                <controls:LinkCard Grid.Row="3" CardTapped="OnLinkCardTapped" IsFavourite="True" />
-                <controls:LinkCard Grid.Row="4" CardTapped="OnLinkCardTapped" IsFavourite="True" />
-            </Grid>
-
-            <Button
-                Grid.Row="4"
-                Margin="0,4,0,2"
-                BackgroundColor="{StaticResource SoftOrange}"
-                BorderColor="{StaticResource BrandOrange}"
-                HorizontalOptions="Center"
-                Style="{StaticResource ChipButton}"
-                Text="1"
-                TextColor="{StaticResource BrandOrange}" />
+                ItemsSource="{Binding Favourites}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:LinkModel">
+                        <controls:LinkCard
+                            CardTapped="OnLinkCardTapped"
+                            CopyRequested="OnLinkCopyRequested"
+                            AnalyticsRequested="OnLinkAnalyticsRequested"
+                            FavouriteToggleRequested="OnLinkFavouriteToggleRequested"
+                            DeleteRequested="OnLinkDeleteRequested"
+                            Category="{Binding CategoryName}"
+                            Date="{Binding DisplayDate}"
+                            IsFavourite="True"
+                            LinkId="{Binding ResolvedId}"
+                            ShortUrl="{Binding ShortUrl}"
+                            Title="{Binding DisplayTitle}"
+                            Url="{Binding OriginalUrl}"
+                            Views="{Binding DisplayViews}" />
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.EmptyView>
+                    <Label
+                        Margin="0,24"
+                        HorizontalTextAlignment="Center"
+                        Style="{StaticResource MutedLabel}"
+                        Text="No favourites yet." />
+                </CollectionView.EmptyView>
+            </CollectionView>
         </Grid>
 
         <controls:BottomNavigation Grid.Row="1" ActiveTab="Favourites" />

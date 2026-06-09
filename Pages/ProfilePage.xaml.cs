@@ -1,10 +1,40 @@
+using KiirLink.Services;
+
 namespace KiirLink.Pages;
 
 public partial class ProfilePage : ContentPage
 {
-    public ProfilePage()
+    private readonly AuthService _authService;
+
+    public ProfilePage(AuthService authService)
     {
         InitializeComponent();
+        _authService = authService;
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await LoadProfileAsync();
+    }
+
+    private async Task LoadProfileAsync()
+    {
+        try
+        {
+            var info = await _authService.GetProfileAsync();
+            if (info is null) return;
+
+            // Populate labels with real data
+            ProfileEmailLabel.Text = info.Email;
+            ProfileNameLabel.Text = info.Email.Split('@')[0];  // use email prefix as display name
+            AccountUsernameLabel.Text = info.Email.Split('@')[0];
+            AccountEmailLabel.Text = info.Email;
+        }
+        catch
+        {
+            // non-critical — keep the placeholder text
+        }
     }
 
     private async void OnEditProfileClicked(object? sender, EventArgs e)
@@ -18,6 +48,7 @@ public partial class ProfilePage : ContentPage
 
         if (shouldLogout)
         {
+            _authService.Logout();
             await Shell.Current.GoToAsync("//Home");
         }
     }

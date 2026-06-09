@@ -9,13 +9,24 @@
         MinimumHeightRequest="70"
         Padding="14,10"
         Style="{StaticResource CardBorder}">
-        <Border.GestureRecognizers>
-            <TapGestureRecognizer Tapped="OnCardTapped" />
-        </Border.GestureRecognizers>
         <Grid
             ColumnDefinitions="64,*,Auto"
             RowDefinitions="22,20,22"
             VerticalOptions="Center">
+
+            <!-- Tap for menu on entire card -->
+            <BoxView
+                Grid.ColumnSpan="3"
+                Grid.RowSpan="3"
+                BackgroundColor="Transparent"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OnCardTapped" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <!-- Link Icon -->
             <Image
                 Grid.RowSpan="3"
                 HeightRequest="52"
@@ -24,17 +35,22 @@
                 VerticalOptions="Center"
                 WidthRequest="52" />
 
+            <!-- Title -->
             <Label
                 Grid.Column="1"
                 FontFamily="RadioCanadaBigSemiBold"
                 FontSize="14"
                 Text="{Binding Title, Source={x:Reference Root}}" />
+
+            <!-- URL -->
             <Label
                 Grid.Row="1"
                 Grid.Column="1"
                 FontSize="11"
                 Text="{Binding Url, Source={x:Reference Root}}"
                 TextColor="{StaticResource MutedText}" />
+
+            <!-- Stats -->
             <HorizontalStackLayout
                 Grid.Row="2"
                 Grid.Column="1"
@@ -50,6 +66,7 @@
                 </HorizontalStackLayout>
             </HorizontalStackLayout>
 
+            <!-- Category Badge or Favorite Badge -->
             <Border
                 x:Name="CategoryBadge"
                 Grid.Column="2"
@@ -66,15 +83,14 @@
 
             <Border
                 x:Name="FavouriteBadge"
-                Grid.Row="1"
-                Grid.RowSpan="2"
                 Grid.Column="2"
                 BackgroundColor="{StaticResource SoftRed}"
                 HeightRequest="38"
                 IsVisible="False"
+                Padding="0"
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 19"
-                VerticalOptions="Center"
+                VerticalOptions="Start"
                 WidthRequest="38">
                 <Image
                     HeightRequest="35"
@@ -84,6 +100,7 @@
                     WidthRequest="35" />
             </Border>
 
+            <!-- More Menu Icon -->
             <Image
                 x:Name="MoreIcon"
                 Grid.Row="1"
@@ -92,7 +109,11 @@
                 HeightRequest="20"
                 Source="more_vert.png"
                 VerticalOptions="Center"
-                WidthRequest="20" />
+                WidthRequest="20">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnMoreIconTapped" />
+                </Image.GestureRecognizers>
+            </Image>
         </Grid>
     </Border>
 

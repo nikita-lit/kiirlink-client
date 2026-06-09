@@ -28,8 +28,8 @@
                             Grid.Column="1"
                             Spacing="2"
                             VerticalOptions="Center">
-                            <Label FontFamily="RadioCanadaBigSemiBold" FontSize="16" Text="Markus Tamm" />
-                            <Label FontSize="11" Text="markustamm@mail.com" TextColor="{StaticResource MutedText}" />
+                            <Label x:Name="ProfileNameLabel" FontFamily="RadioCanadaBigSemiBold" FontSize="16" Text="Markus Tamm" />
+                            <Label x:Name="ProfileEmailLabel" FontSize="11" Text="markustamm@mail.com" TextColor="{StaticResource MutedText}" />
                             <Button
                                 Margin="0,3,0,0"
                                 Clicked="OnEditProfileClicked"
@@ -48,14 +48,14 @@
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
                             <Image HeightRequest="16" Source="userprofile.png" VerticalOptions="Center" WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Username" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="markustamm" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label x:Name="AccountUsernameLabel" Grid.Column="2" FontSize="10" Text="markustamm" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
                             <Image HeightRequest="16" Source="mail.png" VerticalOptions="Center" WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Email" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="markustamm@mail.com" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label x:Name="AccountEmailLabel" Grid.Column="2" FontSize="10" Text="markustamm@mail.com" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />

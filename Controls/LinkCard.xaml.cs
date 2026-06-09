@@ -25,6 +25,30 @@ public partial class LinkCard : ContentView
             false,
             propertyChanged: OnIsFavouriteChanged);
 
+    public static readonly BindableProperty LinkIdProperty =
+        BindableProperty.Create(nameof(LinkId), typeof(int), typeof(LinkCard), 0);
+
+    public static readonly BindableProperty ShortUrlProperty =
+        BindableProperty.Create(nameof(ShortUrl), typeof(string), typeof(LinkCard), "");
+
+    public bool IsFavourite
+    {
+        get => (bool)GetValue(IsFavouriteProperty);
+        set => SetValue(IsFavouriteProperty, value);
+    }
+
+    public int LinkId
+    {
+        get => (int)GetValue(LinkIdProperty);
+        set => SetValue(LinkIdProperty, value);
+    }
+
+    public string ShortUrl
+    {
+        get => (string)GetValue(ShortUrlProperty);
+        set => SetValue(ShortUrlProperty, value);
+    }
+
     public string Title
     {
         get => (string)GetValue(TitleProperty);
@@ -55,13 +79,11 @@ public partial class LinkCard : ContentView
         set => SetValue(DateProperty, value);
     }
 
-    public bool IsFavourite
-    {
-        get => (bool)GetValue(IsFavouriteProperty);
-        set => SetValue(IsFavouriteProperty, value);
-    }
-
     public event EventHandler<TappedEventArgs>? CardTapped;
+    public event EventHandler? CopyRequested;
+    public event EventHandler? AnalyticsRequested;
+    public event EventHandler? FavouriteToggleRequested;
+    public event EventHandler? DeleteRequested;
 
     public LinkCard()
     {
@@ -72,6 +94,11 @@ public partial class LinkCard : ContentView
     private void OnCardTapped(object? sender, TappedEventArgs e)
     {
         CardTapped?.Invoke(this, e);
+    }
+
+    private async void OnMoreIconTapped(object? sender, TappedEventArgs e)
+    {
+        await OnShowContextMenu(sender, e);
     }
 
     private static void OnIsFavouriteChanged(BindableObject bindable, object oldValue, object newValue)
@@ -89,5 +116,34 @@ public partial class LinkCard : ContentView
         CategoryBadge.IsVisible = !IsFavourite;
         MoreIcon.IsVisible = !IsFavourite;
         FavouriteBadge.IsVisible = IsFavourite;
+    }
+
+    private async Task OnShowContextMenu(object? sender, EventArgs e)
+    {
+        var action = await Shell.Current.CurrentPage?.DisplayActionSheet(
+            "Link Actions",
+            "Cancel",
+            null,
+            "Copy",
+            "View Analytics",
+            IsFavourite ? "Remove Favorite" : "Add to Favorites",
+            "Delete");
+
+        switch (action)
+        {
+            case "Copy":
+                CopyRequested?.Invoke(this, EventArgs.Empty);
+                break;
+            case "View Analytics":
+                AnalyticsRequested?.Invoke(this, EventArgs.Empty);
+                break;
+            case "Add to Favorites":
+            case "Remove Favorite":
+                FavouriteToggleRequested?.Invoke(this, EventArgs.Empty);
+                break;
+            case "Delete":
+                DeleteRequested?.Invoke(this, EventArgs.Empty);
+                break;
+        }
     }
 }
