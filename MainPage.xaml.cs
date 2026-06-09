@@ -1,23 +1,22 @@
-﻿namespace KiirLink;
+namespace KiirLink;
 
 public partial class MainPage : ContentPage
 {
-	int count = 0;
+    public MainPage()
+    {
+        InitializeComponent();
+    }
 
-	public MainPage()
-	{
-		InitializeComponent();
-	}
+    private async void OnContinueClicked(object? sender, EventArgs e)
+    {
+        var slug = CustomLinkEntry.Text?.Trim();
 
-	private void OnCounterClicked(object? sender, EventArgs e)
-	{
-		count++;
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            await DisplayAlertAsync("Add a custom link", "Enter the short name you want to use.", "OK");
+            return;
+        }
 
-		if (count == 1)
-			CounterBtn.Text = $"Clicked {count} time";
-		else
-			CounterBtn.Text = $"Clicked {count} times";
-
-		SemanticScreenReader.Announce(CounterBtn.Text);
-	}
+        await DisplayAlertAsync("Link ready", $"kiirlink.ee/{slug}", "Done");
+    }
 }

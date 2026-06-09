@@ -4,6 +4,17 @@
 <dict>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.companyname.kiirlink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kiirlink</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>

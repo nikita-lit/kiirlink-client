@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="KiirLink.Pages.AnalyticsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:KiirLink.Controls"
+    Title="Analytics">
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="24,8,24,18" Spacing="12">
+                <controls:AppHeader />
+
+                <controls:LinkCard
+                    Category="Work"
+                    Date="May 12, 2026"
+                    Title="www.kiirlink.ee/document"
+                    Views="230" />
+
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                    <Border Grid.Column="0" Padding="10" Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="-1">
+                            <Border
+                                BackgroundColor="{StaticResource SoftOrange}"
+                                HeightRequest="24"
+                                HorizontalOptions="Start"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="24">
+                                <Label
+                                    HorizontalTextAlignment="Center"
+                                    Text="⊙"
+                                    TextColor="{StaticResource BrandOrange}"
+                                    VerticalTextAlignment="Center" />
+                            </Border>
+                            <Label FontFamily="RadioCanadaBigSemiBold" FontSize="22" Text="230" />
+                            <Label Style="{StaticResource MutedLabel}" Text="views" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" Padding="10" Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="-1">
+                            <Border
+                                BackgroundColor="{StaticResource SoftOrange}"
+                                HeightRequest="24"
+                                HorizontalOptions="Start"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="24">
+                                <Label
+                                    HorizontalTextAlignment="Center"
+                                    Text="↗"
+                                    TextColor="{StaticResource BrandOrange}"
+                                    VerticalTextAlignment="Center" />
+                            </Border>
+                            <Label FontFamily="RadioCanadaBigSemiBold" FontSize="22" Text="120" />
+                            <Label Style="{StaticResource MutedLabel}" Text="clicks" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="2" Padding="10" Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="-1">
+                            <Border
+                                BackgroundColor="{StaticResource SoftOrange}"
+                                HeightRequest="24"
+                                HorizontalOptions="Start"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="24">
+                                <Label
+                                    HorizontalTextAlignment="Center"
+                                    Text="♥"
+                                    TextColor="{StaticResource BrandOrange}"
+                                    VerticalTextAlignment="Center" />
+                            </Border>
+                            <Label FontFamily="RadioCanadaBigSemiBold" FontSize="22" Text="3" />
+                            <Label Style="{StaticResource MutedLabel}" Text="favourites" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <Label Style="{StaticResource SectionTitle}" Text="Performance" />
+                <Border Padding="8" Style="{StaticResource CardBorder}">
+                    <GraphicsView x:Name="PerformanceChart" HeightRequest="132" />
+                </Border>
+
+                <Label Style="{StaticResource SectionTitle}" Text="Traffic sources" />
+                <Border Padding="12,10" Style="{StaticResource CardBorder}">
+                    <Grid ColumnDefinitions="62,*,38" RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
+                        <Label Grid.Row="0" FontSize="10" Text="Google" />
+                        <ProgressBar Grid.Row="0" Grid.Column="1" Progress="0.45" />
+                        <Label Grid.Row="0" Grid.Column="2" FontSize="10" HorizontalTextAlignment="End" Text="45%" />
+
+                        <Label Grid.Row="1" FontSize="10" Text="Direct" />
+                        <ProgressBar Grid.Row="1" Grid.Column="1" Progress="0.35" />
+                        <Label Grid.Row="1" Grid.Column="2" FontSize="10" HorizontalTextAlignment="End" Text="35%" />
+
+                        <Label Grid.Row="2" FontSize="10" Text="Social" />
+                        <ProgressBar Grid.Row="2" Grid.Column="1" Progress="0.20" />
+                        <Label Grid.Row="2" Grid.Column="2" FontSize="10" HorizontalTextAlignment="End" Text="20%" />
+                    </Grid>
+                </Border>
+
+                <Label Style="{StaticResource SectionTitle}" Text="Recent activity" />
+                <Border Padding="12,0" Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="0">
+                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="42">
+                            <Label Text="⊕" TextColor="{StaticResource BrandOrange}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="Viewed from Estonia" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" Style="{StaticResource MutedLabel}" Text="2 min ago" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="42">
+                            <Label Text="▯" TextColor="{StaticResource BrandOrange}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="Clicked from mobile" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" Style="{StaticResource MutedLabel}" Text="15 min ago" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="42">
+                            <Label Text="♥" TextColor="{StaticResource BrandOrange}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="Added to favourites" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" Style="{StaticResource MutedLabel}" Text="May 12, 2026" VerticalTextAlignment="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:BottomNavigation Grid.Row="1" ActiveTab="Links" />
+    </Grid>
+
+</ContentPage>

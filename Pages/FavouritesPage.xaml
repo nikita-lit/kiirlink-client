@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="KiirLink.Pages.FavouritesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:KiirLink.Controls"
+    Title="Favourites">
+
+    <Grid RowDefinitions="*,Auto">
+        <Grid
+            Grid.Row="0"
+            Padding="24,8,24,10"
+            RowDefinitions="Auto,Auto,Auto,*,Auto"
+            RowSpacing="12">
+            <controls:AppHeader Grid.Row="0" />
+
+            <Border Grid.Row="1" Padding="16,13" Style="{StaticResource CardBorder}">
+                <HorizontalStackLayout Spacing="14">
+                    <Border
+                        BackgroundColor="{StaticResource SoftRed}"
+                        HeightRequest="44"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 22"
+                        WidthRequest="44">
+                        <Image
+                            HeightRequest="35"
+                            HorizontalOptions="Center"
+                            Source="like.png"
+                            VerticalOptions="Center"
+                            WidthRequest="35" />
+                    </Border>
+                    <VerticalStackLayout Spacing="-3" VerticalOptions="Center">
+                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="30" Text="5" />
+                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="11" Text="favourites" TextColor="{StaticResource BrandText}" />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
+
+            <Label
+                Grid.Row="2"
+                Style="{StaticResource SectionTitle}"
+                Text="My favourites" />
+
+            <Grid
+                Grid.Row="3"
+                RowDefinitions="*,*,*,*,*"
+                RowSpacing="5">
+                <controls:LinkCard Grid.Row="0" CardTapped="OnLinkCardTapped" IsFavourite="True" />
+                <controls:LinkCard Grid.Row="1" CardTapped="OnLinkCardTapped" IsFavourite="True" />
+                <controls:LinkCard Grid.Row="2" CardTapped="OnLinkCardTapped" IsFavourite="True" />
+                <controls:LinkCard Grid.Row="3" CardTapped="OnLinkCardTapped" IsFavourite="True" />
+                <controls:LinkCard Grid.Row="4" CardTapped="OnLinkCardTapped" IsFavourite="True" />
+            </Grid>
+
+            <Button
+                Grid.Row="4"
+                Margin="0,4,0,2"
+                BackgroundColor="{StaticResource SoftOrange}"
+                BorderColor="{StaticResource BrandOrange}"
+                HorizontalOptions="Center"
+                Style="{StaticResource ChipButton}"
+                Text="1"
+                TextColor="{StaticResource BrandOrange}" />
+        </Grid>
+
+        <controls:BottomNavigation Grid.Row="1" ActiveTab="Favourites" />
+    </Grid>
+
+</ContentPage>

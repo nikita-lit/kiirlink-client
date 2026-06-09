@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="KiirLink.Controls.LinkCard"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Border
+        MinimumHeightRequest="70"
+        Padding="14,10"
+        Style="{StaticResource CardBorder}">
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnCardTapped" />
+        </Border.GestureRecognizers>
+        <Grid
+            ColumnDefinitions="64,*,Auto"
+            RowDefinitions="22,20,22"
+            VerticalOptions="Center">
+            <Image
+                Grid.RowSpan="3"
+                HeightRequest="52"
+                HorizontalOptions="Start"
+                Source="documenticon.png"
+                VerticalOptions="Center"
+                WidthRequest="52" />
+
+            <Label
+                Grid.Column="1"
+                FontFamily="RadioCanadaBigSemiBold"
+                FontSize="14"
+                Text="{Binding Title, Source={x:Reference Root}}" />
+            <Label
+                Grid.Row="1"
+                Grid.Column="1"
+                FontSize="11"
+                Text="{Binding Url, Source={x:Reference Root}}"
+                TextColor="{StaticResource MutedText}" />
+            <HorizontalStackLayout
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="8,0,0,0"
+                Spacing="15">
+                <HorizontalStackLayout Spacing="4">
+                    <Image HeightRequest="16" Source="bar_chart.png" WidthRequest="16" />
+                    <Label FontSize="10" Text="{Binding Views, Source={x:Reference Root}, StringFormat='{0} views'}" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="4">
+                    <Image HeightRequest="15" Source="calendar.png" WidthRequest="15" />
+                    <Label FontSize="10" Text="{Binding Date, Source={x:Reference Root}}" />
+                </HorizontalStackLayout>
+            </HorizontalStackLayout>
+
+            <Border
+                x:Name="CategoryBadge"
+                Grid.Column="2"
+                BackgroundColor="{StaticResource SoftGreen}"
+                Padding="7,2"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 8"
+                VerticalOptions="Start">
+                <Label
+                    FontSize="10"
+                    Text="{Binding Category, Source={x:Reference Root}}"
+                    TextColor="{StaticResource GreenText}" />
+            </Border>
+
+            <Border
+                x:Name="FavouriteBadge"
+                Grid.Row="1"
+                Grid.RowSpan="2"
+                Grid.Column="2"
+                BackgroundColor="{StaticResource SoftRed}"
+                HeightRequest="38"
+                IsVisible="False"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 19"
+                VerticalOptions="Center"
+                WidthRequest="38">
+                <Image
+                    HeightRequest="35"
+                    HorizontalOptions="Center"
+                    Source="like.png"
+                    VerticalOptions="Center"
+                    WidthRequest="35" />
+            </Border>
+
+            <Image
+                x:Name="MoreIcon"
+                Grid.Row="1"
+                Grid.RowSpan="2"
+                Grid.Column="2"
+                HeightRequest="20"
+                Source="more_vert.png"
+                VerticalOptions="Center"
+                WidthRequest="20" />
+        </Grid>
+    </Border>
+
+</ContentView>

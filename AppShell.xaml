@@ -4,11 +4,33 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:KiirLink"
+    xmlns:pages="clr-namespace:KiirLink.Pages"
+    FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False"
     Title="KiirLink">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar Shell.TabBarIsVisible="False">
+        <ShellContent
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="Home"
+            Title="Home" />
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:LinksPage}"
+            Route="Links"
+            Title="Links" />
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:FavouritesPage}"
+            Route="Favourites"
+            Title="Favourites" />
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:ProfilePage}"
+            Route="Profile"
+            Title="Profile" />
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:AnalyticsPage}"
+            Route="Analytics"
+            Title="Analytics" />
+    </TabBar>
 
 </Shell>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="KiirLink.Pages.ProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:KiirLink.Controls"
+    Title="Profile">
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <controls:AppHeader
+            Grid.Row="0"
+            Margin="24,8,24,0" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,8,24,14" Spacing="10">
+                <Border
+                    HeightRequest="100"
+                    Padding="16,10"
+                    Style="{StaticResource CardBorder}">
+                    <Grid ColumnDefinitions="76,*">
+                        <Image
+                            HeightRequest="70"
+                            HorizontalOptions="Start"
+                            Source="profile_apple.png"
+                            VerticalOptions="Center"
+                            WidthRequest="66" />
+                        <VerticalStackLayout
+                            Grid.Column="1"
+                            Spacing="2"
+                            VerticalOptions="Center">
+                            <Label FontFamily="RadioCanadaBigSemiBold" FontSize="16" Text="Markus Tamm" />
+                            <Label FontSize="11" Text="markustamm@mail.com" TextColor="{StaticResource MutedText}" />
+                            <Button
+                                Margin="0,3,0,0"
+                                Clicked="OnEditProfileClicked"
+                                HorizontalOptions="Start"
+                                MinimumHeightRequest="28"
+                                Padding="10,3"
+                                Style="{StaticResource OutlineButton}"
+                                Text="✎  Edit profile" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <Label Style="{StaticResource SectionTitle}" Text="Account" />
+                <Border Padding="12,0" Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="0">
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                            <Image HeightRequest="16" Source="userprofile.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Label Grid.Column="1" FontSize="11" Text="Username" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="markustamm" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                            <Image HeightRequest="16" Source="mail.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Label Grid.Column="1" FontSize="11" Text="Email" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="markustamm@mail.com" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <Grid ColumnDefinitions="26,*,14" HeightRequest="32">
+                            <Image HeightRequest="16" Source="lock.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Label Grid.Column="1" FontSize="11" Text="Change password" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Style="{StaticResource SectionTitle}" Text="Preferences" />
+                <Border Padding="12,0" Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="0">
+                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="32">
+                            <Image HeightRequest="16" Source="dark_mode.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Label Grid.Column="1" FontSize="11" Text="Dark mode" VerticalTextAlignment="Center" />
+                            <Switch Grid.Column="2" IsToggled="False" />
+                        </Grid>
+                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                            <Image HeightRequest="16" Source="language.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Label Grid.Column="1" FontSize="11" Text="Language" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="English" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="32">
+                            <Image HeightRequest="18" Source="leaderborad.png" VerticalOptions="Center" WidthRequest="18" />
+                            <Label Grid.Column="1" FontSize="11" Text="Analytics visibility" VerticalTextAlignment="Center" />
+                            <Switch Grid.Column="2" IsToggled="True" />
+                        </Grid>
+                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="32">
+                            <Image HeightRequest="16" Source="notifications.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Label Grid.Column="1" FontSize="11" Text="Notifications" VerticalTextAlignment="Center" />
+                            <Switch Grid.Column="2" IsToggled="True" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Style="{StaticResource SectionTitle}" Text="Link Settings" />
+                <Border Padding="12,0" Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="0">
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                            <Image HeightRequest="16" Source="folder.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Label Grid.Column="1" FontSize="11" Text="Default category" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="Work" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                            <Image HeightRequest="16" Source="clock.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Label Grid.Column="1" FontSize="11" Text="Auto-expiration" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="30 days" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                        </Grid>
+                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                            <Image HeightRequest="16" Source="lock.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Label Grid.Column="1" FontSize="11" Text="Privacy" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="Public" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Button
+            Grid.Row="2"
+            Margin="24,8,24,2"
+            Clicked="OnLogoutClicked"
+            ContentLayout="Left,7"
+            ImageSource="log_out.png"
+            MinimumHeightRequest="34"
+            Style="{StaticResource PrimaryButton}"
+            Text="Logout" />
+
+        <controls:BottomNavigation Grid.Row="3" ActiveTab="Profile" />
+    </Grid>
+
+</ContentPage>

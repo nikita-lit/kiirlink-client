@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="KiirLink.Controls.BottomNavigation"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Border
+        Margin="24,6,24,12"
+        Padding="8,4"
+        Style="{StaticResource CardBorder}">
+        <Grid ColumnDefinitions="*,*,*,*" HeightRequest="34">
+            <Grid Grid.Column="0">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnHomeTapped" />
+                </Grid.GestureRecognizers>
+                <Image
+                    x:Name="HomeIcon"
+                    HeightRequest="29"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    Source="hometab.png"
+                    VerticalOptions="Center"
+                    WidthRequest="29" />
+                <Button
+                    BackgroundColor="Transparent"
+                    Clicked="OnHomeClicked"
+                    Opacity="0.01" />
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLinksTapped" />
+                </Grid.GestureRecognizers>
+                <Image
+                    x:Name="LinksIcon"
+                    HeightRequest="29"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    Source="linkstab.png"
+                    VerticalOptions="Center"
+                    WidthRequest="29" />
+                <Button
+                    BackgroundColor="Transparent"
+                    Clicked="OnLinksClicked"
+                    Opacity="0.01" />
+            </Grid>
+
+            <Grid Grid.Column="2">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnFavouritesTapped" />
+                </Grid.GestureRecognizers>
+                <Image
+                    x:Name="FavouritesIcon"
+                    HeightRequest="29"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    Source="startab.png"
+                    VerticalOptions="Center"
+                    WidthRequest="29" />
+                <Button
+                    BackgroundColor="Transparent"
+                    Clicked="OnFavouritesClicked"
+                    Opacity="0.01" />
+            </Grid>
+
+            <Grid Grid.Column="3">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnProfileTapped" />
+                </Grid.GestureRecognizers>
+                <Image
+                    x:Name="ProfileIcon"
+                    HeightRequest="29"
+                    HorizontalOptions="Center"
+                    InputTransparent="True"
+                    Source="usertab.png"
+                    VerticalOptions="Center"
+                    WidthRequest="29" />
+                <Button
+                    BackgroundColor="Transparent"
+                    Clicked="OnProfileClicked"
+                    Opacity="0.01" />
+            </Grid>
+        </Grid>
+    </Border>
+
+</ContentView>
