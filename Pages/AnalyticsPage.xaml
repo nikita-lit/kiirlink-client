@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage
     x:Class="KiirLink.Pages.AnalyticsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -17,6 +18,8 @@
                     x:Name="TopLinkCard"
                     Category="—"
                     Date="—"
+                    CategoryRequested="OnTopLinkCategoryRequested"
+                    CategoryDeleteRequested="OnTopLinkCategoryDeleteRequested"
                     Title="—"
                     Views="—" />
 

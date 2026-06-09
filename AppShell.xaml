@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <Shell
     x:Class="KiirLink.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -8,7 +9,18 @@
     FlyoutBehavior="Disabled"
     Shell.NavBarIsVisible="False"
     Shell.TabBarIsVisible="False"
+    BackgroundColor="{StaticResource White}"
     Title="KiirLink">
+
+    <ShellContent
+        ContentTemplate="{DataTemplate pages:SignInPage}"
+        Route="SignIn"
+        Title="Sign in" />
+
+    <ShellContent
+        ContentTemplate="{DataTemplate pages:CreateAccountPage}"
+        Route="CreateAccount"
+        Title="Create account" />
 
     <TabBar Shell.TabBarIsVisible="False">
         <ShellContent

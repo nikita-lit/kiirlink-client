@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage
     x:Class="KiirLink.Pages.ProfilePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -28,8 +29,10 @@
                             Grid.Column="1"
                             Spacing="2"
                             VerticalOptions="Center">
-                            <Label x:Name="ProfileNameLabel" FontFamily="RadioCanadaBigSemiBold" FontSize="16" Text="Markus Tamm" />
-                            <Label x:Name="ProfileEmailLabel" FontSize="11" Text="markustamm@mail.com" TextColor="{StaticResource MutedText}" />
+                            <Label x:Name="ProfileNameLabel" FontFamily="RadioCanadaBigSemiBold" FontSize="16"
+                                   Text="Markus Tamm" />
+                            <Label x:Name="ProfileEmailLabel" FontSize="11" Text="markustamm@mail.com"
+                                   TextColor="{StaticResource MutedText}" />
                             <Button
                                 Margin="0,3,0,0"
                                 Clicked="OnEditProfileClicked"
@@ -46,23 +49,29 @@
                 <Border Padding="12,0" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
-                            <Image HeightRequest="16" Source="userprofile.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Image HeightRequest="16" Source="userprofile.png" VerticalOptions="Center"
+                                   WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Username" VerticalTextAlignment="Center" />
-                            <Label x:Name="AccountUsernameLabel" Grid.Column="2" FontSize="10" Text="markustamm" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label x:Name="AccountUsernameLabel" Grid.Column="2" FontSize="10" Text="markustamm"
+                                   TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
                             <Image HeightRequest="16" Source="mail.png" VerticalOptions="Center" WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Email" VerticalTextAlignment="Center" />
-                            <Label x:Name="AccountEmailLabel" Grid.Column="2" FontSize="10" Text="markustamm@mail.com" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label x:Name="AccountEmailLabel" Grid.Column="2" FontSize="10" Text="markustamm@mail.com"
+                                   TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,14" HeightRequest="32">
                             <Image HeightRequest="16" Source="lock.png" VerticalOptions="Center" WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Change password" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" Text="›" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
                         </Grid>
                     </VerticalStackLayout>
                 </Border>
@@ -79,18 +88,23 @@
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
                             <Image HeightRequest="16" Source="language.png" VerticalOptions="Center" WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Language" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="English" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="English" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto" HeightRequest="32">
-                            <Image HeightRequest="18" Source="leaderborad.png" VerticalOptions="Center" WidthRequest="18" />
-                            <Label Grid.Column="1" FontSize="11" Text="Analytics visibility" VerticalTextAlignment="Center" />
+                            <Image HeightRequest="18" Source="leaderborad.png" VerticalOptions="Center"
+                                   WidthRequest="18" />
+                            <Label Grid.Column="1" FontSize="11" Text="Analytics visibility"
+                                   VerticalTextAlignment="Center" />
                             <Switch Grid.Column="2" IsToggled="True" />
                         </Grid>
                         <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto" HeightRequest="32">
-                            <Image HeightRequest="16" Source="notifications.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Image HeightRequest="16" Source="notifications.png" VerticalOptions="Center"
+                                   WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Notifications" VerticalTextAlignment="Center" />
                             <Switch Grid.Column="2" IsToggled="True" />
                         </Grid>
@@ -103,22 +117,28 @@
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
                             <Image HeightRequest="16" Source="folder.png" VerticalOptions="Center" WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Default category" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="Work" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="Work" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
                             <Image HeightRequest="16" Source="clock.png" VerticalOptions="Center" WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Auto-expiration" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="30 days" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="30 days" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
                             <Image HeightRequest="16" Source="lock.png" VerticalOptions="Center" WidthRequest="16" />
                             <Label Grid.Column="1" FontSize="11" Text="Privacy" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="Public" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="Public" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
+                                   VerticalTextAlignment="Center" />
                         </Grid>
                     </VerticalStackLayout>
                 </Border>

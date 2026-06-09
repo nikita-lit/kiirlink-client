@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage
     x:Class="KiirLink.Pages.LinksPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -15,10 +16,15 @@
             RowSpacing="12">
             <controls:AppHeader Grid.Row="0" />
 
-            <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                 <Label Style="{StaticResource SectionTitle}" Text="Popular link" VerticalTextAlignment="Center" />
                 <Button
                     Grid.Column="1"
+                    Clicked="OnManageCategoriesClicked"
+                    Style="{StaticResource OutlineButton}"
+                    Text="Categories" />
+                <Button
+                    Grid.Column="2"
                     Clicked="OnNewLinkClicked"
                     ContentLayout="Left,6"
                     ImageSource="plus.png"
@@ -46,7 +52,8 @@
                             FontFamily="RadioCanadaBigSemiBold"
                             FontSize="31"
                             Text="0" />
-                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="9" Text="views" VerticalTextAlignment="End" />
+                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="9" Text="views"
+                               VerticalTextAlignment="End" />
                     </HorizontalStackLayout>
                     <Label x:Name="PopularTitle" Grid.Row="1" Style="{StaticResource CardTitle}" Text="" />
                     <Label x:Name="PopularUrl" Grid.Row="2" Style="{StaticResource MutedLabel}" Text="" />
@@ -103,9 +110,10 @@
                     <DataTemplate x:DataType="models:LinkModel">
                         <controls:LinkCard
                             CardTapped="OnLinkCardTapped"
-                            CopyRequested="OnLinkCopyRequested"
                             AnalyticsRequested="OnLinkAnalyticsRequested"
                             FavouriteToggleRequested="OnLinkFavouriteToggleRequested"
+                            CategoryRequested="OnLinkCategoryRequested"
+                            CategoryDeleteRequested="OnLinkCategoryDeleteRequested"
                             DeleteRequested="OnLinkDeleteRequested"
                             Category="{Binding CategoryName}"
                             Date="{Binding DisplayDate}"

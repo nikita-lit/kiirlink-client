@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage
     x:Class="KiirLink.Pages.FavouritesPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -36,7 +37,8 @@
                             FontFamily="RadioCanadaBigSemiBold"
                             FontSize="30"
                             Text="0" />
-                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="11" Text="favourites" TextColor="{StaticResource BrandText}" />
+                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="11" Text="favourites"
+                               TextColor="{StaticResource BrandText}" />
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
             </Border>
@@ -57,8 +59,9 @@
                     <DataTemplate x:DataType="models:LinkModel">
                         <controls:LinkCard
                             CardTapped="OnLinkCardTapped"
-                            CopyRequested="OnLinkCopyRequested"
                             AnalyticsRequested="OnLinkAnalyticsRequested"
+                            CategoryRequested="OnLinkCategoryRequested"
+                            CategoryDeleteRequested="OnLinkCategoryDeleteRequested"
                             FavouriteToggleRequested="OnLinkFavouriteToggleRequested"
                             DeleteRequested="OnLinkDeleteRequested"
                             Category="{Binding CategoryName}"

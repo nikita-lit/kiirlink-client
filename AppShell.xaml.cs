@@ -1,9 +1,43 @@
-﻿namespace KiirLink;
+using KiirLink.Services;
+
+namespace KiirLink;
 
 public partial class AppShell : Shell
 {
-	public AppShell()
-	{
-		InitializeComponent();
-	}
+    private bool _redirectingToSignIn;
+
+    public AppShell()
+    {
+        InitializeComponent();
+        Navigating += OnNavigating;
+    }
+
+    private async void OnNavigating( object? sender, ShellNavigatingEventArgs e )
+    {
+        var target = e.Target.Location.OriginalString;
+        if ( target.Contains( "SignIn", StringComparison.OrdinalIgnoreCase ) ||
+             target.Contains( "CreateAccount", StringComparison.OrdinalIgnoreCase ) )
+            return;
+
+        if ( await ApiClient.HasStoredTokensAsync() )
+            return;
+
+        if ( _redirectingToSignIn )
+            return;
+
+        _redirectingToSignIn = true;
+        e.Cancel();
+
+        Dispatcher.Dispatch( async () =>
+        {
+            try
+            {
+                await GoToAsync( "//SignIn" );
+            }
+            finally
+            {
+                _redirectingToSignIn = false;
+            }
+        } );
+    }
 }

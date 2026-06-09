@@ -20,7 +20,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/auth/register:
     post:
       tags:
@@ -41,7 +41,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/HttpValidationProblemDetails"
       security:
-        - {}
+        - { }
   /api/auth/login:
     post:
       tags:
@@ -69,7 +69,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/AccessTokenResponse"
       security:
-        - {}
+        - { }
   /api/auth/refresh:
     post:
       tags:
@@ -88,7 +88,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/AccessTokenResponse"
       security:
-        - {}
+        - { }
   /api/auth/confirmEmail:
     get:
       tags:
@@ -113,7 +113,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/auth/resendConfirmationEmail:
     post:
       tags:
@@ -128,7 +128,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/auth/forgotPassword:
     post:
       tags:
@@ -149,7 +149,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/HttpValidationProblemDetails"
       security:
-        - {}
+        - { }
   /api/auth/resetPassword:
     post:
       tags:
@@ -170,7 +170,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/HttpValidationProblemDetails"
       security:
-        - {}
+        - { }
   /api/auth/manage/2fa:
     post:
       tags:
@@ -197,7 +197,7 @@ paths:
         "404":
           description: Not Found
       security:
-        - {}
+        - { }
   /api/auth/manage/info:
     get:
       tags:
@@ -218,7 +218,7 @@ paths:
         "404":
           description: Not Found
       security:
-        - {}
+        - { }
     post:
       tags:
         - Authentication
@@ -244,7 +244,7 @@ paths:
         "404":
           description: Not Found
       security:
-        - {}
+        - { }
   /api/links/shorten:
     post:
       tags:
@@ -269,7 +269,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/get:
     get:
       tags:
@@ -304,7 +304,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/remove:
     post:
       tags:
@@ -324,7 +324,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/{id}/stats:
     get:
       tags:
@@ -342,7 +342,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/{id}/activity:
     get:
       tags:
@@ -360,7 +360,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/favourites:
     get:
       tags:
@@ -370,7 +370,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/favourite:
     post:
       tags:
@@ -390,7 +390,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/unfavourite:
     post:
       tags:
@@ -410,7 +410,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/categories:
     get:
       tags:
@@ -420,7 +420,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/category:
     post:
       tags:
@@ -436,7 +436,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/category/{id}:
     delete:
       tags:
@@ -454,7 +454,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
   /api/links/{id}/category:
     put:
       tags:
@@ -480,7 +480,7 @@ paths:
         "200":
           description: OK
       security:
-        - {}
+        - { }
 components:
   schemas:
     AccessTokenResponse:

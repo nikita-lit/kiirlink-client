@@ -1,6 +1,10 @@
 <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="4.80615" y="4.80621" width="7.2093" height="7.2093" rx="1.20155" stroke="#C4C4C4" stroke-width="2.4031" stroke-linejoin="round"/>
-<rect x="4.80615" y="16.8217" width="7.2093" height="7.2093" rx="1.20155" stroke="#C4C4C4" stroke-width="2.4031" stroke-linejoin="round"/>
-<rect x="16.8217" y="16.8217" width="7.2093" height="7.2093" rx="1.20155" stroke="#C4C4C4" stroke-width="2.4031" stroke-linejoin="round"/>
-<rect x="16.8217" y="4.80621" width="7.2093" height="7.2093" rx="1.20155" stroke="#C4C4C4" stroke-width="2.4031" stroke-linejoin="round"/>
+    <rect x="4.80615" y="4.80621" width="7.2093" height="7.2093" rx="1.20155" stroke="#C4C4C4" stroke-width="2.4031"
+          stroke-linejoin="round"/>
+    <rect x="4.80615" y="16.8217" width="7.2093" height="7.2093" rx="1.20155" stroke="#C4C4C4" stroke-width="2.4031"
+          stroke-linejoin="round"/>
+    <rect x="16.8217" y="16.8217" width="7.2093" height="7.2093" rx="1.20155" stroke="#C4C4C4" stroke-width="2.4031"
+          stroke-linejoin="round"/>
+    <rect x="16.8217" y="4.80621" width="7.2093" height="7.2093" rx="1.20155" stroke="#C4C4C4" stroke-width="2.4031"
+          stroke-linejoin="round"/>
 </svg>

@@ -1,9 +1,6 @@
 <Project>
-	<PropertyGroup>
-		<BaseIntermediateOutputPath>$(HOME)/Library/Caches/KiirLink/obj/</BaseIntermediateOutputPath>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="$([System.String]::Copy('$(TargetFramework)').Contains('-ios')) Or $([System.String]::Copy('$(TargetFramework)').Contains('-maccatalyst'))">
-		<BaseOutputPath>$(HOME)/Library/Caches/KiirLink/bin/</BaseOutputPath>
-	</PropertyGroup>
+    <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
+        <BaseIntermediateOutputPath>$(HOME)/Library/Caches/KiirLink/obj/</BaseIntermediateOutputPath>
+        <BaseOutputPath>$(HOME)/Library/Caches/KiirLink/bin/</BaseOutputPath>
+    </PropertyGroup>
 </Project>

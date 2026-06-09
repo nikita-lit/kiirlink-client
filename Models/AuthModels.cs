@@ -4,48 +4,38 @@ namespace KiirLink.Models;
 
 public class LoginRequest
 {
-    [JsonPropertyName("email")]
-    public string Email { get; set; } = string.Empty;
+    [JsonPropertyName( "email" )] public string Email { get; set; } = string.Empty;
 
-    [JsonPropertyName("password")]
-    public string Password { get; set; } = string.Empty;
+    [JsonPropertyName( "password" )] public string Password { get; set; } = string.Empty;
 }
 
 public class RegisterRequest
 {
-    [JsonPropertyName("email")]
-    public string Email { get; set; } = string.Empty;
+    [JsonPropertyName( "email" )] public string Email { get; set; } = string.Empty;
 
-    [JsonPropertyName("password")]
-    public string Password { get; set; } = string.Empty;
+    [JsonPropertyName( "password" )] public string Password { get; set; } = string.Empty;
 }
 
 public class AccessTokenResponse
 {
-    [JsonPropertyName("tokenType")]
-    public string? TokenType { get; set; }
+    [JsonPropertyName( "tokenType" )] public string? TokenType { get; set; }
 
-    [JsonPropertyName("accessToken")]
-    public string AccessToken { get; set; } = string.Empty;
+    [JsonPropertyName( "accessToken" )] public string AccessToken { get; set; } = string.Empty;
 
-    [JsonPropertyName("expiresIn")]
-    public long ExpiresIn { get; set; }
+    [JsonPropertyName( "expiresIn" )] public long ExpiresIn { get; set; }
 
-    [JsonPropertyName("refreshToken")]
-    public string RefreshToken { get; set; } = string.Empty;
+    [JsonPropertyName( "refreshToken" )] public string RefreshToken { get; set; } = string.Empty;
 }
 
 public class RefreshRequest
 {
-    [JsonPropertyName("refreshToken")]
-    public string RefreshToken { get; set; } = string.Empty;
+    [JsonPropertyName( "refreshToken" )] public string RefreshToken { get; set; } = string.Empty;
 }
 
 public class InfoResponse
 {
-    [JsonPropertyName("email")]
-    public string Email { get; set; } = string.Empty;
+    [JsonPropertyName( "email" )] public string Email { get; set; } = string.Empty;
 
-    [JsonPropertyName("isEmailConfirmed")]
+    [JsonPropertyName( "isEmailConfirmed" )]
     public bool IsEmailConfirmed { get; set; }
 }

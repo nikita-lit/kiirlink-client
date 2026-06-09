@@ -4,7 +4,7 @@ using KiirLink.Services;
 
 namespace KiirLink.Pages;
 
-public partial class LinksPage : ContentPage
+public partial class LinksPage
 {
     private readonly LinkService _linkService;
 
@@ -13,11 +13,12 @@ public partial class LinksPage : ContentPage
     private const int PageSize = 10;
     private int? _selectedCategoryId;
     private int _selectedLinkId;
+    private int _totalLinkCount;
 
     public ObservableCollection<LinkModel> Links { get; } = [];
     public ObservableCollection<CategoryModel> Categories { get; } = [];
 
-    public LinksPage(LinkService linkService)
+    public LinksPage( LinkService linkService )
     {
         InitializeComponent();
         _linkService = linkService;
@@ -42,13 +43,13 @@ public partial class LinksPage : ContentPage
 
             // Keep "All" button, remove old category chips
             var layout = AllFilter.Parent as HorizontalStackLayout;
-            if (layout is not null)
+            if ( layout is not null )
             {
                 // Remove all chips after AllFilter
-                while (layout.Children.Count > 1)
-                    layout.Children.RemoveAt(1);
+                while ( layout.Children.Count > 1 )
+                    layout.Children.RemoveAt( 1 );
 
-                foreach (var cat in categories)
+                foreach ( var cat in categories )
                 {
                     var chip = new Button
                     {
@@ -57,12 +58,12 @@ public partial class LinksPage : ContentPage
                         Style = (Style)Application.Current!.Resources["ChipButton"]
                     };
                     chip.Clicked += OnFilterClicked;
-                    layout.Children.Add(chip);
+                    layout.Children.Add( chip );
                 }
             }
 
             Categories.Clear();
-            foreach (var c in categories) Categories.Add(c);
+            foreach ( var c in categories ) Categories.Add( c );
         }
         catch
         {
@@ -74,30 +75,32 @@ public partial class LinksPage : ContentPage
     {
         try
         {
-            var links = await _linkService.GetLinksAsync(_currentPage, PageSize, _selectedCategoryId);
+            var page = await _linkService.GetLinksPageAsync( _currentPage, PageSize, _selectedCategoryId );
+            var links = page.Items;
 
             Links.Clear();
-            foreach (var link in links) Links.Add(link);
+            foreach ( var link in links ) Links.Add( link );
 
-            UpdatePopularCard(links);
-            UpdatePagination(links.Count);
+            UpdatePopularCard( links );
+            _totalLinkCount = page.TotalCount;
+            UpdatePagination( _totalLinkCount );
         }
-        catch (Exception ex)
+        catch ( Exception ex )
         {
-            await DisplayAlertAsync("Error", $"Could not load links: {ex.Message}", "OK");
+            await DisplayAlertAsync( "Error", $"Could not load links: {ex.Message}", "OK" );
         }
     }
 
-    private void UpdatePopularCard(List<LinkModel> links)
+    private void UpdatePopularCard( List<LinkModel> links )
     {
-        if (links.Count == 0)
+        if ( links.Count == 0 )
         {
             PopularCard.IsVisible = false;
             PopularCardEmpty.IsVisible = true;
             return;
         }
 
-        var top = links.MaxBy(l => l.Views)!;
+        var top = links.MaxBy( l => l.Views )!;
         _selectedLinkId = top.Id;
 
         PopularViews.Text = top.DisplayViews;
@@ -110,29 +113,29 @@ public partial class LinksPage : ContentPage
         PopularCardEmpty.IsVisible = false;
     }
 
-    private void UpdatePagination(int loadedCount)
+    private void UpdatePagination( int totalCount )
     {
         PaginationRow.Children.Clear();
 
         // Show prev page if not on first
-        if (_currentPage > 1)
+        if ( _currentPage > 1 )
         {
-            var prev = MakePageButton("‹", _currentPage - 1, false);
-            PaginationRow.Children.Add(prev);
+            var prev = MakePageButton( "‹", _currentPage - 1, false );
+            PaginationRow.Children.Add( prev );
         }
 
-        var current = MakePageButton(_currentPage.ToString(), _currentPage, true);
-        PaginationRow.Children.Add(current);
+        var current = MakePageButton( _currentPage.ToString(), _currentPage, true );
+        PaginationRow.Children.Add( current );
 
-        // Show next only if a full page was loaded (more may exist)
-        if (loadedCount >= PageSize)
+        // Show next only if more items exist after this page.
+        if ( _currentPage * PageSize < totalCount )
         {
-            var next = MakePageButton("›", _currentPage + 1, false);
-            PaginationRow.Children.Add(next);
+            var next = MakePageButton( "›", _currentPage + 1, false );
+            PaginationRow.Children.Add( next );
         }
     }
 
-    private Button MakePageButton(string text, int page, bool active)
+    private Button MakePageButton( string text, int page, bool active )
     {
         var btn = new Button
         {
@@ -140,14 +143,14 @@ public partial class LinksPage : ContentPage
             Style = (Style)Application.Current!.Resources["ChipButton"]
         };
 
-        if (active)
+        if ( active )
         {
             btn.BackgroundColor = (Color)Application.Current.Resources["SoftOrange"];
             btn.TextColor = (Color)Application.Current.Resources["BrandOrange"];
             btn.BorderColor = (Color)Application.Current.Resources["BrandOrange"];
         }
 
-        btn.Clicked += async (_, _) =>
+        btn.Clicked += async ( _, _ ) =>
         {
             _currentPage = page;
             await LoadLinksAsync();
@@ -158,14 +161,29 @@ public partial class LinksPage : ContentPage
 
     // ── Event handlers ───────────────────────────────────────────────────────
 
-    private async void OnNewLinkClicked(object? sender, EventArgs e)
+    private async void OnNewLinkClicked( object? sender, EventArgs e )
     {
-        await Shell.Current.GoToAsync("//Home");
+        await Shell.Current.GoToAsync( "//Home" );
     }
 
-    private async Task NavigateToAnalyticsAsync(LinkModel? link = null, int? fallbackLinkId = null)
+    private async void OnManageCategoriesClicked( object? sender, EventArgs e )
     {
-        if (link is not null)
+        var action =
+            await DisplayActionSheetAsync( "Categories", "Cancel", null, "Create category", "Delete category" );
+        switch ( action )
+        {
+            case "Create category":
+                await CreateCategoryAsync();
+                break;
+            case "Delete category":
+                await DeleteCategoryAsync();
+                break;
+        }
+    }
+
+    private async Task NavigateToAnalyticsAsync( LinkModel? link = null, int? fallbackLinkId = null )
+    {
+        if ( link is not null )
         {
             _selectedLinkId = link.Id;
             AnalyticsPage.SelectedLinkId = link.Id;
@@ -176,132 +194,269 @@ public partial class LinksPage : ContentPage
             var id = fallbackLinkId ?? _selectedLinkId;
             _selectedLinkId = id;
             AnalyticsPage.SelectedLinkId = id;
-            AnalyticsPage.SelectedLink = Links.FirstOrDefault(l => l.Id == id);
+            AnalyticsPage.SelectedLink = Links.FirstOrDefault( l => l.Id == id );
         }
 
-        await Shell.Current.GoToAsync("//Analytics");
+        await Shell.Current.GoToAsync( "//Analytics" );
     }
 
-    private async void OnAnalyticsTapped(object? sender, TappedEventArgs e)
+    private async void OnAnalyticsTapped( object? sender, TappedEventArgs e )
     {
-        await NavigateToAnalyticsAsync(Links.FirstOrDefault(l => l.Id == _selectedLinkId));
+        await NavigateToAnalyticsAsync( Links.FirstOrDefault( l => l.Id == _selectedLinkId ) );
     }
 
-    private async void OnLinkCardTapped(object? sender, TappedEventArgs e)
+    private async void OnLinkCardTapped( object? sender, TappedEventArgs e )
     {
-        if (sender is Controls.LinkCard card)
-            await NavigateToAnalyticsAsync(Links.FirstOrDefault(l => l.Id == card.LinkId), card.LinkId);
+        if ( sender is Controls.LinkCard card )
+            await NavigateToAnalyticsAsync( Links.FirstOrDefault( l => l.Id == card.LinkId ), card.LinkId );
         else
             await NavigateToAnalyticsAsync();
     }
 
-    private async void OnLinkCopyRequested(object? sender, EventArgs e)
+    private async void OnLinkAnalyticsRequested( object? sender, EventArgs e )
     {
-        if (sender is not Controls.LinkCard card) return;
+        if ( sender is not Controls.LinkCard card ) return;
+
+        await NavigateToAnalyticsAsync( Links.FirstOrDefault( l => l.Id == card.LinkId ), card.LinkId );
+    }
+
+    private async void OnLinkCategoryRequested( object? sender, EventArgs e )
+    {
+        if ( sender is not Controls.LinkCard card ) return;
+
+        var link = Links.FirstOrDefault( l => l.Id == card.LinkId );
+        if ( link is null ) return;
+
+        var category = await PromptAssignExistingCategoryAsync( link.Id );
+        if ( category is null )
+            return;
+
+        link.CategoryId = category.Id;
+        link.CategoryName = category.Name;
+        await LoadCategoriesAsync();
+        await LoadLinksAsync();
+    }
+
+    private async void OnLinkCategoryDeleteRequested( object? sender, EventArgs e )
+    {
+        if ( sender is not Controls.LinkCard card ) return;
+
+        var link = Links.FirstOrDefault( l => l.Id == card.LinkId );
+        if ( link is null || link.CategoryId is null )
+        {
+            await DisplayAlertAsync( "No category", "This link does not have a category to delete.", "OK" );
+            return;
+        }
+
+        var confirm = await DisplayAlertAsync(
+            "Delete category",
+            $"Delete '{link.CategoryName}'? This removes the category from the server.",
+            "Delete",
+            "Cancel" );
+
+        if ( !confirm )
+            return;
+
+        var success = await _linkService.DeleteCategoryAsync( link.CategoryId.Value );
+        if ( !success )
+        {
+            await DisplayAlertAsync( "Error", "Could not delete the category.", "OK" );
+            return;
+        }
+
+        link.CategoryId = null;
+        link.CategoryName = null;
+        await DisplayAlertAsync( "Deleted", "Category has been deleted.", "OK" );
+        await LoadCategoriesAsync();
+        await LoadLinksAsync();
+    }
+
+    private async void OnLinkFavouriteToggleRequested( object? sender, EventArgs e )
+    {
+        if ( sender is not Controls.LinkCard card ) return;
 
         try
         {
-            var fullUrl = $"kiirlink.ee/{card.ShortUrl}";
-            await Clipboard.Default.SetTextAsync(fullUrl);
-            await DisplayAlertAsync("Copied", $"Link copied: {fullUrl}", "OK");
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlertAsync("Error", $"Could not copy link: {ex.Message}", "OK");
-        }
-    }
-
-    private async void OnLinkAnalyticsRequested(object? sender, EventArgs e)
-    {
-        if (sender is not Controls.LinkCard card) return;
-
-        await NavigateToAnalyticsAsync(Links.FirstOrDefault(l => l.Id == card.LinkId), card.LinkId);
-    }
-
-    private async void OnLinkFavouriteToggleRequested(object? sender, EventArgs e)
-    {
-        if (sender is not Controls.LinkCard card) return;
-
-        try
-        {
-            var link = Links.FirstOrDefault(l => l.Id == card.LinkId);
-            if (link is null) return;
+            var link = Links.FirstOrDefault( l => l.Id == card.LinkId );
+            if ( link is null ) return;
 
             bool success;
-            if (link.IsFavourite)
+            if ( link.IsFavourite )
             {
-                success = await _linkService.RemoveFavouriteAsync(card.LinkId);
-                if (success) link.IsFavourite = false;
+                success = await _linkService.RemoveFavouriteAsync( card.LinkId );
+                if ( success ) link.IsFavourite = false;
             }
             else
             {
-                success = await _linkService.AddFavouriteAsync(card.LinkId);
-                if (success) link.IsFavourite = true;
+                success = await _linkService.AddFavouriteAsync( card.LinkId );
+                if ( success ) link.IsFavourite = true;
             }
 
-            if (!success)
-                await DisplayAlertAsync("Error", "Could not update favourite status", "OK");
+            if ( !success )
+                await DisplayAlertAsync( "Error", "Could not update favourite status", "OK" );
         }
-        catch (Exception ex)
+        catch ( Exception ex )
         {
-            await DisplayAlertAsync("Error", $"Error: {ex.Message}", "OK");
+            await DisplayAlertAsync( "Error", $"Error: {ex.Message}", "OK" );
         }
     }
 
-    private async void OnLinkDeleteRequested(object? sender, EventArgs e)
+    private async void OnLinkDeleteRequested( object? sender, EventArgs e )
     {
-        if (sender is not Controls.LinkCard card) return;
+        if ( sender is not Controls.LinkCard card ) return;
 
         var confirm = await DisplayAlertAsync(
             "Delete link",
             $"Delete {card.Title}? This cannot be undone.",
             "Delete",
-            "Cancel");
+            "Cancel" );
 
-        if (!confirm) return;
+        if ( !confirm ) return;
 
         try
         {
-            var success = await _linkService.RemoveLinkAsync(card.LinkId);
-            if (success)
+            var success = await _linkService.RemoveLinkAsync( card.LinkId );
+            if ( success )
             {
-                Links.RemoveAt(Links.IndexOf(Links.FirstOrDefault(l => l.Id == card.LinkId)!));
-                await DisplayAlertAsync("Deleted", "Link has been deleted.", "OK");
+                Links.RemoveAt( Links.IndexOf( Links.FirstOrDefault( l => l.Id == card.LinkId )! ) );
+                await DisplayAlertAsync( "Deleted", "Link has been deleted.", "OK" );
                 await LoadLinksAsync(); // Reload to update pagination and popular card
             }
             else
             {
-                await DisplayAlertAsync("Error", "Could not delete link", "OK");
+                await DisplayAlertAsync( "Error", "Could not delete link", "OK" );
             }
         }
-        catch (Exception ex)
+        catch ( Exception ex )
         {
-            await DisplayAlertAsync("Error", $"Error: {ex.Message}", "OK");
+            await DisplayAlertAsync( "Error", $"Error: {ex.Message}", "OK" );
         }
     }
 
-    private async void OnFilterClicked(object? sender, EventArgs e)
+    private async void OnFilterClicked( object? sender, EventArgs e )
     {
-        if (sender is not Button selected) return;
+        if ( sender is not Button selected ) return;
 
         // Visual state
-        if (_activeFilter is not null)
+        if ( _activeFilter is not null )
         {
             _activeFilter.BackgroundColor = Colors.White;
-            _activeFilter.TextColor = Color.FromArgb("#343434");
-            _activeFilter.BorderColor = Color.FromArgb("#E6E6E6");
+            _activeFilter.TextColor = Color.FromArgb( "#343434" );
+            _activeFilter.BorderColor = Color.FromArgb( "#E6E6E6" );
         }
 
-        selected.BackgroundColor = Color.FromArgb("#FFF0EC");
-        selected.TextColor = Color.FromArgb("#FF5A36");
-        selected.BorderColor = Color.FromArgb("#FF5A36");
+        selected.BackgroundColor = Color.FromArgb( "#FFF0EC" );
+        selected.TextColor = Color.FromArgb( "#FF5A36" );
+        selected.BorderColor = Color.FromArgb( "#FF5A36" );
         _activeFilter = selected;
 
         // Update filter
         var param = selected.CommandParameter?.ToString();
-        _selectedCategoryId = param is "0" or null ? null : int.Parse(param);
+        _selectedCategoryId = param is "0" or null ? null : int.Parse( param );
         _currentPage = 1;
 
         await LoadLinksAsync();
+    }
+
+    private async Task CreateCategoryAsync()
+    {
+        var categoryName = await DisplayPromptAsync(
+            "Create category",
+            "Enter a category name.",
+            accept: "Create",
+            cancel: "Cancel",
+            placeholder: "Category name" );
+
+        if ( string.IsNullOrWhiteSpace( categoryName ) )
+            return;
+
+        categoryName = categoryName.Trim();
+
+        try
+        {
+            var category = await _linkService.CreateCategoryAsync( categoryName );
+            if ( category is null )
+            {
+                await DisplayAlertAsync( "Error", "Could not create that category.", "OK" );
+                return;
+            }
+
+            await DisplayAlertAsync( "Created", $"'{category.Name}' has been created.", "OK" );
+            await LoadCategoriesAsync();
+        }
+        catch ( Exception ex )
+        {
+            await DisplayAlertAsync( "Error", $"Could not create category: {ex.Message}", "OK" );
+        }
+    }
+
+    private async Task DeleteCategoryAsync()
+    {
+        var categories = Categories.ToList();
+        if ( categories.Count == 0 )
+        {
+            await DisplayAlertAsync( "No categories", "Create a category first.", "OK" );
+            return;
+        }
+
+        var action = await DisplayActionSheetAsync( "Delete category", "Cancel", null,
+            categories.Select( c => c.Name ).ToArray() );
+        if ( string.IsNullOrWhiteSpace( action ) || action == "Cancel" )
+            return;
+
+        var category =
+            categories.FirstOrDefault( c => string.Equals( c.Name, action, StringComparison.OrdinalIgnoreCase ) );
+        if ( category is null )
+            return;
+
+        var confirm = await DisplayAlertAsync(
+            "Delete category",
+            $"Delete '{category.Name}' from the server?",
+            "Delete",
+            "Cancel" );
+
+        if ( !confirm )
+            return;
+
+        var success = await _linkService.DeleteCategoryAsync( category.Id );
+        if ( !success )
+        {
+            await DisplayAlertAsync( "Error", "Could not delete the category.", "OK" );
+            return;
+        }
+
+        await DisplayAlertAsync( "Deleted", "Category has been deleted.", "OK" );
+        await LoadCategoriesAsync();
+        await LoadLinksAsync();
+    }
+
+    private async Task<CategoryModel?> PromptAssignExistingCategoryAsync( int linkId )
+    {
+        var categories = Categories.ToList();
+        if ( categories.Count == 0 )
+        {
+            await DisplayAlertAsync( "No categories", "Create a category first from Categories.", "OK" );
+            return null;
+        }
+
+        var action = await DisplayActionSheetAsync( "Assign category", "Cancel", null,
+            categories.Select( c => c.Name ).ToArray() );
+        if ( string.IsNullOrWhiteSpace( action ) || action == "Cancel" )
+            return null;
+
+        var category =
+            categories.FirstOrDefault( c => string.Equals( c.Name, action, StringComparison.OrdinalIgnoreCase ) );
+        if ( category is null )
+            return null;
+
+        var assigned = await _linkService.AssignCategoryAsync( linkId, category.Id );
+        if ( !assigned )
+        {
+            await DisplayAlertAsync( "Error", "Could not assign the category to the link.", "OK" );
+            return null;
+        }
+
+        await DisplayAlertAsync( "Category assigned", $"'{category.Name}' is now attached to the link.", "OK" );
+        return category;
     }
 }

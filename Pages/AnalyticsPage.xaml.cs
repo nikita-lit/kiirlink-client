@@ -4,7 +4,7 @@ using KiirLink.Services;
 
 namespace KiirLink.Pages;
 
-public partial class AnalyticsPage : ContentPage
+public partial class AnalyticsPage
 {
     private readonly LinkService _linkService;
     private PerformanceChartDrawable _chartDrawable = new();
@@ -13,7 +13,7 @@ public partial class AnalyticsPage : ContentPage
     public static int SelectedLinkId { get; set; } = -1;
     public static LinkModel? SelectedLink { get; set; }
 
-    public AnalyticsPage(LinkService linkService)
+    public AnalyticsPage( LinkService linkService )
     {
         InitializeComponent();
         _linkService = linkService;
@@ -30,51 +30,59 @@ public partial class AnalyticsPage : ContentPage
 
     private async Task LoadAnalyticsAsync()
     {
-        if (SelectedLink is not null)
-            PopulateTopCard(SelectedLink);
+        if ( SelectedLink is not null )
+            PopulateTopCard( SelectedLink );
 
-        if (SelectedLinkId <= 0)
+        if ( SelectedLinkId <= 0 )
         {
-            if (SelectedLink is not null)
+            if ( SelectedLink is not null )
                 SelectedLinkId = SelectedLink.ResolvedId;
             else
             {
                 try
                 {
-                    var links = await _linkService.GetLinksAsync(1, 1);
-                    if (links.Count > 0)
+                    var links = await _linkService.GetLinksAsync( 1, 1 );
+                    if ( links.Count > 0 )
                     {
                         SelectedLinkId = links[0].Id;
                         SelectedLink = links[0];
-                        PopulateTopCard(links[0]);
+                        PopulateTopCard( links[0] );
                     }
-                    else { ShowEmpty(); return; }
+                    else
+                    {
+                        ShowEmpty();
+                        return;
+                    }
                 }
-                catch { ShowEmpty(); return; }
+                catch
+                {
+                    ShowEmpty();
+                    return;
+                }
             }
         }
 
-        await Task.WhenAll(LoadStatsAsync(), LoadActivityAsync());
+        await Task.WhenAll( LoadStatsAsync(), LoadActivityAsync() );
     }
 
     private async Task LoadStatsAsync()
     {
         try
         {
-            var stats = await _linkService.GetLinkStatsAsync(SelectedLinkId);
+            var stats = await _linkService.GetLinkStatsAsync( SelectedLinkId );
 
-            if (stats is null)
+            if ( stats is null )
             {
-                if (SelectedLink is null)
+                if ( SelectedLink is null )
                 {
-                    var links = await _linkService.GetLinksAsync(1, 20);
-                    var link = links.FirstOrDefault(l => l.ResolvedId == SelectedLinkId)
+                    var links = await _linkService.GetLinksAsync( 1, 20 );
+                    var link = links.FirstOrDefault( l => l.ResolvedId == SelectedLinkId )
                                ?? links.FirstOrDefault();
 
-                    if (link is not null)
+                    if ( link is not null )
                     {
                         SelectedLink = link;
-                        PopulateTopCard(link);
+                        PopulateTopCard( link );
                     }
                 }
 
@@ -87,18 +95,18 @@ public partial class AnalyticsPage : ContentPage
 
             // Chart
             var dailyViews = stats.DailyViews ?? [];
-            if (dailyViews.Count > 0)
+            if ( dailyViews.Count > 0 )
             {
-                _chartDrawable.SetData(dailyViews);
+                _chartDrawable.SetData( dailyViews );
                 PerformanceChart.Invalidate();
             }
 
             // Traffic sources
-            BuildSourcesLayout(stats.Sources ?? []);
+            BuildSourcesLayout( stats.Sources ?? [] );
         }
-        catch (Exception ex)
+        catch ( Exception ex )
         {
-            await DisplayAlertAsync("Error", $"Could not load stats: {ex.Message}", "OK");
+            await DisplayAlertAsync( "Error", $"Could not load stats: {ex.Message}", "OK" );
         }
     }
 
@@ -106,8 +114,8 @@ public partial class AnalyticsPage : ContentPage
     {
         try
         {
-            var activity = await _linkService.GetLinkActivityAsync(SelectedLinkId);
-            BuildActivityLayout(activity);
+            var activity = await _linkService.GetLinkActivityAsync( SelectedLinkId );
+            BuildActivityLayout( activity );
         }
         catch
         {
@@ -115,7 +123,7 @@ public partial class AnalyticsPage : ContentPage
         }
     }
 
-    private void PopulateTopCard(LinkModel link)
+    private void PopulateTopCard( LinkModel link )
     {
         TopLinkCard.Title = link.DisplayTitle;
         TopLinkCard.Url = link.OriginalUrl;
@@ -135,13 +143,79 @@ public partial class AnalyticsPage : ContentPage
         FavouritesLabel.Text = "0";
     }
 
+    private async void OnTopLinkCategoryRequested( object? sender, EventArgs e )
+    {
+        var link = SelectedLink;
+        if ( link is null && SelectedLinkId > 0 )
+        {
+            var links = await _linkService.GetLinksAsync( 1, 20 );
+            link = links.FirstOrDefault( l => l.ResolvedId == SelectedLinkId ) ?? links.FirstOrDefault();
+            if ( link is not null )
+                SelectedLink = link;
+        }
+
+        if ( link is null )
+            return;
+
+        var category = await PromptAssignExistingCategoryAsync( link.ResolvedId );
+        if ( category is null )
+            return;
+
+        link.CategoryId = category.Id;
+        link.CategoryName = category.Name;
+        PopulateTopCard( link );
+    }
+
+    private async void OnTopLinkCategoryDeleteRequested( object? sender, EventArgs e )
+    {
+        var link = SelectedLink;
+        if ( link is null && SelectedLinkId > 0 )
+        {
+            var links = await _linkService.GetLinksAsync( 1, 20 );
+            link = links.FirstOrDefault( l => l.ResolvedId == SelectedLinkId ) ?? links.FirstOrDefault();
+            if ( link is not null )
+                SelectedLink = link;
+        }
+
+        if ( link is null )
+            return;
+
+        if ( link.CategoryId is null )
+        {
+            await DisplayAlertAsync( "No category", "This link does not have a category to delete.", "OK" );
+            return;
+        }
+
+        var confirm = await DisplayAlertAsync(
+            "Delete category",
+            $"Delete '{link.CategoryName}'? This removes the category from the server.",
+            "Delete",
+            "Cancel" );
+
+        if ( !confirm )
+            return;
+
+        var success = await _linkService.DeleteCategoryAsync( link.CategoryId.Value );
+        if ( !success )
+        {
+            await DisplayAlertAsync( "Error", "Could not delete the category.", "OK" );
+            return;
+        }
+
+        link.CategoryId = null;
+        link.CategoryName = null;
+        PopulateTopCard( link );
+        await DisplayAlertAsync( "Deleted", "Category has been deleted.", "OK" );
+        await LoadAnalyticsAsync();
+    }
+
     // ── Dynamic layout builders ───────────────────────────────────────────────
 
-    private void BuildSourcesLayout(List<TrafficSourceModel> sources)
+    private void BuildSourcesLayout( List<TrafficSourceModel> sources )
     {
         SourcesLayout.Children.Clear();
 
-        if (sources.Count == 0)
+        if ( sources.Count == 0 )
         {
             // Fallback with static demo data
             sources =
@@ -153,26 +227,27 @@ public partial class AnalyticsPage : ContentPage
         }
         else
         {
-            var total = sources.Sum(s => s.Count);
-            foreach (var src in sources)
+            var total = sources.Sum( s => s.Count );
+            foreach ( var src in sources )
             {
                 src.Percentage = total > 0 ? (float)src.Count / total : 0;
             }
         }
 
-        foreach (var src in sources)
+        foreach ( var src in sources )
         {
             var grid = new Grid
             {
                 ColumnDefinitions =
                 [
-                    new ColumnDefinition { Width = new GridLength(62) },
+                    new ColumnDefinition { Width = new GridLength( 62 ) },
                     new ColumnDefinition { Width = GridLength.Star },
-                    new ColumnDefinition { Width = new GridLength(38) }
+                    new ColumnDefinition { Width = new GridLength( 38 ) }
                 ]
             };
 
-            var nameLabel = new Label { FontSize = 10, Text = src.Source, VerticalTextAlignment = TextAlignment.Center };
+            var nameLabel = new Label
+                { FontSize = 10, Text = src.Source, VerticalTextAlignment = TextAlignment.Center };
             var bar = new ProgressBar { Progress = src.Percentage, VerticalOptions = LayoutOptions.Center };
             var pctLabel = new Label
             {
@@ -182,43 +257,43 @@ public partial class AnalyticsPage : ContentPage
                 VerticalTextAlignment = TextAlignment.Center
             };
 
-            Grid.SetColumn(nameLabel, 0);
-            Grid.SetColumn(bar, 1);
-            Grid.SetColumn(pctLabel, 2);
+            Grid.SetColumn( nameLabel, 0 );
+            Grid.SetColumn( bar, 1 );
+            Grid.SetColumn( pctLabel, 2 );
 
-            grid.Children.Add(nameLabel);
-            grid.Children.Add(bar);
-            grid.Children.Add(pctLabel);
+            grid.Children.Add( nameLabel );
+            grid.Children.Add( bar );
+            grid.Children.Add( pctLabel );
 
-            SourcesLayout.Children.Add(grid);
+            SourcesLayout.Children.Add( grid );
         }
     }
 
-    private void BuildActivityLayout(List<LinkActivityModel> activities)
+    private void BuildActivityLayout( List<LinkActivityModel> activities )
     {
         ActivityLayout.Children.Clear();
 
-        if (activities.Count == 0)
+        if ( activities.Count == 0 )
         {
-            ActivityLayout.Children.Add(new Label
+            ActivityLayout.Children.Add( new Label
             {
                 Text = "No recent activity.",
                 FontSize = 11,
-                Margin = new Thickness(0, 12),
+                Margin = new Thickness( 0, 12 ),
                 HorizontalTextAlignment = TextAlignment.Center,
-                TextColor = Color.FromArgb("#969696")
-            });
+                TextColor = Color.FromArgb( "#969696" )
+            } );
             return;
         }
 
-        for (var i = 0; i < activities.Count; i++)
+        for ( var i = 0; i < activities.Count; i++ )
         {
             var act = activities[i];
             var grid = new Grid
             {
                 ColumnDefinitions =
                 [
-                    new ColumnDefinition { Width = new GridLength(26) },
+                    new ColumnDefinition { Width = new GridLength( 26 ) },
                     new ColumnDefinition { Width = GridLength.Star },
                     new ColumnDefinition { Width = GridLength.Auto }
                 ],
@@ -228,7 +303,7 @@ public partial class AnalyticsPage : ContentPage
             var icon = new Label
             {
                 Text = act.Icon,
-                TextColor = Color.FromArgb("#FF5A36"),
+                TextColor = Color.FromArgb( "#FF5A36" ),
                 VerticalTextAlignment = TextAlignment.Center
             };
             var desc = new Label
@@ -241,26 +316,26 @@ public partial class AnalyticsPage : ContentPage
             {
                 FontSize = 10,
                 Text = act.RelativeTime,
-                TextColor = Color.FromArgb("#969696"),
+                TextColor = Color.FromArgb( "#969696" ),
                 VerticalTextAlignment = TextAlignment.Center
             };
 
-            Grid.SetColumn(icon, 0);
-            Grid.SetColumn(desc, 1);
-            Grid.SetColumn(time, 2);
+            Grid.SetColumn( icon, 0 );
+            Grid.SetColumn( desc, 1 );
+            Grid.SetColumn( time, 2 );
 
-            grid.Children.Add(icon);
-            grid.Children.Add(desc);
-            grid.Children.Add(time);
+            grid.Children.Add( icon );
+            grid.Children.Add( desc );
+            grid.Children.Add( time );
 
-            ActivityLayout.Children.Add(grid);
+            ActivityLayout.Children.Add( grid );
 
-            if (i < activities.Count - 1)
-                ActivityLayout.Children.Add(new BoxView
+            if ( i < activities.Count - 1 )
+                ActivityLayout.Children.Add( new BoxView
                 {
-                    BackgroundColor = Color.FromArgb("#F0F0F0"),
+                    BackgroundColor = Color.FromArgb( "#F0F0F0" ),
                     HeightRequest = 1
-                });
+                } );
         }
     }
 
@@ -271,15 +346,15 @@ public partial class AnalyticsPage : ContentPage
         private float[] _values = [20, 35, 56, 40, 80, 30, 58];
         private string[] _labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-        public void SetData(List<DailyStatModel> daily)
+        public void SetData( List<DailyStatModel> daily )
         {
             // Take last 7 days
-            var slice = daily.TakeLast(7).ToList();
-            _values = slice.Select(d => (float)d.Count).ToArray();
-            _labels = slice.Select(d => d.Date.ToString("ddd")).ToArray();
+            var slice = daily.TakeLast( 7 ).ToList();
+            _values = slice.Select( d => (float)d.Count ).ToArray();
+            _labels = slice.Select( d => d.Date.ToString( "ddd" ) ).ToArray();
         }
 
-        public void Draw(ICanvas canvas, RectF dirtyRect)
+        public void Draw( ICanvas canvas, RectF dirtyRect )
         {
             const float left = 28;
             const float top = 8;
@@ -289,48 +364,78 @@ public partial class AnalyticsPage : ContentPage
             var chartWidth = dirtyRect.Width - left - right;
             var chartHeight = dirtyRect.Height - top - bottom;
             var maxValue = _values.Length > 0 ? _values.Max() : 80f;
-            if (maxValue == 0) maxValue = 1;
+            if ( maxValue == 0 ) maxValue = 1;
 
-            canvas.FontColor = Color.FromArgb("#969696");
+            canvas.FontColor = Color.FromArgb( "#969696" );
             canvas.FontSize = 8;
-            canvas.StrokeColor = Color.FromArgb("#ECECEC");
+            canvas.StrokeColor = Color.FromArgb( "#ECECEC" );
             canvas.StrokeSize = 1;
 
-            for (var step = 0; step <= 4; step++)
+            for ( var step = 0; step <= 4; step++ )
             {
                 var y = top + chartHeight - (chartHeight * step / 4);
-                canvas.DrawLine(left, y, dirtyRect.Width - right, y);
-                canvas.DrawString(((int)(maxValue * step / 4)).ToString(), 0, y - 5, left - 5, 10,
-                    HorizontalAlignment.Right, VerticalAlignment.Center);
+                canvas.DrawLine( left, y, dirtyRect.Width - right, y );
+                canvas.DrawString( ((int)(maxValue * step / 4)).ToString(), 0, y - 5, left - 5, 10,
+                    HorizontalAlignment.Right, VerticalAlignment.Center );
             }
 
-            if (_values.Length == 0) return;
+            if ( _values.Length == 0 ) return;
 
             var points = new PointF[_values.Length];
             var spacing = _values.Length > 1 ? chartWidth / (_values.Length - 1) : 0;
 
-            for (var index = 0; index < _values.Length; index++)
+            for ( var index = 0; index < _values.Length; index++ )
             {
                 var x = left + (spacing * index);
                 var y = top + chartHeight - (_values[index] / maxValue * chartHeight);
-                points[index] = new PointF(x, y);
-                canvas.DrawString(_labels[index], x - 12, dirtyRect.Height - 16, 24, 12,
-                    HorizontalAlignment.Center, VerticalAlignment.Center);
+                points[index] = new PointF( x, y );
+                canvas.DrawString( _labels[index], x - 12, dirtyRect.Height - 16, 24, 12,
+                    HorizontalAlignment.Center, VerticalAlignment.Center );
             }
 
-            canvas.StrokeColor = Color.FromArgb("#FF5A36");
+            canvas.StrokeColor = Color.FromArgb( "#FF5A36" );
             canvas.StrokeSize = 2;
 
-            for (var index = 0; index < points.Length - 1; index++)
-                canvas.DrawLine(points[index], points[index + 1]);
+            for ( var index = 0; index < points.Length - 1; index++ )
+                canvas.DrawLine( points[index], points[index + 1] );
 
             canvas.FillColor = Colors.White;
 
-            foreach (var point in points)
+            foreach ( var point in points )
             {
-                canvas.FillCircle(point, 3);
-                canvas.DrawCircle(point, 3);
+                canvas.FillCircle( point, 3 );
+                canvas.DrawCircle( point, 3 );
             }
         }
+    }
+
+    private async Task<CategoryModel?> PromptAssignExistingCategoryAsync( int linkId )
+    {
+        var categories = await _linkService.GetCategoriesAsync();
+        if ( categories.Count == 0 )
+        {
+            await DisplayAlertAsync( "No categories", "Create a category first from Links > Categories.", "OK" );
+            return null;
+        }
+
+        var action = await DisplayActionSheetAsync( "Assign category", "Cancel", null,
+            categories.Select( c => c.Name ).ToArray() );
+        if ( string.IsNullOrWhiteSpace( action ) || action == "Cancel" )
+            return null;
+
+        var category =
+            categories.FirstOrDefault( c => string.Equals( c.Name, action, StringComparison.OrdinalIgnoreCase ) );
+        if ( category is null )
+            return null;
+
+        var assigned = await _linkService.AssignCategoryAsync( linkId, category.Id );
+        if ( !assigned )
+        {
+            await DisplayAlertAsync( "Error", "Could not assign the category to the link.", "OK" );
+            return null;
+        }
+
+        await DisplayAlertAsync( "Category assigned", $"'{category.Name}' is now attached to the link.", "OK" );
+        return category;
     }
 }

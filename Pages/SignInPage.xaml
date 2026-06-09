@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
+    x:Class="KiirLink.Pages.SignInPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Sign in">
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout
+                Padding="24,28"
+                Spacing="18"
+                VerticalOptions="Center">
+
+                <VerticalStackLayout Spacing="10">
+                    <Image
+                        HeightRequest="72"
+                        HorizontalOptions="Center"
+                        Source="kiirlink_logo.png"
+                        WidthRequest="72" />
+                    <Label
+                        HorizontalTextAlignment="Center"
+                        FontFamily="RadioCanadaBigSemiBold"
+                        FontSize="24"
+                        Text="KiirLink" />
+                    <Label
+                        HorizontalTextAlignment="Center"
+                        Style="{StaticResource MutedLabel}"
+                        Text="Sign in to manage your links." />
+                </VerticalStackLayout>
+
+                <Border Padding="16" Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="12">
+                        <VerticalStackLayout Spacing="6">
+                            <Label FontSize="11" Text="Email" />
+                            <Entry x:Name="EmailEntry" Keyboard="Email" Placeholder="you@example.com" ReturnType="Next" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="6">
+                            <Label FontSize="11" Text="Password" />
+                            <Entry x:Name="PasswordEntry" IsPassword="True" Placeholder="Password" ReturnType="Done" />
+                        </VerticalStackLayout>
+
+                        <Button
+                            x:Name="SignInButton"
+                            Clicked="OnSignInClicked"
+                            Style="{StaticResource PrimaryButton}"
+                            Text="SIGN IN" />
+
+                        <Button
+                            Clicked="OnCreateAccountClicked"
+                            Style="{StaticResource OutlineButton}"
+                            Text="CREATE ACCOUNT" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label
+                    HorizontalTextAlignment="Center"
+                    Style="{StaticResource MutedLabel}"
+                    Text="Use your KiirLink account to continue." />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Label
+            Grid.Row="1"
+            Margin="24,0,24,18"
+            HorizontalTextAlignment="Center"
+            Style="{StaticResource MutedLabel}"
+            Text="KiirLink Team" />
+    </Grid>
+</ContentPage>

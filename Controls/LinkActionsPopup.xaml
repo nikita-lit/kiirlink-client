@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<toolkit:Popup
+    x:Class="KiirLink.Controls.LinkActionsPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    CanBeDismissedByTappingOutsideOfPopup="True">
+    
+    <VerticalStackLayout Spacing="8" WidthRequest="310" Padding="14">
+        <Label
+            FontFamily="RadioCanadaBigSemiBold"
+            FontSize="14"
+            Text="Link actions" />
+        
+        <Button
+            Clicked="OnAnalyticsClicked"
+            ContentLayout="Left,8"
+            Style="{StaticResource OutlineButton}"
+            Text="View analytics" />
+        
+        <Button
+            Clicked="OnCopyShortClicked"
+            ContentLayout="Left,8"
+            Style="{StaticResource OutlineButton}"
+            Text="Copy short link" />
+
+        <Button
+            Clicked="OnCopyOriginalClicked"
+            ContentLayout="Left,8"
+            Style="{StaticResource OutlineButton}"
+            Text="Copy original link" />
+
+        <Button
+            Clicked="OnAssignCategoryClicked"
+            ContentLayout="Left,8"
+            Style="{StaticResource OutlineButton}"
+            Text="Assign category" />
+
+        <Button
+            x:Name="FavouriteButton"
+            Clicked="OnFavouriteClicked"
+            ContentLayout="Left,8"
+            Style="{StaticResource OutlineButton}"
+            Text="Add to favourites" />
+
+        <Button
+            BackgroundColor="{StaticResource SoftRed}"
+            Clicked="OnDeleteClicked"
+            ContentLayout="Left,8"
+            Style="{StaticResource OutlineButton}"
+            Text="Delete" />
+    </VerticalStackLayout>
+
+</toolkit:Popup>
