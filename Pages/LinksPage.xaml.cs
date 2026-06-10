@@ -106,6 +106,14 @@ public partial class LinksPage
         try
         {
             var page = await _linkService.GetLinksPageAsync( _currentPage, PageSize, _selectedCategoryId );
+            var lastPage = page.GetLastPage( PageSize );
+
+            if ( _currentPage > lastPage )
+            {
+                _currentPage = lastPage;
+                page = await _linkService.GetLinksPageAsync( _currentPage, PageSize, _selectedCategoryId );
+            }
+
             var links = page.Items;
 
             Links.Clear();
@@ -184,6 +192,7 @@ public partial class LinksPage
             btn.BackgroundColor = (Color)Application.Current.Resources["AppAccentSurface"];
             btn.TextColor = (Color)Application.Current.Resources["AppAccentText"];
             btn.BorderColor = (Color)Application.Current.Resources["AppAccentStroke"];
+            btn.IsEnabled = false;
         }
 
         btn.Clicked += async ( _, _ ) =>
