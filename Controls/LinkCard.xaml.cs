@@ -113,7 +113,7 @@ public partial class LinkCard
     public event EventHandler? AnalyticsRequested;
     public event EventHandler? FavouriteToggleRequested;
     public event EventHandler? CategoryRequested;
-    public event EventHandler? CategoryDeleteRequested;
+    public event EventHandler? QRCodeRequested;
     public event EventHandler? DeleteRequested;
     private readonly EventHandler _themeChangedHandler;
 
@@ -194,7 +194,7 @@ public partial class LinkCard
         if ( page is null )
             return;
 
-        var popup = new LinkActionsPopup( !string.IsNullOrWhiteSpace( Category ), IsFavourite );
+        var popup = new LinkActionsPopup( IsFavourite );
         var result = await page.ShowPopupAsync<LinkActionsPopupAction>(
             popup,
             new PopupOptions
@@ -228,8 +228,8 @@ public partial class LinkCard
             case LinkActionsPopupAction.AssignCategory:
                 CategoryRequested?.Invoke( this, EventArgs.Empty );
                 break;
-            case LinkActionsPopupAction.DeleteCategory:
-                CategoryDeleteRequested?.Invoke( this, EventArgs.Empty );
+            case LinkActionsPopupAction.CreateQRCode:
+                QRCodeRequested?.Invoke( this, EventArgs.Empty );
                 break;
             case LinkActionsPopupAction.ToggleFavourite:
                 FavouriteToggleRequested?.Invoke( this, EventArgs.Empty );

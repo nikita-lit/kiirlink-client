@@ -62,29 +62,6 @@ public sealed class LinksViewModel : ViewModelBase
         });
     }
 
-    public Task SelectCategoryAsync(int? categoryId)
-    {
-        _selectedCategoryId = categoryId;
-        _currentPage = 1;
-        return LoadAsync();
-    }
-
-    public Task PreviousPageAsync()
-    {
-        if (CanGoPrevious)
-            _currentPage--;
-
-        return LoadAsync();
-    }
-
-    public Task NextPageAsync()
-    {
-        if (CanGoNext)
-            _currentPage++;
-
-        return LoadAsync();
-    }
-
     private void RaisePaginationProperties()
     {
         OnPropertyChanged(nameof(CurrentPage));

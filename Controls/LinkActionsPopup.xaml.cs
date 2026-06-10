@@ -6,23 +6,20 @@ public enum LinkActionsPopupAction
 {
     OpenOriginal,
     CopyShort,
+    CreateQRCode,
     CopyOriginal,
     ViewAnalytics,
     AssignCategory,
-    DeleteCategory,
     ToggleFavourite,
     Delete
 }
 
 public partial class LinkActionsPopup
 {
-    private readonly bool _hasCategory;
-
-    public LinkActionsPopup( bool hasCategory, bool isFavourite )
+    public LinkActionsPopup( bool isFavourite )
     {
         InitializeComponent();
-        _hasCategory = hasCategory;
-        CategoryButton.Text = hasCategory ? "Delete category" : "Assign category";
+        CategoryButton.Text = "Assign category";
         FavouriteButton.Text = isFavourite ? "Remove from favourites" : "Add to favourites";
     }
 
@@ -40,14 +37,15 @@ public partial class LinkActionsPopup
 
     private async void OnCopyOriginalClicked( object? sender, EventArgs e ) =>
         await CloseWith( LinkActionsPopupAction.CopyOriginal );
+    
+    private async void OnCreateQRCodeClicked( object? sender, EventArgs e ) =>
+        await CloseWith( LinkActionsPopupAction.CreateQRCode );
 
     private async void OnAnalyticsClicked( object? sender, EventArgs e ) =>
         await CloseWith( LinkActionsPopupAction.ViewAnalytics );
 
     private async void OnAssignCategoryClicked( object? sender, EventArgs e ) =>
-        await CloseWith( _hasCategory
-            ? LinkActionsPopupAction.DeleteCategory
-            : LinkActionsPopupAction.AssignCategory );
+        await CloseWith( LinkActionsPopupAction.AssignCategory );
     
     private async void OnFavouriteClicked( object? sender, EventArgs e ) =>
         await CloseWith( LinkActionsPopupAction.ToggleFavourite );

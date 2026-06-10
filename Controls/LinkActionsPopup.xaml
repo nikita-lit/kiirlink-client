@@ -32,6 +32,12 @@
                 ContentLayout="Left,8"
                 Style="{StaticResource OutlineButton}"
                 Text="Copy short link" />
+            
+            <Button
+                Clicked="OnCreateQRCodeClicked"
+                ContentLayout="Left,8"
+                Style="{StaticResource OutlineButton}"
+                Text="Create QR Code" />
 
             <Button
                 Clicked="OnCopyOriginalClicked"

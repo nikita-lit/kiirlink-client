@@ -1,4 +1,7 @@
 using System.Collections.ObjectModel;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Extensions;
+using KiirLink.Controls;
 using KiirLink.Models;
 using KiirLink.Services;
 
@@ -72,21 +75,24 @@ public partial class FavouritesPage
 
     private async void OnLinkCardTapped( object? sender, TappedEventArgs e )
     {
-        if ( sender is not Controls.LinkCard card ) return;
+        if ( sender is not LinkCard card ) 
+            return;
 
         await NavigateToAnalyticsAsync( Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId ) );
     }
 
     private async void OnLinkAnalyticsRequested( object? sender, EventArgs e )
     {
-        if ( sender is not Controls.LinkCard card ) return;
+        if ( sender is not LinkCard card ) 
+            return;
 
         await NavigateToAnalyticsAsync( Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId ) );
     }
 
     private async void OnLinkCategoryRequested( object? sender, EventArgs e )
     {
-        if ( sender is not Controls.LinkCard card ) return;
+        if ( sender is not LinkCard card ) 
+            return;
 
         var link = Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId );
         if ( link is null ) return;
@@ -99,43 +105,10 @@ public partial class FavouritesPage
         link.CategoryName = category.Name;
         await LoadFavouritesAsync();
     }
-
-    private async void OnLinkCategoryDeleteRequested( object? sender, EventArgs e )
-    {
-        if ( sender is not Controls.LinkCard card ) return;
-
-        var link = Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId );
-        if ( link is null || link.CategoryId is null )
-        {
-            await DisplayAlertAsync( "No category", "This link does not have a category to delete.", "OK" );
-            return;
-        }
-
-        var confirm = await DisplayAlertAsync(
-            "Delete category",
-            $"Delete '{link.CategoryName}'? This removes the category from the server.",
-            "Delete",
-            "Cancel" );
-
-        if ( !confirm )
-            return;
-
-        var success = await _linkService.DeleteCategoryAsync( link.CategoryId.Value );
-        if ( !success )
-        {
-            await DisplayAlertAsync( "Error", "Could not delete the category.", "OK" );
-            return;
-        }
-
-        link.CategoryId = null;
-        link.CategoryName = null;
-        await DisplayAlertAsync( "Deleted", "Category has been deleted.", "OK" );
-        await LoadFavouritesAsync();
-    }
-
+    
     private async void OnLinkFavouriteToggleRequested( object? sender, EventArgs e )
     {
-        if ( sender is not Controls.LinkCard card ) return;
+        if ( sender is not LinkCard card ) return;
 
         try
         {
@@ -161,7 +134,8 @@ public partial class FavouritesPage
 
     private async void OnLinkDeleteRequested( object? sender, EventArgs e )
     {
-        if ( sender is not Controls.LinkCard card ) return;
+        if ( sender is not LinkCard card ) 
+            return;
 
         var confirm = await DisplayAlertAsync(
             "Delete link",
@@ -169,7 +143,8 @@ public partial class FavouritesPage
             "Delete",
             "Cancel" );
 
-        if ( !confirm ) return;
+        if ( !confirm ) 
+            return;
 
         try
         {
@@ -193,6 +168,28 @@ public partial class FavouritesPage
         }
     }
 
+    private async void OnCreateQRCodeClicked( object? sender, EventArgs e )
+    {
+        var page = Shell.Current?.CurrentPage;
+        if ( page is null )
+            return;
+        
+        if ( sender is not LinkCard card ) 
+            return;
+
+        var link = Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId );
+        if ( link is null ) 
+            return;
+        
+        await page.ShowPopupAsync( 
+            new QRCodePopup( link.ShortUrl ), 
+            new PopupOptions
+            {
+                Shape = null,
+                Shadow = null,
+            } );
+    }
+    
     private async Task<CategoryModel?> PromptAssignExistingCategoryAsync( int linkId )
     {
         var categories = await _linkService.GetCategoriesAsync();
@@ -209,6 +206,7 @@ public partial class FavouritesPage
 
         var category =
             categories.FirstOrDefault( c => string.Equals( c.Name, action, StringComparison.OrdinalIgnoreCase ) );
+        
         if ( category is null )
             return null;
 

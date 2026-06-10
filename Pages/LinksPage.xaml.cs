@@ -220,6 +220,31 @@ public partial class LinksPage
         await LoadLinksAsync();
     }
 
+    private async void OnCreateQRCodeClicked( object? sender, EventArgs e )
+    {
+        var page = Shell.Current?.CurrentPage;
+        if ( page is null )
+            return;
+        
+        if ( sender is not LinkCard card ) 
+            return;
+
+        var link = Links.FirstOrDefault( l => l.Id == card.LinkId );
+        if ( link is null ) 
+            return;
+        
+        await page.ShowPopupAsync( 
+            new QRCodePopup( link.ShortUrl ), 
+            new PopupOptions
+            {
+                Shape = null,
+                Shadow = null,
+            } );
+        
+        await LoadCategoriesAsync();
+        await LoadLinksAsync();
+    }
+    
     private async Task NavigateToAnalyticsAsync( LinkModel? link = null, int? fallbackLinkId = null )
     {
         if ( link is not null )
@@ -246,7 +271,7 @@ public partial class LinksPage
 
     private async void OnLinkCardTapped( object? sender, TappedEventArgs e )
     {
-        if ( sender is Controls.LinkCard card )
+        if ( sender is LinkCard card )
             await NavigateToAnalyticsAsync( Links.FirstOrDefault( l => l.Id == card.LinkId ), card.LinkId );
         else
             await NavigateToAnalyticsAsync();
@@ -254,17 +279,20 @@ public partial class LinksPage
 
     private async void OnLinkAnalyticsRequested( object? sender, EventArgs e )
     {
-        if ( sender is not Controls.LinkCard card ) return;
+        if ( sender is not LinkCard card ) 
+            return;
 
         await NavigateToAnalyticsAsync( Links.FirstOrDefault( l => l.Id == card.LinkId ), card.LinkId );
     }
 
     private async void OnLinkCategoryRequested( object? sender, EventArgs e )
     {
-        if ( sender is not Controls.LinkCard card ) return;
+        if ( sender is not LinkCard card ) 
+            return;
 
         var link = Links.FirstOrDefault( l => l.Id == card.LinkId );
-        if ( link is null ) return;
+        if ( link is null ) 
+            return;
 
         var category = await PromptAssignExistingCategoryAsync( link.Id );
         if ( category is null )
@@ -276,43 +304,10 @@ public partial class LinksPage
         await LoadLinksAsync();
     }
 
-    private async void OnLinkCategoryDeleteRequested( object? sender, EventArgs e )
-    {
-        if ( sender is not Controls.LinkCard card ) return;
-
-        var link = Links.FirstOrDefault( l => l.Id == card.LinkId );
-        if ( link is null || link.CategoryId is null )
-        {
-            await DisplayAlertAsync( "No category", "This link does not have a category to delete.", "OK" );
-            return;
-        }
-
-        var confirm = await DisplayAlertAsync(
-            "Delete category",
-            $"Delete '{link.CategoryName}'? This removes the category from the server.",
-            "Delete",
-            "Cancel" );
-
-        if ( !confirm )
-            return;
-
-        var success = await _linkService.DeleteCategoryAsync( link.CategoryId.Value );
-        if ( !success )
-        {
-            await DisplayAlertAsync( "Error", "Could not delete the category.", "OK" );
-            return;
-        }
-
-        link.CategoryId = null;
-        link.CategoryName = null;
-        await DisplayAlertAsync( "Deleted", "Category has been deleted.", "OK" );
-        await LoadCategoriesAsync();
-        await LoadLinksAsync();
-    }
-
     private async void OnLinkFavouriteToggleRequested( object? sender, EventArgs e )
     {
-        if ( sender is not Controls.LinkCard card ) return;
+        if ( sender is not LinkCard card ) 
+            return;
 
         try
         {
@@ -359,7 +354,7 @@ public partial class LinksPage
             {
                 Links.RemoveAt( Links.IndexOf( Links.FirstOrDefault( l => l.Id == card.LinkId )! ) );
                 await DisplayAlertAsync( "Deleted", "Link has been deleted.", "OK" );
-                await LoadLinksAsync(); // Reload to update pagination and popular card
+                await LoadLinksAsync();
             }
             else
             {
@@ -374,17 +369,15 @@ public partial class LinksPage
 
     private async void OnFilterClicked( object? sender, EventArgs e )
     {
-        if ( sender is not Button selected ) return;
-
-        // Visual state
+        if ( sender is not Button selected ) 
+            return;
+        
         if ( _activeFilter is not null )
-        {
             RefreshFilterStyles();
-        }
+        
         _activeFilter = selected;
         RefreshFilterStyles();
-
-        // Update filter
+        
         var param = selected.CommandParameter?.ToString();
         _selectedCategoryId = param is "0" or null ? null : int.Parse( param );
         _currentPage = 1;
