@@ -19,7 +19,12 @@ public partial class LinkCard
             propertyChanged: OnCardContentChanged );
 
     public static readonly BindableProperty ClicksProperty =
-        BindableProperty.Create( nameof(Clicks), typeof(string), typeof(LinkCard), "120" );
+        BindableProperty.Create(
+            nameof(Clicks),
+            typeof(int),
+            typeof(LinkCard),
+            0,
+            propertyChanged: OnCardContentChanged );
 
     public static readonly BindableProperty DateProperty =
         BindableProperty.Create( nameof(Date), typeof(string), typeof(LinkCard), "May 12, 2026" );
@@ -65,6 +70,14 @@ public partial class LinkCard
             string.Empty,
             propertyChanged: OnCardContentChanged );
 
+    public static readonly BindableProperty ExpiresAtProperty =
+        BindableProperty.Create(
+            nameof(ExpiresAt),
+            typeof(DateTime?),
+            typeof(LinkCard),
+            null,
+            propertyChanged: OnCardContentChanged );
+
     public bool IsFavourite
     {
         get => (bool)GetValue( IsFavouriteProperty );
@@ -107,6 +120,12 @@ public partial class LinkCard
         set => SetValue( ExpirationProperty, value );
     }
 
+    public DateTime? ExpiresAt
+    {
+        get => (DateTime?)GetValue( ExpiresAtProperty );
+        set => SetValue( ExpiresAtProperty, value );
+    }
+
     public string Title
     {
         get => (string)GetValue( TitleProperty );
@@ -125,9 +144,9 @@ public partial class LinkCard
         set => SetValue( CategoryProperty, value );
     }
 
-    public string Clicks
+    public int Clicks
     {
-        get => (string)GetValue( ClicksProperty );
+        get => (int)GetValue( ClicksProperty );
         set => SetValue( ClicksProperty, value );
     }
 
@@ -144,12 +163,15 @@ public partial class LinkCard
     public event EventHandler? QRCodeRequested;
     public event EventHandler? DeleteRequested;
     private readonly EventHandler _themeChangedHandler;
+    private readonly EventHandler _cultureChangedHandler;
 
     public LinkCard()
     {
         InitializeComponent();
         _themeChangedHandler = (_, _) => ApplyThemeToIcons();
+        _cultureChangedHandler = (_, _) => RefreshVisualState();
         ThemeService.ThemeChanged += _themeChangedHandler;
+        LocalizationManager.Instance.CultureChanged += _cultureChangedHandler;
         RefreshVisualState();
         ApplyThemeToIcons();
     }
@@ -167,7 +189,10 @@ public partial class LinkCard
     protected override void OnHandlerChanging( HandlerChangingEventArgs args )
     {
         if ( args.NewHandler is null )
+        {
             ThemeService.ThemeChanged -= _themeChangedHandler;
+            LocalizationManager.Instance.CultureChanged -= _cultureChangedHandler;
+        }
 
         base.OnHandlerChanging( args );
     }
@@ -191,18 +216,41 @@ public partial class LinkCard
 
         var category = Category?.Trim();
         var hasCategory = !string.IsNullOrWhiteSpace( category );
-        CategoryLabel.Text = hasCategory ? category : "Uncategorized";
+        CategoryLabel.Text = hasCategory ? category : LocalizationManager.Instance.Get("Uncategorized");
+        ClicksLabel.Text = $"{Clicks} {LocalizationManager.Instance.Get("Clicks")}";
         CategoryBadge.IsVisible = hasCategory;
         FavouriteIndicator.IsVisible = IsFavourite && ShowFavouriteIndicator;
         PrivateBadge.IsVisible = !IsPublic;
-        ExpirationLabel.Text = Expiration;
-        ExpirationBadge.IsVisible = !string.IsNullOrWhiteSpace(Expiration);
+        var expiration = ExpiresAt.HasValue ? FormatExpiration(ExpiresAt.Value) : Expiration;
+        ExpirationLabel.Text = expiration;
+        ExpirationBadge.IsVisible = !string.IsNullOrWhiteSpace(expiration);
         StatusLayout.IsVisible = PrivateBadge.IsVisible || ExpirationBadge.IsVisible;
         SemanticProperties.SetDescription(
             this,
-            $"{Title}. {Clicks} clicks. {Date}. " +
-            $"{(IsPublic ? "Public" : "Private")}. {Expiration}. " +
+            $"{Title}. {Clicks} {LocalizationManager.Instance.Get("Clicks")}. {Date}. " +
+            $"{LocalizationManager.Instance.Get(IsPublic ? "Public" : "Private")}. {expiration}. " +
             "Tap for analytics; use link actions for more options.");
+    }
+
+    private static string FormatExpiration(DateTime expiresAt)
+    {
+        var localization = LocalizationManager.Instance;
+        var remaining = expiresAt.ToUniversalTime() - DateTime.UtcNow;
+
+        if (remaining <= TimeSpan.Zero)
+            return localization.Get("Expired");
+
+        if (remaining.TotalHours < 24)
+            return localization.Format("ExpiresInHours",
+                Math.Max(1, (int)Math.Ceiling(remaining.TotalHours)));
+
+        if (remaining.TotalDays < 30)
+            return localization.Format("ExpiresInDays",
+                Math.Max(1, (int)Math.Ceiling(remaining.TotalDays)));
+
+        return localization.Format(
+            "ExpiresOn",
+            expiresAt.ToLocalTime().ToString("d MMM yyyy", localization.CurrentCulture));
     }
 
     private void ApplyThemeToIcons()

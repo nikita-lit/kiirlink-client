@@ -5,11 +5,12 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
+    xmlns:l="clr-namespace:KiirLink.Extensions"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:viewModels="clr-namespace:KiirLink.ViewModels"
     x:DataType="viewModels:ProfileViewModel"
     BackgroundColor="{DynamicResource AppBackground}"
-    Title="Profile">
+    Title="{l:Translate Profile}">
 
     <Grid
         x:Name="PageLayout"
@@ -22,7 +23,7 @@
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="{StaticResource PagePadding}" Spacing="10">
                 <Border IsVisible="{Binding IsOffline}" Style="{StaticResource OfflineBanner}">
-                    <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                    <Label HorizontalTextAlignment="Center" Text="{l:Translate NoInternetConnection}"
                            TextColor="{DynamicResource AppDangerText}" />
                 </Border>
                 <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
@@ -66,7 +67,7 @@
                     </Grid>
                 </Border>
 
-                <Label Style="{StaticResource SectionTitle}" Text="Account" />
+                <Label Style="{StaticResource SectionTitle}" Text="{l:Translate Account}" />
                 <Border Padding="12,6" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="38">
@@ -80,7 +81,7 @@
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
-                            <Label Grid.Column="1" FontSize="11" Text="Username" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="{l:Translate Username}" VerticalTextAlignment="Center" />
                             <Label
                                 Grid.Column="2"
                                 FontSize="10"
@@ -96,7 +97,7 @@
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
-                            <Label Grid.Column="1" FontSize="11" Text="Email" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="{l:Translate Email}" VerticalTextAlignment="Center" />
                             <Label
                                 Grid.Column="2"
                                 FontSize="10"
@@ -115,13 +116,13 @@
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
-                            <Label Grid.Column="1" FontSize="11" Text="Change password" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="{l:Translate ChangePassword}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="2" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                     </VerticalStackLayout>
                 </Border>
 
-                <Label Style="{StaticResource SectionTitle}" Text="Preferences" />
+                <Label Style="{StaticResource SectionTitle}" Text="{l:Translate Preferences}" />
                 <Border Padding="12,6" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
                         <Grid ColumnDefinitions="26,*,Auto" HeightRequest="38">
@@ -130,24 +131,27 @@
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
-                            <Label Grid.Column="1" FontSize="11" Text="Dark theme" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="{l:Translate DarkTheme}" VerticalTextAlignment="Center" />
                             <Switch x:Name="ThemeSwitch" Grid.Column="2" Toggled="OnThemeToggled" Margin="0, 0, 2, 0" />
                         </Grid>
                         <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="38">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnLanguageTapped" />
+                            </Grid.GestureRecognizers>
                             <Image x:Name="LanguageIcon" HeightRequest="16" Source="language.png" VerticalOptions="Center" WidthRequest="16">
                                 <Image.Behaviors>
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
-                            <Label Grid.Column="1" FontSize="11" Text="Language" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="English" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="{l:Translate Language}" VerticalTextAlignment="Center" />
+                            <Label x:Name="LanguageLabel" Grid.Column="2" FontSize="10" Text="{l:Translate English}" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                     </VerticalStackLayout>
                 </Border>
 
-                <Label Style="{StaticResource SectionTitle}" Text="Link Settings" />
+                <Label Style="{StaticResource SectionTitle}" Text="{l:Translate LinkSettings}" />
                 <Border Padding="12,6" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="38">
@@ -159,8 +163,8 @@
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
-                            <Label Grid.Column="1" FontSize="11" Text="Default category" VerticalTextAlignment="Center" />
-                            <Label x:Name="DefaultCategoryLabel" Grid.Column="2" FontSize="10" Text="None" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="{l:Translate DefaultCategory}" VerticalTextAlignment="Center" />
+                            <Label x:Name="DefaultCategoryLabel" Grid.Column="2" FontSize="10" Text="{l:Translate None}" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
@@ -173,8 +177,8 @@
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
-                            <Label Grid.Column="1" FontSize="11" Text="Auto-expiration" VerticalTextAlignment="Center" />
-                            <Label x:Name="AutoExpirationLabel" Grid.Column="2" FontSize="10" Text="Never" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="{l:Translate AutoExpiration}" VerticalTextAlignment="Center" />
+                            <Label x:Name="AutoExpirationLabel" Grid.Column="2" FontSize="10" Text="{l:Translate Never}" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
@@ -187,8 +191,8 @@
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
-                            <Label Grid.Column="1" FontSize="11" Text="Privacy" VerticalTextAlignment="Center" />
-                            <Label x:Name="PrivacyLabel" Grid.Column="2" FontSize="10" Text="Public" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1" FontSize="11" Text="{l:Translate Privacy}" VerticalTextAlignment="Center" />
+                            <Label x:Name="PrivacyLabel" Grid.Column="2" FontSize="10" Text="{l:Translate Public}" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                     </VerticalStackLayout>
@@ -204,7 +208,7 @@
             ImageSource="log_out.png"
             MinimumHeightRequest="34"
             Style="{StaticResource PrimaryButton}"
-            Text="Logout" />
+            Text="{l:Translate Logout}" />
 
         <controls:BottomNavigation Grid.Row="3" ActiveTab="Profile" />
     </Grid>

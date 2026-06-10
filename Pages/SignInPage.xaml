@@ -4,10 +4,11 @@
     x:Class="KiirLink.Pages.SignInPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:l="clr-namespace:KiirLink.Extensions"
     xmlns:viewModels="clr-namespace:KiirLink.ViewModels"
     x:DataType="viewModels:SignInViewModel"
     BackgroundColor="{DynamicResource AppBackground}"
-    Title="Sign in">
+    Title="{l:Translate SignIn}">
 
     <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <ScrollView Grid.Row="0">
@@ -31,20 +32,20 @@
                     <Label
                         HorizontalTextAlignment="Center"
                         Style="{StaticResource MutedLabel}"
-                        Text="Sign in to manage your links." />
+                        Text="{l:Translate SignInSubtitle}" />
                 </VerticalStackLayout>
 
                 <Border Padding="{StaticResource CardPadding}" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="12">
                         <VerticalStackLayout Spacing="6">
-                            <Label FontSize="11" Text="Email" />
+                            <Label FontSize="11" Text="{l:Translate Email}" />
                             <Entry Keyboard="Email" Placeholder="you@example.com" ReturnType="Next"
                                    Text="{Binding Email}" SemanticProperties.Description="Email address" />
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="6">
-                            <Label FontSize="11" Text="Password" />
-                            <Entry IsPassword="True" Placeholder="Password" ReturnType="Done"
+                            <Label FontSize="11" Text="{l:Translate Password}" />
+                            <Entry IsPassword="True" Placeholder="{l:Translate Password}" ReturnType="Done"
                                    Text="{Binding Password}" SemanticProperties.Description="Password" />
                         </VerticalStackLayout>
 
@@ -52,7 +53,7 @@
                             Command="{Binding SignInCommand}"
                             IsEnabled="{Binding CanInteract}"
                             Style="{StaticResource PrimaryButton}"
-                            Text="SIGN IN"
+                            Text="{l:Translate SignInAction}"
                             SemanticProperties.Description="Sign in to KiirLink" />
 
                         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
@@ -61,19 +62,19 @@
                         <Button
                             Command="{Binding CreateAccountCommand}"
                             Style="{StaticResource OutlineButton}"
-                            Text="CREATE ACCOUNT" />
+                            Text="{l:Translate CreateAccountAction}" />
                     </VerticalStackLayout>
                 </Border>
 
                 <Border IsVisible="{Binding IsOffline}" Style="{StaticResource OfflineBanner}">
-                    <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                    <Label HorizontalTextAlignment="Center" Text="{l:Translate NoInternetConnection}"
                            TextColor="{DynamicResource AppDangerText}" />
                 </Border>
 
                 <Label
                     HorizontalTextAlignment="Center"
                     Style="{StaticResource MutedLabel}"
-                    Text="Use your KiirLink account to continue." />
+                    Text="{l:Translate SignInFooter}" />
             </VerticalStackLayout>
         </ScrollView>
 

@@ -5,10 +5,11 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
+    xmlns:l="clr-namespace:KiirLink.Extensions"
     xmlns:viewModels="clr-namespace:KiirLink.ViewModels"
     x:DataType="viewModels:HomeViewModel"
     BackgroundColor="{DynamicResource AppBackground}"
-    Title="Home">
+    Title="{l:Translate Home}">
 
     <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <Grid
@@ -64,13 +65,13 @@
                     Command="{Binding CreateLinkCommand}"
                     IsEnabled="{Binding CanInteract}"
                     Style="{StaticResource PrimaryButton}"
-                    Text="CREATE LINK"
+                    Text="{l:Translate CreateLink}"
                     SemanticProperties.Description="Create short link" />
 
                 <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
                                    SemanticProperties.Description="Creating link" />
                 <Border IsVisible="{Binding IsOffline}" Style="{StaticResource OfflineBanner}">
-                    <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                    <Label HorizontalTextAlignment="Center" Text="{l:Translate NoInternetConnection}"
                            TextColor="{DynamicResource AppDangerText}" />
                 </Border>
             </VerticalStackLayout>

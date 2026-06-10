@@ -120,7 +120,7 @@ public partial class AnalyticsPage
         catch ( Exception ex )
         {
             ShowNoStatistics();
-            await DisplayAlertAsync( "Error", $"Could not load stats: {ex.Message}", "OK" );
+            await DisplayAlertAsync( L("Error"), F("CouldNotLoadStats", ex.Message), "OK" );
             return false;
         }
     }
@@ -142,10 +142,10 @@ public partial class AnalyticsPage
     {
         TopLinkCard.Title = link.DisplayTitle;
         TopLinkCard.Url = link.OriginalUrl;
-        TopLinkCard.Clicks = link.DisplayClicks;
+        TopLinkCard.Clicks = link.Clicks;
         TopLinkCard.Category = link.CategoryName ?? string.Empty;
         TopLinkCard.Date = link.DisplayDate;
-        TopLinkCard.Expiration = link.DisplayExpiration;
+        TopLinkCard.ExpiresAt = link.ExpiresAt;
         TopLinkCard.IsPublic = link.IsPublic;
         TopLinkCard.LinkId = link.ResolvedId;
         TopLinkCard.ShortUrl = link.ShortUrl;
@@ -415,13 +415,14 @@ public partial class AnalyticsPage
         var categories = await _linkService.GetCategoriesAsync();
         if ( categories.Count == 0 )
         {
-            await DisplayAlertAsync( "No categories", "Create a category first from Links > Categories.", "OK" );
+            await DisplayAlertAsync( L("NoCategories"), L("CreateCategoryFirst"), "OK" );
             return null;
         }
 
-        var action = await DisplayActionSheetAsync( "Assign category", "Cancel", null,
+        var cancel = L("Cancel");
+        var action = await DisplayActionSheetAsync( L("AssignCategory"), cancel, null,
             categories.Select( c => c.Name ).ToArray() );
-        if ( string.IsNullOrWhiteSpace( action ) || action == "Cancel" )
+        if ( string.IsNullOrWhiteSpace( action ) || action == cancel )
             return null;
 
         var category =
@@ -432,13 +433,16 @@ public partial class AnalyticsPage
         var assigned = await _linkService.AssignCategoryAsync( linkId, category.Id );
         if ( !assigned )
         {
-            await DisplayAlertAsync( "Error", "Could not assign the category to the link.", "OK" );
+            await DisplayAlertAsync( L("Error"), L("CouldNotAssignCategory"), "OK" );
             return null;
         }
 
-        await DisplayAlertAsync( "Category assigned", $"'{category.Name}' is now attached to the link.", "OK" );
+        await DisplayAlertAsync( L("CategoryAssigned"), F("CategoryAssignedMessage", category.Name), "OK" );
         return category;
     }
+
+    private static string L(string key) => LocalizationManager.Instance.Get(key);
+    private static string F(string key, params object[] args) => LocalizationManager.Instance.Format(key, args);
 
     private static Color GetThemeColor( string key )
     {

@@ -37,8 +37,8 @@ public partial class CategoryManagementPopup
         if (!_connectivity.IsOnline)
         {
             await Shell.Current!.CurrentPage!.DisplayAlertAsync(
-                "Offline",
-                "Connect to the internet to manage categories.",
+                L("Offline"),
+                L("ConnectToManageCategories"),
                 "OK");
             await CloseAsync();
             return;
@@ -54,8 +54,8 @@ public partial class CategoryManagementPopup
         catch (Exception ex)
         {
             await Shell.Current!.CurrentPage!.DisplayAlertAsync(
-                "Error",
-                $"Could not load categories: {ex.Message}",
+                L("Error"),
+                F("CouldNotLoadCategories", ex.Message),
                 "OK");
             await CloseAsync();
         }
@@ -73,8 +73,8 @@ public partial class CategoryManagementPopup
             if (created is null)
             {
                 await Shell.Current!.CurrentPage!.DisplayAlertAsync(
-                    "Error",
-                    "Could not create that category.",
+                    L("Error"),
+                    L("CouldNotCreateCategory"),
                     "OK");
                 return;
             }
@@ -85,8 +85,8 @@ public partial class CategoryManagementPopup
         catch (Exception ex)
         {
             await Shell.Current!.CurrentPage!.DisplayAlertAsync(
-                "Error",
-                $"Could not create category: {ex.Message}",
+                L("Error"),
+                F("CouldNotCreateCategoryDetails", ex.Message),
                 "OK");
         }
     }
@@ -101,10 +101,10 @@ public partial class CategoryManagementPopup
             return;
 
         var confirm = await page.DisplayAlertAsync(
-            "Delete category",
-            $"Delete '{category.Name}'? This removes it from links too.",
-            "Delete",
-            "Cancel");
+            L("DeleteCategory"),
+            F("DeleteCategoryConfirmation", category.Name),
+            L("Delete"),
+            L("Cancel"));
 
         if (!confirm)
             return;
@@ -114,7 +114,7 @@ public partial class CategoryManagementPopup
             var success = await _linkService.DeleteCategoryAsync(category.Id);
             if (!success)
             {
-                await page.DisplayAlertAsync("Error", "Could not delete the category.", "OK");
+                await page.DisplayAlertAsync(L("Error"), L("CouldNotDeleteCategory"), "OK");
                 return;
             }
 
@@ -122,7 +122,7 @@ public partial class CategoryManagementPopup
         }
         catch (Exception ex)
         {
-            await page.DisplayAlertAsync("Error", $"Could not delete category: {ex.Message}", "OK");
+            await page.DisplayAlertAsync(L("Error"), F("CouldNotDeleteCategoryDetails", ex.Message), "OK");
         }
     }
 
@@ -139,4 +139,7 @@ public partial class CategoryManagementPopup
 
         await page.ClosePopupAsync();
     }
+
+    private static string L(string key) => LocalizationManager.Instance.Get(key);
+    private static string F(string key, params object[] args) => LocalizationManager.Instance.Format(key, args);
 }

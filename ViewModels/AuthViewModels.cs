@@ -51,7 +51,7 @@ public sealed class SignInViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
-            await _dialogs.AlertAsync("Missing details", "Enter an email and password.");
+            await _dialogs.AlertAsync(L("MissingDetails"), L("EnterEmailPassword"));
             return;
         }
 
@@ -60,7 +60,9 @@ public sealed class SignInViewModel : ViewModelBase
             var login = await _auth.LoginAsync(Email.Trim(), Password);
             if (!login.Success)
             {
-                await _dialogs.AlertAsync("Sign in failed", login.Error ?? "Could not sign in.");
+                await _dialogs.AlertAsync(
+                    L("SignInFailed"),
+                    LocalizationManager.Instance.LocalizeAuthError(login.Error ?? L("CouldNotSignIn")));
                 return;
             }
 
@@ -70,8 +72,10 @@ public sealed class SignInViewModel : ViewModelBase
         });
 
         if (HasError)
-            await _dialogs.AlertAsync("Sign in failed", ErrorMessage!);
+            await _dialogs.AlertAsync(L("SignInFailed"), ErrorMessage!);
     }
+
+    private static string L(string key) => LocalizationManager.Instance.Get(key);
 }
 
 public sealed class CreateAccountViewModel : ViewModelBase
@@ -129,13 +133,13 @@ public sealed class CreateAccountViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
-            await _dialogs.AlertAsync("Missing details", "Enter an email and password.");
+            await _dialogs.AlertAsync(L("MissingDetails"), L("EnterEmailPassword"));
             return;
         }
 
         if (Password != ConfirmPassword)
         {
-            await _dialogs.AlertAsync("Passwords do not match", "Check the confirmation password and try again.");
+            await _dialogs.AlertAsync(L("PasswordConfirmationMismatch"), L("CheckConfirmationPassword"));
             return;
         }
 
@@ -144,16 +148,16 @@ public sealed class CreateAccountViewModel : ViewModelBase
             var register = await _auth.RegisterAsync(Email.Trim(), Password);
             if (!register.Success)
             {
-                await _dialogs.AlertAsync("Create account failed",
-                    register.Error ?? "Could not create the account.");
+                await _dialogs.AlertAsync(
+                    L("CreateAccountFailed"),
+                    LocalizationManager.Instance.LocalizeAuthError(register.Error ?? L("CouldNotCreateAccount")));
                 return;
             }
 
             var login = await _auth.LoginAsync(Email.Trim(), Password);
             if (!login.Success)
             {
-                await _dialogs.AlertAsync("Account created",
-                    "Your account was created, but automatic sign in failed. Please sign in.");
+                await _dialogs.AlertAsync(L("AccountCreated"), L("AutomaticSignInFailed"));
                 await _navigation.GoToAsync("//SignIn");
                 return;
             }
@@ -165,6 +169,8 @@ public sealed class CreateAccountViewModel : ViewModelBase
         });
 
         if (HasError)
-            await _dialogs.AlertAsync("Create account failed", ErrorMessage!);
+            await _dialogs.AlertAsync(L("CreateAccountFailed"), ErrorMessage!);
     }
+
+    private static string L(string key) => LocalizationManager.Instance.Get(key);
 }

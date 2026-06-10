@@ -5,10 +5,11 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
+    xmlns:l="clr-namespace:KiirLink.Extensions"
     xmlns:models="clr-namespace:KiirLink.Models"
     xmlns:models1="clr-namespace:KiirLink.Models;assembly=KiirLink.Core"
     BackgroundColor="{DynamicResource AppBackground}"
-    Title="Links">
+    Title="{l:Translate Links}">
 
     <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <Grid
@@ -19,19 +20,19 @@
             <controls:AppHeader Grid.Row="0" />
 
             <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                <Label Style="{StaticResource SectionTitle}" Text="Popular link" VerticalTextAlignment="Center" />
+                <Label Style="{StaticResource SectionTitle}" Text="{l:Translate PopularLink}" VerticalTextAlignment="Center" />
                 <Button
                     Grid.Column="1"
                     Clicked="OnManageCategoriesClicked"
                     Style="{StaticResource OutlineButton}"
-                    Text="Categories" />
+                    Text="{l:Translate Categories}" />
                 <Button
                     Grid.Column="2"
                     Clicked="OnNewLinkClicked"
                     ContentLayout="Left,6"
                     ImageSource="plus.png"
                     Style="{StaticResource PrimaryButton}"
-                    Text="New link"
+                    Text="{l:Translate NewLink}"
                     AutomationProperties.IsInAccessibleTree="True"
                     SemanticProperties.Description="Create a new short link" />
             </Grid>
@@ -56,7 +57,7 @@
                             FontFamily="RadioCanadaBigSemiBold"
                             FontSize="31"
                             Text="0" />
-                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="16" Text="clicks"
+                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="16" Text="{l:Translate Clicks}"
                                HorizontalTextAlignment="Start"
                                VerticalTextAlignment="End" />
                     </HorizontalStackLayout>
@@ -77,7 +78,7 @@
                 </Grid>
             </Border>
 
-            <Label Grid.Row="3" Style="{StaticResource SectionTitle}" Text="My links" />
+            <Label Grid.Row="3" Style="{StaticResource SectionTitle}" Text="{l:Translate MyLinks}" />
 
             <Grid Grid.Row="4">
 
@@ -89,7 +90,7 @@
                             Clicked="OnFilterClicked"
                             CommandParameter="0"
                             Style="{StaticResource ChipButton}"
-                            Text="All"
+                            Text="{l:Translate All}"
                             MinimumWidthRequest="50" />
 
                     </HorizontalStackLayout>
@@ -142,14 +143,14 @@
                             QRCodeRequested="OnCreateQRCodeClicked"
                             Category="{Binding CategoryName}"
                             Date="{Binding DisplayDate}"
-                            Expiration="{Binding DisplayExpiration}"
+                            ExpiresAt="{Binding ExpiresAt}"
                             IsFavourite="{Binding IsFavourite}"
                             IsPublic="{Binding IsPublic}"
                             LinkId="{Binding Id}"
                             ShortUrl="{Binding ShortUrl}"
                             Title="{Binding DisplayTitle}"
                             Url="{Binding OriginalUrl}"
-                            Clicks="{Binding DisplayClicks}" />
+                            Clicks="{Binding Clicks}" />
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
                 <CollectionView.EmptyView>
@@ -157,7 +158,7 @@
                         Margin="0,24"
                         HorizontalTextAlignment="Center"
                         Style="{StaticResource MutedLabel}"
-                        Text="No links found." />
+                        Text="{l:Translate NoLinksFound}" />
                 </CollectionView.EmptyView>
             </CollectionView>
 
@@ -200,7 +201,7 @@
                 IsVisible="False"
                 Style="{StaticResource OfflineBanner}"
                 VerticalOptions="Start">
-                <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                <Label HorizontalTextAlignment="Center" Text="{l:Translate NoInternetConnection}"
                        TextColor="{DynamicResource AppDangerText}" />
             </Border>
 

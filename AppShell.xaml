@@ -4,6 +4,7 @@
     x:Class="KiirLink.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:l="clr-namespace:KiirLink.Extensions"
     xmlns:local="clr-namespace:KiirLink"
     xmlns:pages="clr-namespace:KiirLink.Pages"
     FlyoutBehavior="Disabled"
@@ -15,34 +16,34 @@
     <ShellContent
         ContentTemplate="{DataTemplate pages:SignInPage}"
         Route="SignIn"
-        Title="Sign in" />
+        Title="{l:Translate SignIn}" />
 
     <ShellContent
         ContentTemplate="{DataTemplate pages:CreateAccountPage}"
         Route="CreateAccount"
-        Title="Create account" />
+        Title="{l:Translate CreateAccount}" />
 
     <TabBar Shell.TabBarIsVisible="False">
         <ShellContent
             ContentTemplate="{DataTemplate local:MainPage}"
             Route="Home"
-            Title="Home" />
+            Title="{l:Translate Home}" />
         <ShellContent
             ContentTemplate="{DataTemplate pages:LinksPage}"
             Route="Links"
-            Title="Links" />
+            Title="{l:Translate Links}" />
         <ShellContent
             ContentTemplate="{DataTemplate pages:FavouritesPage}"
             Route="Favourites"
-            Title="Favourites" />
+            Title="{l:Translate Favourites}" />
         <ShellContent
             ContentTemplate="{DataTemplate pages:ProfilePage}"
             Route="Profile"
-            Title="Profile" />
+            Title="{l:Translate Profile}" />
         <ShellContent
             ContentTemplate="{DataTemplate pages:AnalyticsPage}"
             Route="Analytics"
-            Title="Analytics" />
+            Title="{l:Translate Analytics}" />
     </TabBar>
 
 </Shell>

@@ -19,4 +19,10 @@
   <ItemGroup>
     <ProjectReference Include="..\KiirLink.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Resources\Strings\AppResources*.resx"
+          Link="Localization\%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

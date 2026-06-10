@@ -7,6 +7,7 @@ public partial class App : Application
 {
     public App()
     {
+        LocalizationManager.Instance.Initialize();
         InitializeComponent();
         ThemeService.Initialize();
     }

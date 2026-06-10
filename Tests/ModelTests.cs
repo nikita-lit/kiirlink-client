@@ -49,6 +49,25 @@ public sealed class ModelTests
         Assert.Equal(3, country.Count);
     }
 
+    [Fact]
+    public void LinkModel_DeserializesClickCount()
+    {
+        const string json = """
+            {
+              "id": 7,
+              "shortUrl": "test",
+              "originalUrl": "https://example.com",
+              "clickCount": 23
+            }
+            """;
+
+        var model = JsonSerializer.Deserialize<LinkModel>(json);
+
+        Assert.NotNull(model);
+        Assert.Equal(23, model.Clicks);
+        Assert.Equal("23", model.DisplayClicks);
+    }
+
     [Theory]
     [InlineData(null, "")]
     [InlineData("2026-06-10T11:00:00Z", "Expired")]

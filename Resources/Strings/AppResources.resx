@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="Account" xml:space="preserve"><value>Account</value></data>
+  <data name="Add" xml:space="preserve"><value>Add</value></data>
+  <data name="AddToFavourites" xml:space="preserve"><value>Add to favourites</value></data>
+  <data name="All" xml:space="preserve"><value>All</value></data>
+  <data name="Analytics" xml:space="preserve"><value>Analytics</value></data>
+  <data name="AssignCategory" xml:space="preserve"><value>Assign category</value></data>
+  <data name="AutoExpiration" xml:space="preserve"><value>Auto-expiration</value></data>
+  <data name="BackToSignIn" xml:space="preserve"><value>BACK TO SIGN IN</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Categories" xml:space="preserve"><value>Categories</value></data>
+  <data name="ChangePassword" xml:space="preserve"><value>Change password</value></data>
+  <data name="Clicks" xml:space="preserve"><value>clicks</value></data>
+  <data name="ConfirmNewPassword" xml:space="preserve"><value>Confirm new password</value></data>
+  <data name="ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="CopyOriginalLink" xml:space="preserve"><value>Copy original link</value></data>
+  <data name="CopyShortLink" xml:space="preserve"><value>Copy short link</value></data>
+  <data name="Countries" xml:space="preserve"><value>Countries</value></data>
+  <data name="CreateAccount" xml:space="preserve"><value>Create account</value></data>
+  <data name="CreateAccountAction" xml:space="preserve"><value>CREATE ACCOUNT</value></data>
+  <data name="CreateLink" xml:space="preserve"><value>CREATE LINK</value></data>
+  <data name="CreateQrCode" xml:space="preserve"><value>Create QR Code</value></data>
+  <data name="CurrentPassword" xml:space="preserve"><value>Current password</value></data>
+  <data name="DarkTheme" xml:space="preserve"><value>Dark theme</value></data>
+  <data name="DefaultCategory" xml:space="preserve"><value>Default category</value></data>
+  <data name="Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Email" xml:space="preserve"><value>Email</value></data>
+  <data name="English" xml:space="preserve"><value>English</value></data>
+  <data name="Error" xml:space="preserve"><value>Error</value></data>
+  <data name="Estonian" xml:space="preserve"><value>Estonian</value></data>
+  <data name="Favourites" xml:space="preserve"><value>Favourites</value></data>
+  <data name="Home" xml:space="preserve"><value>Home</value></data>
+  <data name="Language" xml:space="preserve"><value>Language</value></data>
+  <data name="LinkActions" xml:space="preserve"><value>Link actions</value></data>
+  <data name="LinkSettings" xml:space="preserve"><value>Link Settings</value></data>
+  <data name="Links" xml:space="preserve"><value>Links</value></data>
+  <data name="Logout" xml:space="preserve"><value>Logout</value></data>
+  <data name="ManageCategories" xml:space="preserve"><value>Manage categories</value></data>
+  <data name="MyFavourites" xml:space="preserve"><value>My favourites</value></data>
+  <data name="MyLinks" xml:space="preserve"><value>My links</value></data>
+  <data name="Never" xml:space="preserve"><value>Never</value></data>
+  <data name="NewCategory" xml:space="preserve"><value>New category</value></data>
+  <data name="NewLink" xml:space="preserve"><value>New link</value></data>
+  <data name="NewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="NoCategoriesYet" xml:space="preserve"><value>No categories yet.</value></data>
+  <data name="NoFavouritesYet" xml:space="preserve"><value>No favourites yet.</value></data>
+  <data name="NoInternetConnection" xml:space="preserve"><value>No internet connection</value></data>
+  <data name="NoLinksFound" xml:space="preserve"><value>No links found.</value></data>
+  <data name="NoPerformanceData" xml:space="preserve"><value>No performance data yet.</value></data>
+  <data name="NoStatistics" xml:space="preserve"><value>No statistics are available for this link yet.</value></data>
+  <data name="None" xml:space="preserve"><value>None</value></data>
+  <data name="Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Performance" xml:space="preserve"><value>Performance</value></data>
+  <data name="PopularLink" xml:space="preserve"><value>Popular link</value></data>
+  <data name="Preferences" xml:space="preserve"><value>Preferences</value></data>
+  <data name="Privacy" xml:space="preserve"><value>Privacy</value></data>
+  <data name="Private" xml:space="preserve"><value>Private</value></data>
+  <data name="Profile" xml:space="preserve"><value>Profile</value></data>
+  <data name="Public" xml:space="preserve"><value>Public</value></data>
+  <data name="RecentActivity" xml:space="preserve"><value>Recent activity</value></data>
+  <data name="RemoveFromFavourites" xml:space="preserve"><value>Remove from favourites</value></data>
+  <data name="RepeatPassword" xml:space="preserve"><value>Repeat password</value></data>
+  <data name="Russian" xml:space="preserve"><value>Russian</value></data>
+  <data name="Save" xml:space="preserve"><value>Save</value></data>
+  <data name="SignIn" xml:space="preserve"><value>Sign in</value></data>
+  <data name="SignInAction" xml:space="preserve"><value>SIGN IN</value></data>
+  <data name="Username" xml:space="preserve"><value>Username</value></data>
+  <data name="ViewAnalytics" xml:space="preserve"><value>View analytics</value></data>
+  <data name="SignInSubtitle" xml:space="preserve"><value>Sign in to manage your links.</value></data>
+  <data name="SignInFooter" xml:space="preserve"><value>Use your KiirLink account to continue.</value></data>
+  <data name="CreateAccountSubtitle" xml:space="preserve"><value>Make a new KiirLink account.</value></data>
+  <data name="ProtectedWorkspace" xml:space="preserve"><value>Protected workspace</value></data>
+  <data name="ExpirationHelp" xml:space="preserve"><value>New links will expire at the end of the selected day.</value></data>
+  <data name="DeleteCategoryHelp" xml:space="preserve"><value>Deleting a category removes it from linked links.</value></data>
+  <data name="SelectLanguage" xml:space="preserve"><value>Select language</value></data>
+  <data name="DefaultPrivacy" xml:space="preserve"><value>Default privacy</value></data>
+  <data name="LogOutTitle" xml:space="preserve"><value>Log out</value></data>
+  <data name="LogOutConfirmation" xml:space="preserve"><value>Are you sure you want to log out?</value></data>
+  <data name="PasswordChanged" xml:space="preserve"><value>Password changed</value></data>
+  <data name="PasswordChangedMessage" xml:space="preserve"><value>Your password has been updated.</value></data>
+  <data name="EnterCurrentPassword" xml:space="preserve"><value>Enter your current password.</value></data>
+  <data name="PasswordMinimumLength" xml:space="preserve"><value>The new password must contain at least 6 characters.</value></data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve"><value>The new passwords do not match.</value></data>
+  <data name="CouldNotChangePassword" xml:space="preserve"><value>Could not change the password.</value></data>
+  <data name="CouldNotChangePasswordDetails" xml:space="preserve"><value>Could not change password: {0}</value></data>
+  <data name="MissingDetails" xml:space="preserve"><value>Missing details</value></data>
+  <data name="EnterEmailPassword" xml:space="preserve"><value>Enter an email and password.</value></data>
+  <data name="SignInFailed" xml:space="preserve"><value>Sign in failed</value></data>
+  <data name="CouldNotSignIn" xml:space="preserve"><value>Could not sign in.</value></data>
+  <data name="PasswordConfirmationMismatch" xml:space="preserve"><value>Passwords do not match</value></data>
+  <data name="CheckConfirmationPassword" xml:space="preserve"><value>Check the confirmation password and try again.</value></data>
+  <data name="CreateAccountFailed" xml:space="preserve"><value>Create account failed</value></data>
+  <data name="CouldNotCreateAccount" xml:space="preserve"><value>Could not create the account.</value></data>
+  <data name="AccountCreated" xml:space="preserve"><value>Account created</value></data>
+  <data name="AutomaticSignInFailed" xml:space="preserve"><value>Your account was created, but automatic sign in failed. Please sign in.</value></data>
+  <data name="AddLink" xml:space="preserve"><value>Add a link</value></data>
+  <data name="EnterUrl" xml:space="preserve"><value>Enter the URL you want to shorten.</value></data>
+  <data name="InvalidLink" xml:space="preserve"><value>Invalid link</value></data>
+  <data name="EnterValidWebAddress" xml:space="preserve"><value>Enter a valid web address.</value></data>
+  <data name="CouldNotCreateLink" xml:space="preserve"><value>Could not create link</value></data>
+  <data name="TryAgain" xml:space="preserve"><value>Please try again.</value></data>
+  <data name="LinkCreated" xml:space="preserve"><value>Link created</value></data>
+  <data name="ShortLinkReady" xml:space="preserve"><value>Your short link is ready.</value></data>
+  <data name="Done" xml:space="preserve"><value>Done</value></data>
+  <data name="NetworkError" xml:space="preserve"><value>Network error</value></data>
+  <data name="CouldNotLoadLinks" xml:space="preserve"><value>Could not load links: {0}</value></data>
+  <data name="CouldNotLoadFavourites" xml:space="preserve"><value>Could not load favourites: {0}</value></data>
+  <data name="CouldNotLoadStats" xml:space="preserve"><value>Could not load stats: {0}</value></data>
+  <data name="CouldNotUpdateFavourite" xml:space="preserve"><value>Could not update favourite status</value></data>
+  <data name="ErrorDetails" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="DeleteLink" xml:space="preserve"><value>Delete link</value></data>
+  <data name="DeleteLinkConfirmation" xml:space="preserve"><value>Delete {0}? This cannot be undone.</value></data>
+  <data name="Deleted" xml:space="preserve"><value>Deleted</value></data>
+  <data name="LinkDeleted" xml:space="preserve"><value>Link has been deleted.</value></data>
+  <data name="CouldNotDeleteLink" xml:space="preserve"><value>Could not delete link</value></data>
+  <data name="Removed" xml:space="preserve"><value>Removed</value></data>
+  <data name="RemovedFromFavourites" xml:space="preserve"><value>Removed from favourites.</value></data>
+  <data name="NoCategories" xml:space="preserve"><value>No categories</value></data>
+  <data name="CreateCategoryFirst" xml:space="preserve"><value>Create a category first from Links &gt; Categories.</value></data>
+  <data name="CouldNotAssignCategory" xml:space="preserve"><value>Could not assign the category to the link.</value></data>
+  <data name="CategoryAssigned" xml:space="preserve"><value>Category assigned</value></data>
+  <data name="CategoryAssignedMessage" xml:space="preserve"><value>'{0}' is now attached to the link.</value></data>
+  <data name="Offline" xml:space="preserve"><value>Offline</value></data>
+  <data name="ConnectToManageCategories" xml:space="preserve"><value>Connect to the internet to manage categories.</value></data>
+  <data name="CouldNotLoadCategories" xml:space="preserve"><value>Could not load categories: {0}</value></data>
+  <data name="CouldNotCreateCategory" xml:space="preserve"><value>Could not create that category.</value></data>
+  <data name="CouldNotCreateCategoryDetails" xml:space="preserve"><value>Could not create category: {0}</value></data>
+  <data name="DeleteCategory" xml:space="preserve"><value>Delete category</value></data>
+  <data name="DeleteCategoryConfirmation" xml:space="preserve"><value>Delete '{0}'? This removes it from links too.</value></data>
+  <data name="CouldNotDeleteCategory" xml:space="preserve"><value>Could not delete the category.</value></data>
+  <data name="CouldNotDeleteCategoryDetails" xml:space="preserve"><value>Could not delete category: {0}</value></data>
+  <data name="Expired" xml:space="preserve"><value>Expired</value></data>
+  <data name="ExpiresInHours" xml:space="preserve"><value>Expires in {0}h</value></data>
+  <data name="ExpiresInDays" xml:space="preserve"><value>Expires in {0}d</value></data>
+  <data name="ExpiresOn" xml:space="preserve"><value>Expires {0}</value></data>
+  <data name="Uncategorized" xml:space="preserve"><value>Uncategorized</value></data>
+  <data name="TooManyAttempts" xml:space="preserve"><value>Too many attempts. Wait a moment and try again.</value></data>
+  <data name="IncorrectEmailPassword" xml:space="preserve"><value>Incorrect email or password.</value></data>
+  <data name="SessionExpired" xml:space="preserve"><value>Your session has expired. Sign in again and retry.</value></data>
+  <data name="DuplicateEmail" xml:space="preserve"><value>An account with this email already exists.</value></data>
+  <data name="InvalidEmail" xml:space="preserve"><value>Enter a valid email address.</value></data>
+  <data name="PasswordTooShort" xml:space="preserve"><value>The password is too short.</value></data>
+  <data name="PasswordRequiresDigit" xml:space="preserve"><value>The password must contain a number.</value></data>
+  <data name="PasswordRequiresLower" xml:space="preserve"><value>The password must contain a lowercase letter.</value></data>
+  <data name="PasswordRequiresUpper" xml:space="preserve"><value>The password must contain an uppercase letter.</value></data>
+  <data name="PasswordRequiresNonAlphanumeric" xml:space="preserve"><value>The password must contain a special character.</value></data>
+  <data name="PasswordRequiresUniqueChars" xml:space="preserve"><value>The password must contain more unique characters.</value></data>
+  <data name="CurrentPasswordIncorrect" xml:space="preserve"><value>The current password is incorrect.</value></data>
+  <data name="RegisterAuthFailed" xml:space="preserve"><value>Could not create the account. Check the email and password.</value></data>
+  <data name="ChangePasswordAuthFailed" xml:space="preserve"><value>Could not change the password. Check your current and new passwords.</value></data>
+  <data name="AuthenticationFailed" xml:space="preserve"><value>Authentication failed. Please try again.</value></data>
+  <data name="InvalidServerResponse" xml:space="preserve"><value>Invalid response from server.</value></data>
+  <data name="CouldNotLoadCategoriesProfile" xml:space="preserve"><value>Could not load categories: {0}</value></data>
+</root>

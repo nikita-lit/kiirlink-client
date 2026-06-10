@@ -39,7 +39,7 @@ public sealed class HomeViewModel : ViewModelBase
         var value = OriginalUrl.Trim();
         if (string.IsNullOrWhiteSpace(value))
         {
-            await _dialogs.AlertAsync("Add a link", "Enter the URL you want to shorten.");
+            await _dialogs.AlertAsync(L("AddLink"), L("EnterUrl"));
             return;
         }
 
@@ -49,7 +49,7 @@ public sealed class HomeViewModel : ViewModelBase
 
         if (!Uri.TryCreate(originalUrl, UriKind.Absolute, out _))
         {
-            await _dialogs.AlertAsync("Invalid link", "Enter a valid web address.");
+            await _dialogs.AlertAsync(L("InvalidLink"), L("EnterValidWebAddress"));
             return;
         }
 
@@ -63,17 +63,18 @@ public sealed class HomeViewModel : ViewModelBase
                 _preferences.DefaultCategoryId);
             if (!result.Success)
             {
-                await _dialogs.AlertAsync("Could not create link", result.Error ?? "Please try again.");
+                await _dialogs.AlertAsync(L("CouldNotCreateLink"), result.Error ?? L("TryAgain"));
                 return;
             }
 
             OriginalUrl = string.Empty;
-            await _dialogs.AlertAsync("Link created", "Your short link is ready.", "Done");
+            await _dialogs.AlertAsync(L("LinkCreated"), L("ShortLinkReady"), L("Done"));
             await _navigation.GoToAsync("//Links");
         });
 
         if (HasError)
-            await _dialogs.AlertAsync("Network error", ErrorMessage!);
+            await _dialogs.AlertAsync(L("NetworkError"), ErrorMessage!);
     }
 
+    private static string L(string key) => LocalizationManager.Instance.Get(key);
 }

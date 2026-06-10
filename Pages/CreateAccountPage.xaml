@@ -4,10 +4,11 @@
     x:Class="KiirLink.Pages.CreateAccountPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:l="clr-namespace:KiirLink.Extensions"
     xmlns:viewModels="clr-namespace:KiirLink.ViewModels"
     x:DataType="viewModels:CreateAccountViewModel"
     BackgroundColor="{DynamicResource AppBackground}"
-    Title="Create account">
+    Title="{l:Translate CreateAccount}">
 
     <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <ScrollView Grid.Row="0">
@@ -27,30 +28,30 @@
                         HorizontalTextAlignment="Center"
                         FontFamily="RadioCanadaBigSemiBold"
                         FontSize="24"
-                        Text="Create account" />
+                        Text="{l:Translate CreateAccount}" />
                     <Label
                         HorizontalTextAlignment="Center"
                         Style="{StaticResource MutedLabel}"
-                        Text="Make a new KiirLink account." />
+                        Text="{l:Translate CreateAccountSubtitle}" />
                 </VerticalStackLayout>
 
                 <Border Padding="{StaticResource CardPadding}" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="12">
                         <VerticalStackLayout Spacing="6">
-                            <Label FontSize="11" Text="Email" />
+                            <Label FontSize="11" Text="{l:Translate Email}" />
                             <Entry Keyboard="Email" Placeholder="you@example.com" ReturnType="Next"
                                    Text="{Binding Email}" SemanticProperties.Description="Email address" />
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="6">
-                            <Label FontSize="11" Text="Password" />
-                            <Entry IsPassword="True" Placeholder="Password" ReturnType="Next"
+                            <Label FontSize="11" Text="{l:Translate Password}" />
+                            <Entry IsPassword="True" Placeholder="{l:Translate Password}" ReturnType="Next"
                                    Text="{Binding Password}" SemanticProperties.Description="Password" />
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="6">
-                            <Label FontSize="11" Text="Confirm password" />
-                            <Entry IsPassword="True" Placeholder="Repeat password" ReturnType="Done"
+                            <Label FontSize="11" Text="{l:Translate ConfirmPassword}" />
+                            <Entry IsPassword="True" Placeholder="{l:Translate RepeatPassword}" ReturnType="Done"
                                    Text="{Binding ConfirmPassword}" SemanticProperties.Description="Confirm password" />
                         </VerticalStackLayout>
 
@@ -58,19 +59,19 @@
                             Command="{Binding CreateAccountCommand}"
                             IsEnabled="{Binding CanInteract}"
                             Style="{StaticResource PrimaryButton}"
-                            Text="CREATE ACCOUNT" />
+                            Text="{l:Translate CreateAccountAction}" />
 
                         <Button
                             Command="{Binding BackCommand}"
                             Style="{StaticResource OutlineButton}"
-                            Text="BACK TO SIGN IN" />
+                            Text="{l:Translate BackToSignIn}" />
                     </VerticalStackLayout>
                 </Border>
 
                 <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
                                    SemanticProperties.Description="Creating account" />
                 <Border IsVisible="{Binding IsOffline}" Style="{StaticResource OfflineBanner}">
-                    <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                    <Label HorizontalTextAlignment="Center" Text="{l:Translate NoInternetConnection}"
                            TextColor="{DynamicResource AppDangerText}" />
                 </Border>
             </VerticalStackLayout>
@@ -81,6 +82,6 @@
             Margin="24,0,24,18"
             HorizontalTextAlignment="Center"
             Style="{StaticResource MutedLabel}"
-            Text="Protected workspace" />
+            Text="{l:Translate ProtectedWorkspace}" />
     </Grid>
 </ContentPage>

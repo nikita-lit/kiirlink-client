@@ -3,7 +3,8 @@
 <ContentView
     x:Class="KiirLink.Controls.BottomNavigation"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:l="clr-namespace:KiirLink.Extensions">
 
     <Border
         Margin="24,6,24,12"
@@ -24,7 +25,7 @@
                     WidthRequest="29" />
                 <Button
                     AutomationProperties.IsInAccessibleTree="True"
-                    SemanticProperties.Description="Home"
+                    SemanticProperties.Description="{l:Translate Home}"
                     BackgroundColor="Transparent"
                     Clicked="OnHomeClicked"
                     Opacity="0.01" />
@@ -44,7 +45,7 @@
                     WidthRequest="29" />
                 <Button
                     AutomationProperties.IsInAccessibleTree="True"
-                    SemanticProperties.Description="Links"
+                    SemanticProperties.Description="{l:Translate Links}"
                     BackgroundColor="Transparent"
                     Clicked="OnLinksClicked"
                     Opacity="0.01" />
@@ -64,7 +65,7 @@
                     WidthRequest="29" />
                 <Button
                     AutomationProperties.IsInAccessibleTree="True"
-                    SemanticProperties.Description="Favourites"
+                    SemanticProperties.Description="{l:Translate Favourites}"
                     BackgroundColor="Transparent"
                     Clicked="OnFavouritesClicked"
                     Opacity="0.01" />
@@ -84,7 +85,7 @@
                     WidthRequest="29" />
                 <Button
                     AutomationProperties.IsInAccessibleTree="True"
-                    SemanticProperties.Description="Profile"
+                    SemanticProperties.Description="{l:Translate Profile}"
                     BackgroundColor="Transparent"
                     Clicked="OnProfileClicked"
                     Opacity="0.01" />

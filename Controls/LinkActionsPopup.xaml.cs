@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui.Extensions;
+using KiirLink.Services;
 
 namespace KiirLink.Controls;
 
@@ -19,8 +20,9 @@ public partial class LinkActionsPopup
     public LinkActionsPopup( bool isFavourite )
     {
         InitializeComponent();
-        CategoryButton.Text = "Assign category";
-        FavouriteButton.Text = isFavourite ? "Remove from favourites" : "Add to favourites";
+        CategoryButton.Text = LocalizationManager.Instance.Get("AssignCategory");
+        FavouriteButton.Text = LocalizationManager.Instance.Get(
+            isFavourite ? "RemoveFromFavourites" : "AddToFavourites");
     }
 
     private async Task CloseWith( LinkActionsPopupAction action )

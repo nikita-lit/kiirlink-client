@@ -26,19 +26,19 @@ public partial class ChangePasswordPopup
 
         if (string.IsNullOrWhiteSpace(currentPassword))
         {
-            ShowError("Enter your current password.");
+            ShowError(LocalizationManager.Instance.Get("EnterCurrentPassword"));
             return;
         }
 
         if (newPassword.Length < 6)
         {
-            ShowError("The new password must contain at least 6 characters.");
+            ShowError(LocalizationManager.Instance.Get("PasswordMinimumLength"));
             return;
         }
 
         if (!string.Equals(newPassword, confirmation, StringComparison.Ordinal))
         {
-            ShowError("The new passwords do not match.");
+            ShowError(LocalizationManager.Instance.Get("PasswordsDoNotMatch"));
             return;
         }
 
@@ -48,7 +48,8 @@ public partial class ChangePasswordPopup
             var result = await _authService.ChangePasswordAsync(currentPassword, newPassword);
             if (!result.Success)
             {
-                ShowError(result.Error ?? "Could not change the password.");
+                ShowError(LocalizationManager.Instance.LocalizeAuthError(
+                    result.Error ?? LocalizationManager.Instance.Get("CouldNotChangePassword")));
                 return;
             }
 
@@ -56,7 +57,7 @@ public partial class ChangePasswordPopup
         }
         catch (Exception ex)
         {
-            ShowError($"Could not change password: {ex.Message}");
+            ShowError(LocalizationManager.Instance.Format("CouldNotChangePasswordDetails", ex.Message));
         }
         finally
         {

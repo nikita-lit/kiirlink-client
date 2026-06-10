@@ -125,7 +125,7 @@ public partial class LinksPage
         }
         catch ( Exception ex )
         {
-            await DisplayAlertAsync( "Error", $"Could not load links: {ex.Message}", "OK" );
+            await DisplayAlertAsync( L("Error"), F("CouldNotLoadLinks", ex.Message), "OK" );
         }
         finally
         {
@@ -336,11 +336,11 @@ public partial class LinksPage
             }
 
             if ( !success )
-                await DisplayAlertAsync( "Error", "Could not update favourite status", "OK" );
+                await DisplayAlertAsync( L("Error"), L("CouldNotUpdateFavourite"), "OK" );
         }
         catch ( Exception ex )
         {
-            await DisplayAlertAsync( "Error", $"Error: {ex.Message}", "OK" );
+            await DisplayAlertAsync( L("Error"), F("ErrorDetails", ex.Message), "OK" );
         }
     }
 
@@ -349,10 +349,10 @@ public partial class LinksPage
         if ( sender is not Controls.LinkCard card ) return;
 
         var confirm = await DisplayAlertAsync(
-            "Delete link",
-            $"Delete {card.Title}? This cannot be undone.",
-            "Delete",
-            "Cancel" );
+            L("DeleteLink"),
+            F("DeleteLinkConfirmation", card.Title),
+            L("Delete"),
+            L("Cancel") );
 
         if ( !confirm ) return;
 
@@ -362,17 +362,17 @@ public partial class LinksPage
             if ( success )
             {
                 Links.RemoveAt( Links.IndexOf( Links.FirstOrDefault( l => l.Id == card.LinkId )! ) );
-                await DisplayAlertAsync( "Deleted", "Link has been deleted.", "OK" );
+                await DisplayAlertAsync( L("Deleted"), L("LinkDeleted"), "OK" );
                 await LoadLinksAsync();
             }
             else
             {
-                await DisplayAlertAsync( "Error", "Could not delete link", "OK" );
+                await DisplayAlertAsync( L("Error"), L("CouldNotDeleteLink"), "OK" );
             }
         }
         catch ( Exception ex )
         {
-            await DisplayAlertAsync( "Error", $"Error: {ex.Message}", "OK" );
+            await DisplayAlertAsync( L("Error"), F("ErrorDetails", ex.Message), "OK" );
         }
     }
 
@@ -399,13 +399,14 @@ public partial class LinksPage
         var categories = Categories.ToList();
         if ( categories.Count == 0 )
         {
-            await DisplayAlertAsync( "No categories", "Create a category first from Categories.", "OK" );
+            await DisplayAlertAsync( L("NoCategories"), L("CreateCategoryFirst"), "OK" );
             return null;
         }
 
-        var action = await DisplayActionSheetAsync( "Assign category", "Cancel", null,
+        var cancel = L("Cancel");
+        var action = await DisplayActionSheetAsync( L("AssignCategory"), cancel, null,
             categories.Select( c => c.Name ).ToArray() );
-        if ( string.IsNullOrWhiteSpace( action ) || action == "Cancel" )
+        if ( string.IsNullOrWhiteSpace( action ) || action == cancel )
             return null;
 
         var category =
@@ -416,13 +417,16 @@ public partial class LinksPage
         var assigned = await _linkService.AssignCategoryAsync( linkId, category.Id );
         if ( !assigned )
         {
-            await DisplayAlertAsync( "Error", "Could not assign the category to the link.", "OK" );
+            await DisplayAlertAsync( L("Error"), L("CouldNotAssignCategory"), "OK" );
             return null;
         }
 
-        await DisplayAlertAsync( "Category assigned", $"'{category.Name}' is now attached to the link.", "OK" );
+        await DisplayAlertAsync( L("CategoryAssigned"), F("CategoryAssignedMessage", category.Name), "OK" );
         return category;
     }
+
+    private static string L(string key) => LocalizationManager.Instance.Get(key);
+    private static string F(string key, params object[] args) => LocalizationManager.Instance.Format(key, args);
 
     private void RefreshFilterStyles()
     {

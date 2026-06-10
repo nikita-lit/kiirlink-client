@@ -18,7 +18,9 @@ public sealed class LinkPreferencesService
     }
 
     public string DefaultCategoryName =>
-        Preferences.Default.Get(CategoryNameKey, "None");
+        DefaultCategoryId.HasValue
+            ? Preferences.Default.Get(CategoryNameKey, string.Empty)
+            : LocalizationManager.Instance.Get("None");
 
     public DateTime? AutoExpirationDate
     {
@@ -41,9 +43,12 @@ public sealed class LinkPreferencesService
     public bool IsPublic => Preferences.Default.Get(IsPublicKey, true);
 
     public string AutoExpirationDisplay =>
-        AutoExpirationDate is DateTime date ? date.ToString("MMM d, yyyy") : "Never";
+        AutoExpirationDate is DateTime date
+            ? date.ToString("MMM d, yyyy", LocalizationManager.Instance.CurrentCulture)
+            : LocalizationManager.Instance.Get("Never");
 
-    public string PrivacyDisplay => IsPublic ? "Public" : "Private";
+    public string PrivacyDisplay =>
+        LocalizationManager.Instance.Get(IsPublic ? "Public" : "Private");
 
     public void SetDefaultCategory(int? categoryId, string? categoryName)
     {

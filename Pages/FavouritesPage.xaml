@@ -5,10 +5,11 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
+    xmlns:l="clr-namespace:KiirLink.Extensions"
     xmlns:models="clr-namespace:KiirLink.Models"
     xmlns:models1="clr-namespace:KiirLink.Models;assembly=KiirLink.Core"
     BackgroundColor="{DynamicResource AppBackground}"
-    Title="Favourites">
+    Title="{l:Translate Favourites}">
 
     <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <Grid
@@ -40,7 +41,7 @@
                             FontFamily="RadioCanadaBigSemiBold"
                             FontSize="30"
                             Text="0" />
-                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="11" Text="favourites"
+                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="11" Text="{l:Translate Favourites}"
                                TextColor="{DynamicResource AppText}" />
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
@@ -49,7 +50,7 @@
             <Label
                 Grid.Row="2"
                 Style="{StaticResource SectionTitle}"
-                Text="My favourites" />
+                Text="{l:Translate MyFavourites}" />
 
             <CollectionView
                 x:Name="FavouritesCollection"
@@ -69,14 +70,14 @@
                             QRCodeRequested="OnCreateQRCodeClicked"
                             Category="{Binding CategoryName}"
                             Date="{Binding DisplayDate}"
-                            Expiration="{Binding DisplayExpiration}"
+                            ExpiresAt="{Binding ExpiresAt}"
                             IsFavourite="True"
                             IsPublic="{Binding IsPublic}"
                             LinkId="{Binding ResolvedId}"
                             ShortUrl="{Binding ShortUrl}"
                             Title="{Binding DisplayTitle}"
                             Url="{Binding OriginalUrl}"
-                            Clicks="{Binding DisplayClicks}" />
+                            Clicks="{Binding Clicks}" />
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
                 <CollectionView.EmptyView>
@@ -84,7 +85,7 @@
                         Margin="0,24"
                         HorizontalTextAlignment="Center"
                         Style="{StaticResource MutedLabel}"
-                        Text="No favourites yet." />
+                        Text="{l:Translate NoFavouritesYet}" />
                 </CollectionView.EmptyView>
             </CollectionView>
 
@@ -101,7 +102,7 @@
                 IsVisible="False"
                 Style="{StaticResource OfflineBanner}"
                 VerticalOptions="Start">
-                <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                <Label HorizontalTextAlignment="Center" Text="{l:Translate NoInternetConnection}"
                        TextColor="{DynamicResource AppDangerText}" />
             </Border>
         </Grid>

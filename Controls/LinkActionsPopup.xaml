@@ -4,6 +4,7 @@
     x:Class="KiirLink.Controls.LinkActionsPopup"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:l="clr-namespace:KiirLink.Extensions"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     BackgroundColor="Transparent"
     Padding="0"
@@ -18,7 +19,7 @@
             <Label
                 FontFamily="RadioCanadaBigSemiBold"
                 FontSize="14"
-                Text="Link actions"
+                Text="{l:Translate LinkActions}"
                 TextColor="{DynamicResource AppText}" />
 
             <Button
@@ -26,14 +27,14 @@
                 ContentLayout="Left,8"
                 ImageSource="copy.svg"
                 Style="{StaticResource PrimaryButton}"
-                Text="Copy short link" />
+                Text="{l:Translate CopyShortLink}" />
 
             <Button
                 Clicked="OnCreateQRCodeClicked"
                 ContentLayout="Left,8"
                 ImageSource="qr_code.svg"
                 Style="{StaticResource PrimaryButton}"
-                Text="Create QR Code" />
+                Text="{l:Translate CreateQrCode}" />
 
             <BoxView
                 Margin="0,4"
@@ -45,14 +46,14 @@
                 ContentLayout="Left,8"
                 ImageSource="action_link.svg"
                 Style="{StaticResource OutlineButton}"
-                Text="Copy original link" />
+                Text="{l:Translate CopyOriginalLink}" />
 
             <Button
                 Clicked="OnAnalyticsClicked"
                 ContentLayout="Left,8"
                 ImageSource="action_analytics.svg"
                 Style="{StaticResource OutlineButton}"
-                Text="View analytics" />
+                Text="{l:Translate ViewAnalytics}" />
 
             <Button
                 x:Name="CategoryButton"
@@ -60,7 +61,7 @@
                 ContentLayout="Left,8"
                 ImageSource="action_category.svg"
                 Style="{StaticResource OutlineButton}"
-                Text="Assign category" />
+                Text="{l:Translate AssignCategory}" />
 
             <Button
                 x:Name="FavouriteButton"
@@ -68,7 +69,7 @@
                 ContentLayout="Left,8"
                 ImageSource="action_favourite.svg"
                 Style="{StaticResource OutlineButton}"
-                Text="Add to favourites" />
+                Text="{l:Translate AddToFavourites}" />
 
             <BoxView
                 Margin="0,4"
@@ -82,7 +83,7 @@
                 ContentLayout="Left,8"
                 ImageSource="action_delete.svg"
                 Style="{StaticResource OutlineButton}"
-                Text="Delete"
+                Text="{l:Translate Delete}"
                 TextColor="{DynamicResource AppDangerText}" />
 
         </VerticalStackLayout>
