@@ -54,14 +54,14 @@
                                 FontSize="11"
                                 Text="{Binding Email}"
                                 TextColor="{DynamicResource AppMutedText}" />
-                            <Button
+                            <!--<Button
                                 Margin="0,3,0,0"
                                 Clicked="OnEditProfileClicked"
                                 HorizontalOptions="Start"
                                 MinimumHeightRequest="28"
                                 Padding="10,3"
                                 Style="{StaticResource OutlineButton}"
-                                Text="Edit profile" />
+                                Text="Edit profile" />-->
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
@@ -69,7 +69,7 @@
                 <Label Style="{StaticResource SectionTitle}" Text="Account" />
                 <Border Padding="12,6" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
-                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="38">
                             <Image
                                 x:Name="UserProfileIcon"
                                 HeightRequest="16"
@@ -90,7 +90,7 @@
                                 HorizontalTextAlignment="End" />
                         </Grid>
                         <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
-                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="38">
                             <Image x:Name="MailIcon" HeightRequest="16" Source="mail.png" VerticalOptions="Center" WidthRequest="16">
                                 <Image.Behaviors>
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
@@ -106,7 +106,7 @@
                                 HorizontalTextAlignment="End" />
                         </Grid>
                         <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
-                        <Grid ColumnDefinitions="26,*,14" HeightRequest="32">
+                        <Grid ColumnDefinitions="26,*,14" HeightRequest="38">
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnChangePasswordTapped" />
                             </Grid.GestureRecognizers>
@@ -124,7 +124,7 @@
                 <Label Style="{StaticResource SectionTitle}" Text="Preferences" />
                 <Border Padding="12,6" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
-                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="32">
+                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="38">
                             <Image x:Name="DarkThemeIcon" HeightRequest="16" Source="dark_mode.png" VerticalOptions="Center" WidthRequest="16">
                                 <Image.Behaviors>
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
@@ -134,7 +134,7 @@
                             <Switch x:Name="ThemeSwitch" Grid.Column="2" Toggled="OnThemeToggled" Margin="0, 0, 2, 0" />
                         </Grid>
                         <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
-                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="38">
                             <Image x:Name="LanguageIcon" HeightRequest="16" Source="language.png" VerticalOptions="Center" WidthRequest="16">
                                 <Image.Behaviors>
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
@@ -150,36 +150,45 @@
                 <Label Style="{StaticResource SectionTitle}" Text="Link Settings" />
                 <Border Padding="12,6" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
-                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="38">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnDefaultCategoryTapped" />
+                            </Grid.GestureRecognizers>
                             <Image x:Name="FolderIcon" HeightRequest="16" Source="folder.png" VerticalOptions="Center" WidthRequest="16">
                                 <Image.Behaviors>
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Default category" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="Work" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label x:Name="DefaultCategoryLabel" Grid.Column="2" FontSize="10" Text="None" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
-                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="38">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnAutoExpirationTapped" />
+                            </Grid.GestureRecognizers>
                             <Image x:Name="ClockIcon" HeightRequest="16" Source="clock.png" VerticalOptions="Center" WidthRequest="16">
                                 <Image.Behaviors>
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Auto-expiration" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="30 days" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label x:Name="AutoExpirationLabel" Grid.Column="2" FontSize="10" Text="Never" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                         <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
-                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
+                        <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="38">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPrivacyTapped" />
+                            </Grid.GestureRecognizers>
                             <Image x:Name="PrivacyIcon" HeightRequest="16" Source="lock.png" VerticalOptions="Center" WidthRequest="16">
                                 <Image.Behaviors>
                                     <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
                                 </Image.Behaviors>
                             </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Privacy" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="Public" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label x:Name="PrivacyLabel" Grid.Column="2" FontSize="10" Text="Public" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                             <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                     </VerticalStackLayout>

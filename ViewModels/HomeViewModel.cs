@@ -1,3 +1,4 @@
+using KiirLink.Models;
 using KiirLink.Services;
 
 namespace KiirLink.ViewModels;
@@ -7,14 +8,16 @@ public sealed class HomeViewModel : ViewModelBase
     private readonly ILinkService _links;
     private readonly INavigationService _navigation;
     private readonly IDialogService _dialogs;
+    private readonly LinkPreferencesService _preferences;
     private string _originalUrl = string.Empty;
 
     public HomeViewModel(ILinkService links, IConnectivityService connectivity, INavigationService navigation,
-        IDialogService dialogs) : base(connectivity)
+        IDialogService dialogs, LinkPreferencesService preferences) : base(connectivity)
     {
         _links = links;
         _navigation = navigation;
         _dialogs = dialogs;
+        _preferences = preferences;
         CreateLinkCommand = new AsyncCommand(CreateLinkAsync, () => CanInteract);
         PropertyChanged += (_, args) =>
         {
@@ -52,7 +55,12 @@ public sealed class HomeViewModel : ViewModelBase
 
         await RunBusyAsync(async () =>
         {
-            var result = await _links.ShortenLinkAsync(originalUrl);
+            var expiresAt = LinkExpiration.EndOfSelectedDayUtc(_preferences.AutoExpirationDate);
+            var result = await _links.ShortenLinkAsync(
+                originalUrl,
+                expiresAt,
+                _preferences.IsPublic,
+                _preferences.DefaultCategoryId);
             if (!result.Success)
             {
                 await _dialogs.AlertAsync("Could not create link", result.Error ?? "Please try again.");
@@ -67,4 +75,5 @@ public sealed class HomeViewModel : ViewModelBase
         if (HasError)
             await _dialogs.AlertAsync("Network error", ErrorMessage!);
     }
+
 }

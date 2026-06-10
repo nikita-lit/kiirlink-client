@@ -48,7 +48,7 @@ public partial class ChangePasswordPopup
             var result = await _authService.ChangePasswordAsync(currentPassword, newPassword);
             if (!result.Success)
             {
-                ShowError("The current password is incorrect or the new password is not accepted.");
+                ShowError(result.Error ?? "Could not change the password.");
                 return;
             }
 

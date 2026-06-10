@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="Models\**\*.cs" />
     <Compile Include="Services\ApiException.cs" />
+    <Compile Include="Services\AuthErrorMessages.cs" />
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Services\LinkService.cs" />
     <Compile Include="Services\ServiceContracts.cs" />

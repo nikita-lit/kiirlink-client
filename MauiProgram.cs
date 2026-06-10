@@ -41,10 +41,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<IConnectivityService, ConnectivityService>();
         builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
         builder.Services.AddSingleton<IDialogService, DialogService>();
+        builder.Services.AddSingleton<LinkPreferencesService>();
         builder.Services
             .AddHttpClient<IApiClient, ApiClient>((services, client) =>
             {
                 var options = services.GetRequiredService<IOptions<ApiOptions>>().Value;
+                AppHostHelper.SetOptions( options );
                 client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/'));
                 client.Timeout = Timeout.InfiniteTimeSpan;
             })

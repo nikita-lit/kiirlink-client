@@ -22,33 +22,43 @@
                 TextColor="{DynamicResource AppText}" />
 
             <Button
-                Clicked="OnAnalyticsClicked"
-                ContentLayout="Left,8"
-                Style="{StaticResource OutlineButton}"
-                Text="View analytics" />
-
-            <Button
                 Clicked="OnCopyShortClicked"
                 ContentLayout="Left,8"
-                Style="{StaticResource OutlineButton}"
+                ImageSource="copy.svg"
+                Style="{StaticResource PrimaryButton}"
                 Text="Copy short link" />
-            
+
             <Button
                 Clicked="OnCreateQRCodeClicked"
                 ContentLayout="Left,8"
-                Style="{StaticResource OutlineButton}"
+                ImageSource="qr_code.svg"
+                Style="{StaticResource PrimaryButton}"
                 Text="Create QR Code" />
+
+            <BoxView
+                Margin="0,4"
+                BackgroundColor="{DynamicResource AppDivider}"
+                HeightRequest="1" />
 
             <Button
                 Clicked="OnCopyOriginalClicked"
                 ContentLayout="Left,8"
+                ImageSource="action_link.svg"
                 Style="{StaticResource OutlineButton}"
                 Text="Copy original link" />
+
+            <Button
+                Clicked="OnAnalyticsClicked"
+                ContentLayout="Left,8"
+                ImageSource="action_analytics.svg"
+                Style="{StaticResource OutlineButton}"
+                Text="View analytics" />
 
             <Button
                 x:Name="CategoryButton"
                 Clicked="OnAssignCategoryClicked"
                 ContentLayout="Left,8"
+                ImageSource="action_category.svg"
                 Style="{StaticResource OutlineButton}"
                 Text="Assign category" />
 
@@ -56,14 +66,21 @@
                 x:Name="FavouriteButton"
                 Clicked="OnFavouriteClicked"
                 ContentLayout="Left,8"
+                ImageSource="action_favourite.svg"
                 Style="{StaticResource OutlineButton}"
                 Text="Add to favourites" />
+
+            <BoxView
+                Margin="0,4"
+                BackgroundColor="{DynamicResource AppDivider}"
+                HeightRequest="1" />
 
             <Button
                 BackgroundColor="{DynamicResource AppDangerSurface}"
                 BorderColor="{DynamicResource AppDangerStroke}"
                 Clicked="OnDeleteClicked"
                 ContentLayout="Left,8"
+                ImageSource="action_delete.svg"
                 Style="{StaticResource OutlineButton}"
                 Text="Delete"
                 TextColor="{DynamicResource AppDangerText}" />

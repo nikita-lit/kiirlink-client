@@ -42,6 +42,20 @@ public sealed class ServiceTests
         Assert.Equal((2, 5, 9), api.LastPageRequest);
     }
 
+    [Fact]
+    public async Task LinkService_ForwardsCreationPreferences()
+    {
+        var api = new FakeApiClient();
+        var service = new LinkService(api);
+        var expiresAt = new DateTime(2026, 7, 10, 12, 0, 0, DateTimeKind.Utc);
+
+        var result = await service.ShortenLinkAsync("https://example.com", expiresAt, false, 9);
+
+        Assert.True(result.Success);
+        Assert.Equal("abc123", result.ShortUrl);
+        Assert.Equal(("https://example.com", expiresAt, false, 9), api.LastShortenRequest);
+    }
+
     private sealed class FakeApiClient : IApiClient
     {
         public (bool Success, string? Error) LoginResult { get; set; }
@@ -50,6 +64,8 @@ public sealed class ServiceTests
         public int LoginCalls { get; private set; }
         public (string OldPassword, string NewPassword) LastPasswordChange { get; private set; }
         public (int Page, int Limit, int? CategoryId) LastPageRequest { get; private set; }
+        public (string OriginalUrl, DateTime? ExpiresAt, bool IsPublic, int? CategoryId) LastShortenRequest
+            { get; private set; }
 
         public Task<bool> HasStoredTokensAsync() => Task.FromResult(true);
         public Task ClearTokensAsync() => Task.CompletedTask;
@@ -83,9 +99,13 @@ public sealed class ServiceTests
         public Task<List<LinkModel>> GetLinksAsync(int page = 1, int limit = 20, int? categoryId = null,
             CancellationToken ct = default) => Task.FromResult(LinksPage.Items);
 
-        public Task<(bool Success, string? Error)> ShortenLinkAsync(string originalUrl,
-            DateTime? expiresAt = null, bool isPublic = true, CancellationToken ct = default)
-            => Task.FromResult((true, (string?)null));
+        public Task<LinkCreationResult> ShortenLinkAsync(string originalUrl,
+            DateTime? expiresAt = null, bool isPublic = true, int? categoryId = null,
+            CancellationToken ct = default)
+        {
+            LastShortenRequest = (originalUrl, expiresAt, isPublic, categoryId);
+            return Task.FromResult(new LinkCreationResult { Success = true, ShortUrl = "abc123" });
+        }
 
         public Task<bool> RemoveLinkAsync(int linkId, CancellationToken ct = default) => Task.FromResult(true);
         public Task<LinkStatsModel?> GetLinkStatsAsync(int id, CancellationToken ct = default)

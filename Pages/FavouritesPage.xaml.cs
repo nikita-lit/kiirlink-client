@@ -182,7 +182,7 @@ public partial class FavouritesPage
             return;
         
         await page.ShowPopupAsync( 
-            new QRCodePopup( link.ShortUrl ), 
+            new QRCodePopup( $"{AppHostHelper.BaseUrl}/{link.ShortUrl}" ), 
             new PopupOptions
             {
                 Shape = null,

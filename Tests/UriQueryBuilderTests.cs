@@ -11,10 +11,11 @@ public sealed class UriQueryBuilderTests
             "/api/links/shorten",
             ("originalUrl", "https://example.com/a path?q=1"),
             ("isPublic", true),
-            ("expiresAt", null));
+            ("expiresAt", null),
+            ("categoryId", 9));
 
         Assert.Equal(
-            "/api/links/shorten?originalUrl=https%3A%2F%2Fexample.com%2Fa%20path%3Fq%3D1&isPublic=true",
+            "/api/links/shorten?originalUrl=https%3A%2F%2Fexample.com%2Fa%20path%3Fq%3D1&isPublic=true&categoryId=9",
             result);
     }
 

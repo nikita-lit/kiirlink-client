@@ -15,8 +15,8 @@ public interface IApiClient
         int? categoryId = null, CancellationToken ct = default);
     Task<List<LinkModel>> GetLinksAsync(int page = 1, int limit = 20, int? categoryId = null,
         CancellationToken ct = default);
-    Task<(bool Success, string? Error)> ShortenLinkAsync(string originalUrl, DateTime? expiresAt = null,
-        bool isPublic = true, CancellationToken ct = default);
+    Task<LinkCreationResult> ShortenLinkAsync(string originalUrl, DateTime? expiresAt = null,
+        bool isPublic = true, int? categoryId = null, CancellationToken ct = default);
     Task<bool> RemoveLinkAsync(int linkId, CancellationToken ct = default);
     Task<LinkStatsModel?> GetLinkStatsAsync(int id, CancellationToken ct = default);
     Task<List<LinkActivityModel>> GetLinkActivityAsync(int id, CancellationToken ct = default);
@@ -45,8 +45,8 @@ public interface ILinkService
     Task<PaginatedLinksResponse> GetLinksPageAsync(int page = 1, int limit = 20,
         int? categoryId = null);
     Task<List<LinkModel>> GetLinksAsync(int page = 1, int limit = 20, int? categoryId = null);
-    Task<(bool Success, string? Error)> ShortenLinkAsync(string originalUrl, DateTime? expiresAt = null,
-        bool isPublic = true);
+    Task<LinkCreationResult> ShortenLinkAsync(string originalUrl, DateTime? expiresAt = null,
+        bool isPublic = true, int? categoryId = null);
     Task<bool> RemoveLinkAsync(int linkId);
     Task<LinkStatsModel?> GetLinkStatsAsync(int id);
     Task<List<LinkActivityModel>> GetLinkActivityAsync(int id);

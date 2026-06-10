@@ -14,9 +14,9 @@ public class LinkService(IApiClient api) : ILinkService
     public Task<List<LinkModel>> GetLinksAsync( int page = 1, int limit = 20, int? categoryId = null )
         => api.GetLinksAsync( page, limit, categoryId );
 
-    public Task<(bool Success, string? Error)> ShortenLinkAsync( string originalUrl, DateTime? expiresAt = null,
-        bool isPublic = true )
-        => api.ShortenLinkAsync( originalUrl, expiresAt, isPublic );
+    public Task<LinkCreationResult> ShortenLinkAsync( string originalUrl, DateTime? expiresAt = null,
+        bool isPublic = true, int? categoryId = null )
+        => api.ShortenLinkAsync( originalUrl, expiresAt, isPublic, categoryId );
 
     public Task<bool> RemoveLinkAsync( int linkId )
         => api.RemoveLinkAsync( linkId );

@@ -245,7 +245,7 @@ public class ApiClient : IApiClient
             return (true, null);
 
         var error = await response.Content.ReadAsStringAsync( ct );
-        return (false, error);
+        return (false, AuthErrorMessages.FromResponse(response.StatusCode, error, AuthOperation.Register));
     }
 
     /// <summary>POST /api/auth/login</summary>
@@ -262,7 +262,7 @@ public class ApiClient : IApiClient
         if ( !response.IsSuccessStatusCode )
         {
             var error = await response.Content.ReadAsStringAsync( ct );
-            return (false, error);
+            return (false, AuthErrorMessages.FromResponse(response.StatusCode, error, AuthOperation.Login));
         }
 
         var tokens = await DeserializeAsync<AccessTokenResponse>( response, ct );
@@ -292,7 +292,7 @@ public class ApiClient : IApiClient
             return (true, null);
 
         var error = await response.Content.ReadAsStringAsync( ct );
-        return (false, string.IsNullOrWhiteSpace( error ) ? "Could not change password." : error);
+        return (false, AuthErrorMessages.FromResponse(response.StatusCode, error, AuthOperation.ChangePassword));
     }
 
     /// <summary>GET /api/auth/manage/info</summary>
@@ -333,22 +333,33 @@ public class ApiClient : IApiClient
     }
 
     /// <summary>POST /api/links/shorten?originalUrl=&amp;expiresAt=&amp;isPublic=</summary>
-    public async Task<(bool Success, string? Error)> ShortenLinkAsync( string originalUrl, DateTime? expiresAt = null,
-        bool isPublic = true, CancellationToken ct = default )
+    public async Task<LinkCreationResult> ShortenLinkAsync( string originalUrl, DateTime? expiresAt = null,
+        bool isPublic = true, int? categoryId = null, CancellationToken ct = default )
     {
         var query = UriQueryBuilder.Build(
             "/api/links/shorten",
             ("originalUrl", originalUrl),
             ("isPublic", isPublic),
-            ("expiresAt", expiresAt));
+            ("expiresAt", expiresAt),
+            ("categoryId", categoryId));
 
         var request = new HttpRequestMessage( HttpMethod.Post, query );
         var response = await SendWithRefreshAsync( request, ct );
         if ( response.IsSuccessStatusCode )
-            return (true, null);
+        {
+            var created = await DeserializeAsync<CreatedLinkResponse>(response, ct);
+            return new LinkCreationResult
+            {
+                Success = true,
+                ShortUrl = created?.ShortUrl
+            };
+        }
 
         var error = await response.Content.ReadAsStringAsync( ct );
-        return (false, $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}: {error}");
+        return new LinkCreationResult
+        {
+            Error = $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}: {error}"
+        };
     }
 
     /// <summary>POST /api/links/remove?linkId=</summary>

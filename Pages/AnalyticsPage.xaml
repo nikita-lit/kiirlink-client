@@ -26,7 +26,7 @@
                     Clicks="—" />
 
                 <!--  Stats: clicks / favourites  -->
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Grid ColumnDefinitions="*" ColumnSpacing="10">
                     <Border Grid.Column="0" Padding="10" Style="{StaticResource CardBorder}">
                         <VerticalStackLayout Spacing="-1">
                             <Border
@@ -49,6 +49,7 @@
                             <Label Style="{StaticResource MutedLabel}" Text="clicks" />
                         </VerticalStackLayout>
                     </Border>
+                    <!--
                     <Border Grid.Column="1" Padding="10" Style="{StaticResource CardBorder}">
                         <VerticalStackLayout Spacing="-1">
                             <Border
@@ -70,7 +71,7 @@
                             <Label x:Name="FavouritesLabel" FontFamily="RadioCanadaBigSemiBold" FontSize="22" Text="—" />
                             <Label Style="{StaticResource MutedLabel}" Text="favourites" />
                         </VerticalStackLayout>
-                    </Border>
+                    </Border>-->
                 </Grid>
 
                 <Border

@@ -49,6 +49,22 @@ public partial class LinkCard
     public static readonly BindableProperty ShowActionsProperty =
         BindableProperty.Create( nameof(ShowActions), typeof(bool), typeof(LinkCard), true );
 
+    public static readonly BindableProperty IsPublicProperty =
+        BindableProperty.Create(
+            nameof(IsPublic),
+            typeof(bool),
+            typeof(LinkCard),
+            true,
+            propertyChanged: OnCardContentChanged );
+
+    public static readonly BindableProperty ExpirationProperty =
+        BindableProperty.Create(
+            nameof(Expiration),
+            typeof(string),
+            typeof(LinkCard),
+            string.Empty,
+            propertyChanged: OnCardContentChanged );
+
     public bool IsFavourite
     {
         get => (bool)GetValue( IsFavouriteProperty );
@@ -77,6 +93,18 @@ public partial class LinkCard
     {
         get => (bool)GetValue( ShowActionsProperty );
         set => SetValue( ShowActionsProperty, value );
+    }
+
+    public bool IsPublic
+    {
+        get => (bool)GetValue( IsPublicProperty );
+        set => SetValue( IsPublicProperty, value );
+    }
+
+    public string Expiration
+    {
+        get => (string)GetValue( ExpirationProperty );
+        set => SetValue( ExpirationProperty, value );
     }
 
     public string Title
@@ -166,9 +194,15 @@ public partial class LinkCard
         CategoryLabel.Text = hasCategory ? category : "Uncategorized";
         CategoryBadge.IsVisible = hasCategory;
         FavouriteIndicator.IsVisible = IsFavourite && ShowFavouriteIndicator;
+        PrivateBadge.IsVisible = !IsPublic;
+        ExpirationLabel.Text = Expiration;
+        ExpirationBadge.IsVisible = !string.IsNullOrWhiteSpace(Expiration);
+        StatusLayout.IsVisible = PrivateBadge.IsVisible || ExpirationBadge.IsVisible;
         SemanticProperties.SetDescription(
             this,
-            $"{Title}. {Clicks} views. {Date}. Tap for analytics; use link actions for more options.");
+            $"{Title}. {Clicks} clicks. {Date}. " +
+            $"{(IsPublic ? "Public" : "Private")}. {Expiration}. " +
+            "Tap for analytics; use link actions for more options.");
     }
 
     private void ApplyThemeToIcons()
@@ -216,7 +250,7 @@ public partial class LinkCard
                 break;
             case LinkActionsPopupAction.CopyShort:
                 if ( !string.IsNullOrWhiteSpace( ShortUrl ) )
-                    await Clipboard.Default.SetTextAsync( $"http://88.196.25.201/{ShortUrl}" );
+                    await Clipboard.Default.SetTextAsync( $"{AppHostHelper.BaseUrl}/{ShortUrl}" );
                 break;
             case LinkActionsPopupAction.CopyOriginal:
                 if ( !string.IsNullOrWhiteSpace( Url ) )

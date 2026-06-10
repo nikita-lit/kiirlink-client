@@ -98,7 +98,7 @@ public partial class AnalyticsPage
 
             NoStatisticsBanner.IsVisible = false;
             ClicksLabel.Text = stats.Clicks.ToString();
-            FavouritesLabel.Text = stats.Favourites.ToString();
+            //FavouritesLabel.Text = stats.Favourites.ToString();
 
             // Chart
             var dailyViews = stats.DailyViews ?? [];
@@ -145,6 +145,8 @@ public partial class AnalyticsPage
         TopLinkCard.Clicks = link.DisplayClicks;
         TopLinkCard.Category = link.CategoryName ?? string.Empty;
         TopLinkCard.Date = link.DisplayDate;
+        TopLinkCard.Expiration = link.DisplayExpiration;
+        TopLinkCard.IsPublic = link.IsPublic;
         TopLinkCard.LinkId = link.ResolvedId;
         TopLinkCard.ShortUrl = link.ShortUrl;
         TopLinkCard.IsFavourite = link.IsFavourite;
@@ -160,7 +162,7 @@ public partial class AnalyticsPage
     {
         NoStatisticsBanner.IsVisible = false;
         ClicksLabel.Text = "—";
-        FavouritesLabel.Text = "—";
+        //FavouritesLabel.Text = "—";
         _chartDrawable.Clear();
         PerformanceChart.Invalidate();
         ShowEmptyPerformance();
@@ -171,7 +173,7 @@ public partial class AnalyticsPage
     private void ShowNoStatistics( string message = "No statistics are available for this link yet." )
     {
         ClicksLabel.Text = "—";
-        FavouritesLabel.Text = "—";
+        //FavouritesLabel.Text = "—";
         NoStatisticsLabel.Text = message;
         NoStatisticsBanner.IsVisible = true;
         _chartDrawable.Clear();

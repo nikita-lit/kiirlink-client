@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<toolkit:Popup
+    x:Class="KiirLink.Controls.ExpirationDatePopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    BackgroundColor="Transparent"
+    CanBeDismissedByTappingOutsideOfPopup="True"
+    Padding="0">
+
+    <Border
+        BackgroundColor="{DynamicResource AppSurface}"
+        Padding="18"
+        Stroke="{DynamicResource AppStroke}"
+        StrokeShape="RoundRectangle 14">
+        <VerticalStackLayout Spacing="14" WidthRequest="310">
+            <Label
+                FontFamily="RadioCanadaBigSemiBold"
+                FontSize="16"
+                Text="Auto-expiration"
+                TextColor="{DynamicResource AppText}" />
+
+            <Label
+                FontSize="11"
+                Text="New links will expire at the end of the selected day."
+                TextColor="{DynamicResource AppMutedText}" />
+
+            <DatePicker
+                x:Name="ExpirationPicker"
+                Format="MMM d, yyyy" />
+
+            <Grid ColumnDefinitions="Auto,*,*" ColumnSpacing="8">
+                <Button
+                    Clicked="OnNeverClicked"
+                    Style="{StaticResource OutlineButton}"
+                    Text="Never" />
+                <Button
+                    Grid.Column="1"
+                    Clicked="OnCancelClicked"
+                    Style="{StaticResource OutlineButton}"
+                    Text="Cancel" />
+                <Button
+                    Grid.Column="2"
+                    Clicked="OnSaveClicked"
+                    Style="{StaticResource PrimaryButton}"
+                    Text="Save" />
+            </Grid>
+        </VerticalStackLayout>
+    </Border>
+</toolkit:Popup>

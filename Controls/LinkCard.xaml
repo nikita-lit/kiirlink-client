@@ -14,14 +14,14 @@
         Style="{StaticResource CardBorder}">
         <Grid
             ColumnDefinitions="64,*,Auto"
-            RowDefinitions="22,20,22"
+            RowDefinitions="22,20,22,Auto"
             ColumnSpacing="12"
             VerticalOptions="Center">
 
             <!-- Tap for menu on entire card -->
             <BoxView
                 Grid.ColumnSpan="3"
-                Grid.RowSpan="3"
+                Grid.RowSpan="4"
                 BackgroundColor="Transparent"
                 HorizontalOptions="Fill"
                 VerticalOptions="Fill">
@@ -91,6 +91,55 @@
                         VerticalTextAlignment="Center" />
                 </HorizontalStackLayout>
             </Grid>
+
+            <!-- Privacy and expiration -->
+            <HorizontalStackLayout
+                x:Name="StatusLayout"
+                Grid.Row="3"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="0,5,0,0"
+                Spacing="6">
+                <Border
+                    x:Name="PrivateBadge"
+                    BackgroundColor="{DynamicResource AppTrack}"
+                    Padding="7,3"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 8">
+                    <HorizontalStackLayout Spacing="4">
+                        <Image HeightRequest="12" Source="lock.svg" WidthRequest="12">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppMutedText}" />
+                            </Image.Behaviors>
+                        </Image>
+                        <Label
+                            FontSize="9"
+                            Text="Private"
+                            TextColor="{DynamicResource AppMutedText}"
+                            VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <Border
+                    x:Name="ExpirationBadge"
+                    BackgroundColor="{DynamicResource AppTrack}"
+                    Padding="7,3"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 8">
+                    <HorizontalStackLayout Spacing="4">
+                        <Image HeightRequest="12" Source="clock.svg" WidthRequest="12">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppMutedText}" />
+                            </Image.Behaviors>
+                        </Image>
+                        <Label
+                            x:Name="ExpirationLabel"
+                            FontSize="9"
+                            TextColor="{DynamicResource AppMutedText}"
+                            VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+            </HorizontalStackLayout>
 
             <!-- Category and favourite indicator -->
             <HorizontalStackLayout
