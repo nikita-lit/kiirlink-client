@@ -14,9 +14,8 @@ public class LinkModel
     [JsonPropertyName( "shortUrl" )] public string ShortUrl { get; set; } = string.Empty;
 
     [JsonPropertyName( "originalUrl" )] public string OriginalUrl { get; set; } = string.Empty;
-
-    // The API uses "clickCount" instead of "views"
-    [JsonPropertyName( "clickCount" )] public int Views { get; set; }
+    
+    [JsonPropertyName( "clickCount" )] public int Clicks { get; set; }
 
     [JsonPropertyName( "favourites" )] public int Favourites { get; set; }
 
@@ -35,5 +34,5 @@ public class LinkModel
 
     public string DisplayTitle => $"kiirlink.ee/{ShortUrl}";
     public string DisplayDate => CreatedAt.ToString( "MMM d, yyyy" );
-    public string DisplayViews => Views.ToString();
+    public string DisplayClicks => Clicks.ToString();
 }

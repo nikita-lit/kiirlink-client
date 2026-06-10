@@ -5,12 +5,15 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
+    xmlns:viewModels="clr-namespace:KiirLink.ViewModels"
+    x:DataType="viewModels:HomeViewModel"
+    BackgroundColor="{DynamicResource AppBackground}"
     Title="Home">
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <Grid
             Grid.Row="0"
-            Padding="24,8,24,18"
+            Padding="{StaticResource PagePadding}"
             RowDefinitions="Auto,*">
             <controls:AppHeader Grid.Row="0" />
 
@@ -19,47 +22,57 @@
                 Spacing="16"
                 VerticalOptions="Center">
                 <Image
-                    Margin="4,0,4,10"
+                    Margin="4,0,4,30"
                     Aspect="AspectFit"
-                    HeightRequest="178"
-                    Source="home_hero.png" />
+                    HeightRequest="180"
+                    Source="home_hero.svg"
+                    SemanticProperties.Description="Illustration of sharing a short link" />
 
                 <Border
                     Padding="0"
                     Style="{StaticResource CardBorder}">
-                    <Grid ColumnDefinitions="92,*,40" HeightRequest="42">
+                    <Grid ColumnDefinitions="82,*,40" HeightRequest="42">
                         <Border
-                            BackgroundColor="#F2F2F2"
-                            Padding="10,0"
-                            Stroke="{StaticResource CardStroke}"
-                            StrokeShape="RoundRectangle 10,0,0,10">
+                            BackgroundColor="{DynamicResource AppTrack}"
+                            Padding="10,0">
                             <Label
                                 FontSize="11"
                                 Text="kiirlink.ee/"
-                                TextColor="{StaticResource BrandText}"
-                                VerticalTextAlignment="Center" />
+                                TextColor="{DynamicResource AppText}"
+                                VerticalTextAlignment="Center"
+                                HorizontalTextAlignment="Center" />
                         </Border>
                         <Entry
-                            x:Name="CustomLinkEntry"
                             Grid.Column="1"
                             Margin="4,0"
-                            Placeholder="your-custom-link"
-                            ReturnType="Done" />
+                            Placeholder="https://example.com"
+                            ReturnType="Done"
+                            Text="{Binding OriginalUrl}"
+                            SemanticProperties.Description="URL to shorten" />
                         <Image
                             Grid.Column="2"
                             HeightRequest="20"
                             HorizontalOptions="Center"
                             Source="link.png"
                             VerticalOptions="Center"
-                            WidthRequest="20" />
+                            WidthRequest="20"
+                            SemanticProperties.Description="Link" />
                     </Grid>
                 </Border>
 
                 <Button
-                    x:Name="ContinueButton"
-                    Clicked="OnContinueClicked"
+                    Command="{Binding CreateLinkCommand}"
+                    IsEnabled="{Binding CanInteract}"
                     Style="{StaticResource PrimaryButton}"
-                    Text="CONTINUE" />
+                    Text="CREATE LINK"
+                    SemanticProperties.Description="Create short link" />
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   SemanticProperties.Description="Creating link" />
+                <Border IsVisible="{Binding IsOffline}" Style="{StaticResource OfflineBanner}">
+                    <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                           TextColor="{DynamicResource AppDangerText}" />
+                </Border>
             </VerticalStackLayout>
         </Grid>
 

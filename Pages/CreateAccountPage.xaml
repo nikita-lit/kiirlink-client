@@ -4,12 +4,15 @@
     x:Class="KiirLink.Pages.CreateAccountPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewModels="clr-namespace:KiirLink.ViewModels"
+    x:DataType="viewModels:CreateAccountViewModel"
+    BackgroundColor="{DynamicResource AppBackground}"
     Title="Create account">
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <ScrollView Grid.Row="0">
             <VerticalStackLayout
-                Padding="24,28"
+                Padding="{StaticResource PagePadding}"
                 Spacing="18"
                 VerticalOptions="Center">
 
@@ -18,7 +21,8 @@
                         HeightRequest="72"
                         HorizontalOptions="Center"
                         Source="kiirlink_logo.png"
-                        WidthRequest="72" />
+                        WidthRequest="72"
+                        SemanticProperties.Description="KiirLink logo" />
                     <Label
                         HorizontalTextAlignment="Center"
                         FontFamily="RadioCanadaBigSemiBold"
@@ -30,35 +34,44 @@
                         Text="Make a new KiirLink account." />
                 </VerticalStackLayout>
 
-                <Border Padding="16" Style="{StaticResource CardBorder}">
+                <Border Padding="{StaticResource CardPadding}" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="12">
                         <VerticalStackLayout Spacing="6">
                             <Label FontSize="11" Text="Email" />
-                            <Entry x:Name="EmailEntry" Keyboard="Email" Placeholder="you@example.com" ReturnType="Next" />
+                            <Entry Keyboard="Email" Placeholder="you@example.com" ReturnType="Next"
+                                   Text="{Binding Email}" SemanticProperties.Description="Email address" />
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="6">
                             <Label FontSize="11" Text="Password" />
-                            <Entry x:Name="PasswordEntry" IsPassword="True" Placeholder="Password" ReturnType="Next" />
+                            <Entry IsPassword="True" Placeholder="Password" ReturnType="Next"
+                                   Text="{Binding Password}" SemanticProperties.Description="Password" />
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="6">
                             <Label FontSize="11" Text="Confirm password" />
-                            <Entry x:Name="ConfirmPasswordEntry" IsPassword="True" Placeholder="Repeat password"
-                                   ReturnType="Done" />
+                            <Entry IsPassword="True" Placeholder="Repeat password" ReturnType="Done"
+                                   Text="{Binding ConfirmPassword}" SemanticProperties.Description="Confirm password" />
                         </VerticalStackLayout>
 
                         <Button
-                            x:Name="CreateAccountButton"
-                            Clicked="OnCreateAccountClicked"
+                            Command="{Binding CreateAccountCommand}"
+                            IsEnabled="{Binding CanInteract}"
                             Style="{StaticResource PrimaryButton}"
                             Text="CREATE ACCOUNT" />
 
                         <Button
-                            Clicked="OnBackToSignInClicked"
+                            Command="{Binding BackCommand}"
                             Style="{StaticResource OutlineButton}"
                             Text="BACK TO SIGN IN" />
                     </VerticalStackLayout>
+                </Border>
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   SemanticProperties.Description="Creating account" />
+                <Border IsVisible="{Binding IsOffline}" Style="{StaticResource OfflineBanner}">
+                    <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                           TextColor="{DynamicResource AppDangerText}" />
                 </Border>
             </VerticalStackLayout>
         </ScrollView>

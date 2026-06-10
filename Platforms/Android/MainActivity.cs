@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using KiirLink.Services;
 
 namespace KiirLink;
 
@@ -9,4 +10,11 @@ namespace KiirLink;
                            ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density )]
 public class MainActivity : MauiAppCompatActivity
 {
+    protected override void OnResume()
+    {
+        base.OnResume();
+
+        var background = (Color)Microsoft.Maui.Controls.Application.Current!.Resources["AppBackground"];
+        SystemBarTheme.Apply(ThemeService.IsDark, background);
+    }
 }

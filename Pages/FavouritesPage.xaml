@@ -6,12 +6,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
     xmlns:models="clr-namespace:KiirLink.Models"
+    xmlns:models1="clr-namespace:KiirLink.Models;assembly=KiirLink.Core"
+    BackgroundColor="{DynamicResource AppBackground}"
     Title="Favourites">
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <Grid
             Grid.Row="0"
-            Padding="24,8,24,10"
+            Padding="{StaticResource PagePadding}"
             RowDefinitions="Auto,Auto,Auto,*"
             RowSpacing="12">
             <controls:AppHeader Grid.Row="0" />
@@ -19,7 +21,7 @@
             <Border Grid.Row="1" Padding="16,13" Style="{StaticResource CardBorder}">
                 <HorizontalStackLayout Spacing="14">
                     <Border
-                        BackgroundColor="{StaticResource SoftRed}"
+                        BackgroundColor="{DynamicResource AppDangerSurface}"
                         HeightRequest="44"
                         StrokeThickness="0"
                         StrokeShape="RoundRectangle 22"
@@ -28,6 +30,7 @@
                             HeightRequest="35"
                             HorizontalOptions="Center"
                             Source="like.png"
+                            SemanticProperties.Description="Favourites"
                             VerticalOptions="Center"
                             WidthRequest="35" />
                     </Border>
@@ -38,7 +41,7 @@
                             FontSize="30"
                             Text="0" />
                         <Label FontFamily="RadioCanadaBigSemiBold" FontSize="11" Text="favourites"
-                               TextColor="{StaticResource BrandText}" />
+                               TextColor="{DynamicResource AppText}" />
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
             </Border>
@@ -56,7 +59,7 @@
                     <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:LinkModel">
+                    <DataTemplate x:DataType="models1:LinkModel">
                         <controls:LinkCard
                             CardTapped="OnLinkCardTapped"
                             AnalyticsRequested="OnLinkAnalyticsRequested"
@@ -71,7 +74,7 @@
                             ShortUrl="{Binding ShortUrl}"
                             Title="{Binding DisplayTitle}"
                             Url="{Binding OriginalUrl}"
-                            Views="{Binding DisplayViews}" />
+                            Clicks="{Binding DisplayClicks}" />
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
                 <CollectionView.EmptyView>
@@ -82,6 +85,23 @@
                         Text="No favourites yet." />
                 </CollectionView.EmptyView>
             </CollectionView>
+
+            <ActivityIndicator
+                x:Name="LoadingIndicator"
+                Grid.Row="3"
+                IsVisible="False"
+                VerticalOptions="Center"
+                SemanticProperties.Description="Loading favourites" />
+
+            <Border
+                x:Name="OfflineBanner"
+                Grid.Row="3"
+                IsVisible="False"
+                Style="{StaticResource OfflineBanner}"
+                VerticalOptions="Start">
+                <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                       TextColor="{DynamicResource AppDangerText}" />
+            </Border>
         </Grid>
 
         <controls:BottomNavigation Grid.Row="1" ActiveTab="Favourites" />

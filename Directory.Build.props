@@ -1,4 +1,10 @@
 <Project>
+    <PropertyGroup Condition="'$(MSBuildProjectName)' == 'KiirLink.Core'">
+        <BaseIntermediateOutputPath>obj\Core\</BaseIntermediateOutputPath>
+        <MSBuildProjectExtensionsPath>obj\Core\</MSBuildProjectExtensionsPath>
+        <BaseOutputPath>bin\Core\</BaseOutputPath>
+    </PropertyGroup>
+
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
         <BaseIntermediateOutputPath>$(HOME)/Library/Caches/KiirLink/obj/</BaseIntermediateOutputPath>
         <BaseOutputPath>$(HOME)/Library/Caches/KiirLink/bin/</BaseOutputPath>

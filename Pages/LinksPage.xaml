@@ -6,12 +6,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
     xmlns:models="clr-namespace:KiirLink.Models"
+    xmlns:models1="clr-namespace:KiirLink.Models;assembly=KiirLink.Core"
+    BackgroundColor="{DynamicResource AppBackground}"
     Title="Links">
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <Grid
             Grid.Row="0"
-            Padding="24,8,24,10"
+            Padding="{StaticResource PagePadding}"
             RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto"
             RowSpacing="12">
             <controls:AppHeader Grid.Row="0" />
@@ -29,7 +31,9 @@
                     ContentLayout="Left,6"
                     ImageSource="plus.png"
                     Style="{StaticResource PrimaryButton}"
-                    Text="New link" />
+                    Text="New link"
+                    AutomationProperties.IsInAccessibleTree="True"
+                    SemanticProperties.Description="Create a new short link" />
             </Grid>
 
             <!--  Popular link card (top link by views)  -->
@@ -37,7 +41,7 @@
                 x:Name="PopularCard"
                 Grid.Row="2"
                 IsVisible="False"
-                Padding="13,13"
+                Padding="{StaticResource CardPadding}"
                 Style="{StaticResource CardBorder}">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnAnalyticsTapped" />
@@ -52,7 +56,8 @@
                             FontFamily="RadioCanadaBigSemiBold"
                             FontSize="31"
                             Text="0" />
-                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="9" Text="views"
+                        <Label FontFamily="RadioCanadaBigSemiBold" FontSize="16" Text="clicks"
+                               HorizontalTextAlignment="Start"
                                VerticalTextAlignment="End" />
                     </HorizontalStackLayout>
                     <Label x:Name="PopularTitle" Grid.Row="1" Style="{StaticResource CardTitle}" Text="" />
@@ -61,42 +66,62 @@
                         x:Name="PopularCategoryBadge"
                         Grid.RowSpan="3"
                         Grid.Column="1"
-                        BackgroundColor="{StaticResource BrandGold}"
+                        BackgroundColor="{DynamicResource AppGoldSurface}"
                         Padding="8,4"
                         StrokeThickness="0"
                         StrokeShape="RoundRectangle 5"
                         VerticalOptions="Center">
-                        <Label x:Name="PopularCategory" FontSize="10" Text="" TextColor="{StaticResource White}" />
+                        <Label x:Name="PopularCategory" FontSize="10" Text=""
+                               TextColor="{DynamicResource AppGoldText}" />
                     </Border>
                 </Grid>
             </Border>
 
-            <!--  Empty popular card placeholder  -->
-            <Border
-                x:Name="PopularCardEmpty"
-                Grid.Row="2"
-                IsVisible="True"
-                Padding="13,13"
-                Style="{StaticResource CardBorder}">
-                <Label
-                    HorizontalTextAlignment="Center"
-                    Style="{StaticResource MutedLabel}"
-                    Text="No links yet. Create your first one!" />
-            </Border>
-
             <Label Grid.Row="3" Style="{StaticResource SectionTitle}" Text="My links" />
 
-            <HorizontalStackLayout Grid.Row="4" Spacing="8">
-                <Button
-                    x:Name="AllFilter"
-                    BackgroundColor="{StaticResource SoftOrange}"
-                    BorderColor="{StaticResource BrandOrange}"
-                    Clicked="OnFilterClicked"
-                    CommandParameter="0"
-                    Style="{StaticResource ChipButton}"
-                    Text="All"
-                    TextColor="{StaticResource BrandOrange}" />
-            </HorizontalStackLayout>
+            <Grid Grid.Row="4">
+
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never" Padding="5, 0, 5, 0">
+                    <HorizontalStackLayout Spacing="8">
+
+                        <Button
+                            x:Name="AllFilter"
+                            Clicked="OnFilterClicked"
+                            CommandParameter="0"
+                            Style="{StaticResource ChipButton}"
+                            Text="All"
+                            MinimumWidthRequest="50" />
+
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <!-- Left fade -->
+                <BoxView
+                    HorizontalOptions="Start"
+                    WidthRequest="10"
+                    InputTransparent="True">
+                    <BoxView.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="{DynamicResource AppBackground}" Offset="0" />
+                            <GradientStop Color="Transparent" Offset="1" />
+                        </LinearGradientBrush>
+                    </BoxView.Background>
+                </BoxView>
+
+                <!-- Right fade -->
+                <BoxView
+                    HorizontalOptions="End"
+                    WidthRequest="10"
+                    InputTransparent="True">
+                    <BoxView.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="Transparent" Offset="0" />
+                            <GradientStop Color="{DynamicResource AppBackground}" Offset="1" />
+                        </LinearGradientBrush>
+                    </BoxView.Background>
+                </BoxView>
+
+            </Grid>
 
             <!--  Links list  -->
             <CollectionView
@@ -107,7 +132,7 @@
                     <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:LinkModel">
+                    <DataTemplate x:DataType="models1:LinkModel">
                         <controls:LinkCard
                             CardTapped="OnLinkCardTapped"
                             AnalyticsRequested="OnLinkAnalyticsRequested"
@@ -117,11 +142,12 @@
                             DeleteRequested="OnLinkDeleteRequested"
                             Category="{Binding CategoryName}"
                             Date="{Binding DisplayDate}"
+                            IsFavourite="{Binding IsFavourite}"
                             LinkId="{Binding Id}"
                             ShortUrl="{Binding ShortUrl}"
                             Title="{Binding DisplayTitle}"
                             Url="{Binding OriginalUrl}"
-                            Views="{Binding DisplayViews}" />
+                            Clicks="{Binding DisplayClicks}" />
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
                 <CollectionView.EmptyView>
@@ -132,6 +158,49 @@
                         Text="No links found." />
                 </CollectionView.EmptyView>
             </CollectionView>
+
+            <ActivityIndicator
+                x:Name="LoadingIndicator"
+                Grid.Row="5"
+                IsVisible="False"
+                VerticalOptions="Center"
+                SemanticProperties.Description="Loading links" />
+
+            <VerticalStackLayout
+                x:Name="LoadingSkeleton"
+                Grid.Row="5"
+                IsVisible="False"
+                Spacing="8"
+                SemanticProperties.Description="Loading link cards">
+                <Border Padding="{StaticResource CardPadding}" Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <BoxView BackgroundColor="{DynamicResource AppTrack}" HeightRequest="14" WidthRequest="180"
+                                 HorizontalOptions="Start" />
+                        <BoxView BackgroundColor="{DynamicResource AppTrack}" HeightRequest="10" />
+                        <BoxView BackgroundColor="{DynamicResource AppTrack}" HeightRequest="10" WidthRequest="120"
+                                 HorizontalOptions="Start" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Padding="{StaticResource CardPadding}" Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <BoxView BackgroundColor="{DynamicResource AppTrack}" HeightRequest="14" WidthRequest="160"
+                                 HorizontalOptions="Start" />
+                        <BoxView BackgroundColor="{DynamicResource AppTrack}" HeightRequest="10" />
+                        <BoxView BackgroundColor="{DynamicResource AppTrack}" HeightRequest="10" WidthRequest="140"
+                                 HorizontalOptions="Start" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <Border
+                x:Name="OfflineBanner"
+                Grid.Row="5"
+                IsVisible="False"
+                Style="{StaticResource OfflineBanner}"
+                VerticalOptions="Start">
+                <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                       TextColor="{DynamicResource AppDangerText}" />
+            </Border>
 
             <!--  Pagination  -->
             <HorizontalStackLayout

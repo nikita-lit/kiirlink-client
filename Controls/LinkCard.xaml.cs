@@ -1,9 +1,11 @@
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Maui.Behaviors;
+using KiirLink.Services;
 
 namespace KiirLink.Controls;
 
-public partial class LinkCard : ContentView
+public partial class LinkCard
 {
     public static readonly BindableProperty TitleProperty =
         BindableProperty.Create( nameof(Title), typeof(string), typeof(LinkCard), "www.kiirlink.ee/forms" );
@@ -16,8 +18,8 @@ public partial class LinkCard : ContentView
         BindableProperty.Create( nameof(Category), typeof(string), typeof(LinkCard), string.Empty,
             propertyChanged: OnCardContentChanged );
 
-    public static readonly BindableProperty ViewsProperty =
-        BindableProperty.Create( nameof(Views), typeof(string), typeof(LinkCard), "120" );
+    public static readonly BindableProperty ClicksProperty =
+        BindableProperty.Create( nameof(Clicks), typeof(string), typeof(LinkCard), "120" );
 
     public static readonly BindableProperty DateProperty =
         BindableProperty.Create( nameof(Date), typeof(string), typeof(LinkCard), "May 12, 2026" );
@@ -36,6 +38,17 @@ public partial class LinkCard : ContentView
     public static readonly BindableProperty ShortUrlProperty =
         BindableProperty.Create( nameof(ShortUrl), typeof(string), typeof(LinkCard), "" );
 
+    public static readonly BindableProperty ShowFavouriteIndicatorProperty =
+        BindableProperty.Create(
+            nameof(ShowFavouriteIndicator),
+            typeof(bool),
+            typeof(LinkCard),
+            true,
+            propertyChanged: OnCardContentChanged );
+
+    public static readonly BindableProperty ShowActionsProperty =
+        BindableProperty.Create( nameof(ShowActions), typeof(bool), typeof(LinkCard), true );
+
     public bool IsFavourite
     {
         get => (bool)GetValue( IsFavouriteProperty );
@@ -52,6 +65,18 @@ public partial class LinkCard : ContentView
     {
         get => (string)GetValue( ShortUrlProperty );
         set => SetValue( ShortUrlProperty, value );
+    }
+
+    public bool ShowFavouriteIndicator
+    {
+        get => (bool)GetValue( ShowFavouriteIndicatorProperty );
+        set => SetValue( ShowFavouriteIndicatorProperty, value );
+    }
+
+    public bool ShowActions
+    {
+        get => (bool)GetValue( ShowActionsProperty );
+        set => SetValue( ShowActionsProperty, value );
     }
 
     public string Title
@@ -72,10 +97,10 @@ public partial class LinkCard : ContentView
         set => SetValue( CategoryProperty, value );
     }
 
-    public string Views
+    public string Clicks
     {
-        get => (string)GetValue( ViewsProperty );
-        set => SetValue( ViewsProperty, value );
+        get => (string)GetValue( ClicksProperty );
+        set => SetValue( ClicksProperty, value );
     }
 
     public string Date
@@ -90,11 +115,15 @@ public partial class LinkCard : ContentView
     public event EventHandler? CategoryRequested;
     public event EventHandler? CategoryDeleteRequested;
     public event EventHandler? DeleteRequested;
+    private readonly EventHandler _themeChangedHandler;
 
     public LinkCard()
     {
         InitializeComponent();
+        _themeChangedHandler = (_, _) => ApplyThemeToIcons();
+        ThemeService.ThemeChanged += _themeChangedHandler;
         RefreshVisualState();
+        ApplyThemeToIcons();
     }
 
     private void OnCardTapped( object? sender, TappedEventArgs e )
@@ -107,9 +136,12 @@ public partial class LinkCard : ContentView
         await OnShowContextMenu( sender, e );
     }
 
-    private void OnFavouriteTapped( object? sender, TappedEventArgs e )
+    protected override void OnHandlerChanging( HandlerChangingEventArgs args )
     {
-        FavouriteToggleRequested?.Invoke( this, EventArgs.Empty );
+        if ( args.NewHandler is null )
+            ThemeService.ThemeChanged -= _themeChangedHandler;
+
+        base.OnHandlerChanging( args );
     }
 
     private static void OnIsFavouriteChanged( BindableObject bindable, object oldValue, object newValue )
@@ -133,7 +165,27 @@ public partial class LinkCard : ContentView
         var hasCategory = !string.IsNullOrWhiteSpace( category );
         CategoryLabel.Text = hasCategory ? category : "Uncategorized";
         CategoryBadge.IsVisible = hasCategory;
-        FavouriteBadge.IsVisible = IsFavourite;
+        FavouriteIndicator.IsVisible = IsFavourite && ShowFavouriteIndicator;
+        SemanticProperties.SetDescription(
+            this,
+            $"{Title}. {Clicks} views. {Date}. Tap for analytics; use link actions for more options.");
+    }
+
+    private void ApplyThemeToIcons()
+    {
+        SetIconTint( MoreIcon, (Color)Application.Current!.Resources["AppText"] );
+    }
+
+    private static void SetIconTint( Image image, Color tint )
+    {
+        var behavior = image.Behaviors.OfType<IconTintColorBehavior>().FirstOrDefault();
+        if ( behavior is null )
+        {
+            behavior = new IconTintColorBehavior();
+            image.Behaviors.Add( behavior );
+        }
+
+        behavior.TintColor = tint;
     }
 
     private async Task OnShowContextMenu( object? sender, EventArgs e )
@@ -143,7 +195,13 @@ public partial class LinkCard : ContentView
             return;
 
         var popup = new LinkActionsPopup( !string.IsNullOrWhiteSpace( Category ), IsFavourite );
-        var result = await page.ShowPopupAsync<LinkActionsPopupAction>( popup );
+        var result = await page.ShowPopupAsync<LinkActionsPopupAction>(
+            popup,
+            new PopupOptions
+            {
+                Shape = null,
+                Shadow = null,
+            } );
 
         if ( result.WasDismissedByTappingOutsideOfPopup )
             return;
@@ -158,7 +216,7 @@ public partial class LinkCard : ContentView
                 break;
             case LinkActionsPopupAction.CopyShort:
                 if ( !string.IsNullOrWhiteSpace( ShortUrl ) )
-                    await Clipboard.Default.SetTextAsync( $"https://kiirlink.ee/{ShortUrl}" );
+                    await Clipboard.Default.SetTextAsync( $"http://88.196.25.201/{ShortUrl}" );
                 break;
             case LinkActionsPopupAction.CopyOriginal:
                 if ( !string.IsNullOrWhiteSpace( Url ) )

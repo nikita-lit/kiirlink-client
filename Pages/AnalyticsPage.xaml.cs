@@ -1,3 +1,4 @@
+using CommunityToolkit.Maui.Behaviors;
 using Microsoft.Maui.Graphics;
 using KiirLink.Models;
 using KiirLink.Services;
@@ -30,6 +31,8 @@ public partial class AnalyticsPage
 
     private async Task LoadAnalyticsAsync()
     {
+        ResetAnalyticsState();
+
         if ( SelectedLink is not null )
             PopulateTopCard( SelectedLink );
 
@@ -62,16 +65,19 @@ public partial class AnalyticsPage
             }
         }
 
-        await Task.WhenAll( LoadStatsAsync(), LoadActivityAsync() );
+        if ( await LoadStatsAsync() )
+            await LoadActivityAsync();
+        else
+            BuildActivityLayout( [] );
     }
 
-    private async Task LoadStatsAsync()
+    private async Task<bool> LoadStatsAsync()
     {
         try
         {
             var stats = await _linkService.GetLinkStatsAsync( SelectedLinkId );
 
-            if ( stats is null )
+            if ( stats is null || !AnalyticsDataState.HasStatistics( stats ) )
             {
                 if ( SelectedLink is null )
                 {
@@ -86,10 +92,11 @@ public partial class AnalyticsPage
                     }
                 }
 
-                return;
+                ShowNoStatistics();
+                return false;
             }
 
-            ViewsLabel.Text = stats.Clicks.ToString(); // Server doesn't separate views/clicks
+            NoStatisticsBanner.IsVisible = false;
             ClicksLabel.Text = stats.Clicks.ToString();
             FavouritesLabel.Text = stats.Favourites.ToString();
 
@@ -98,15 +105,23 @@ public partial class AnalyticsPage
             if ( dailyViews.Count > 0 )
             {
                 _chartDrawable.SetData( dailyViews );
+                PerformanceChart.IsVisible = true;
+                PerformanceEmptyLabel.IsVisible = false;
                 PerformanceChart.Invalidate();
             }
+            else
+            {
+                ShowEmptyPerformance();
+            }
 
-            // Traffic sources
-            BuildSourcesLayout( stats.Sources ?? [] );
+            BuildCountriesLayout( stats.Countries ?? [] );
+            return true;
         }
         catch ( Exception ex )
         {
+            ShowNoStatistics();
             await DisplayAlertAsync( "Error", $"Could not load stats: {ex.Message}", "OK" );
+            return false;
         }
     }
 
@@ -127,132 +142,97 @@ public partial class AnalyticsPage
     {
         TopLinkCard.Title = link.DisplayTitle;
         TopLinkCard.Url = link.OriginalUrl;
-        TopLinkCard.Views = link.DisplayViews;
+        TopLinkCard.Clicks = link.DisplayClicks;
         TopLinkCard.Category = link.CategoryName ?? string.Empty;
         TopLinkCard.Date = link.DisplayDate;
-
-        ViewsLabel.Text = link.Views.ToString();
-        ClicksLabel.Text = link.Views.ToString();
-        FavouritesLabel.Text = link.Favourites.ToString();
+        TopLinkCard.LinkId = link.ResolvedId;
+        TopLinkCard.ShortUrl = link.ShortUrl;
+        TopLinkCard.IsFavourite = link.IsFavourite;
     }
 
     private void ShowEmpty()
     {
-        ViewsLabel.Text = "0";
-        ClicksLabel.Text = "0";
-        FavouritesLabel.Text = "0";
+        ShowNoStatistics( "No link is available to show statistics for." );
+        BuildActivityLayout( [] );
     }
 
-    private async void OnTopLinkCategoryRequested( object? sender, EventArgs e )
+    private void ResetAnalyticsState()
     {
-        var link = SelectedLink;
-        if ( link is null && SelectedLinkId > 0 )
-        {
-            var links = await _linkService.GetLinksAsync( 1, 20 );
-            link = links.FirstOrDefault( l => l.ResolvedId == SelectedLinkId ) ?? links.FirstOrDefault();
-            if ( link is not null )
-                SelectedLink = link;
-        }
-
-        if ( link is null )
-            return;
-
-        var category = await PromptAssignExistingCategoryAsync( link.ResolvedId );
-        if ( category is null )
-            return;
-
-        link.CategoryId = category.Id;
-        link.CategoryName = category.Name;
-        PopulateTopCard( link );
+        NoStatisticsBanner.IsVisible = false;
+        ClicksLabel.Text = "—";
+        FavouritesLabel.Text = "—";
+        _chartDrawable.Clear();
+        PerformanceChart.Invalidate();
+        ShowEmptyPerformance();
+        BuildCountriesLayout( [] );
+        BuildActivityLayout( [] );
     }
 
-    private async void OnTopLinkCategoryDeleteRequested( object? sender, EventArgs e )
+    private void ShowNoStatistics( string message = "No statistics are available for this link yet." )
     {
-        var link = SelectedLink;
-        if ( link is null && SelectedLinkId > 0 )
-        {
-            var links = await _linkService.GetLinksAsync( 1, 20 );
-            link = links.FirstOrDefault( l => l.ResolvedId == SelectedLinkId ) ?? links.FirstOrDefault();
-            if ( link is not null )
-                SelectedLink = link;
-        }
+        ClicksLabel.Text = "—";
+        FavouritesLabel.Text = "—";
+        NoStatisticsLabel.Text = message;
+        NoStatisticsBanner.IsVisible = true;
+        _chartDrawable.Clear();
+        PerformanceChart.Invalidate();
+        ShowEmptyPerformance();
+        BuildCountriesLayout( [] );
+    }
 
-        if ( link is null )
-            return;
-
-        if ( link.CategoryId is null )
-        {
-            await DisplayAlertAsync( "No category", "This link does not have a category to delete.", "OK" );
-            return;
-        }
-
-        var confirm = await DisplayAlertAsync(
-            "Delete category",
-            $"Delete '{link.CategoryName}'? This removes the category from the server.",
-            "Delete",
-            "Cancel" );
-
-        if ( !confirm )
-            return;
-
-        var success = await _linkService.DeleteCategoryAsync( link.CategoryId.Value );
-        if ( !success )
-        {
-            await DisplayAlertAsync( "Error", "Could not delete the category.", "OK" );
-            return;
-        }
-
-        link.CategoryId = null;
-        link.CategoryName = null;
-        PopulateTopCard( link );
-        await DisplayAlertAsync( "Deleted", "Category has been deleted.", "OK" );
-        await LoadAnalyticsAsync();
+    private void ShowEmptyPerformance()
+    {
+        PerformanceChart.IsVisible = false;
+        PerformanceEmptyLabel.IsVisible = true;
     }
 
     // ── Dynamic layout builders ───────────────────────────────────────────────
 
-    private void BuildSourcesLayout( List<TrafficSourceModel> sources )
+    private void BuildCountriesLayout( List<CountryStatModel> countries )
     {
-        SourcesLayout.Children.Clear();
+        CountriesLayout.Children.Clear();
 
-        if ( sources.Count == 0 )
+        if ( countries.Count == 0 )
         {
-            // Fallback with static demo data
-            sources =
-            [
-                new() { Source = "Google", Percentage = 0.45f },
-                new() { Source = "Direct", Percentage = 0.35f },
-                new() { Source = "Social", Percentage = 0.20f }
-            ];
-        }
-        else
-        {
-            var total = sources.Sum( s => s.Count );
-            foreach ( var src in sources )
+            CountriesLayout.Children.Add( new Label
             {
-                src.Percentage = total > 0 ? (float)src.Count / total : 0;
-            }
+                Text = "No country data yet.",
+                FontSize = 11,
+                Margin = new Thickness( 0, 4 ),
+                HorizontalTextAlignment = TextAlignment.Center,
+                TextColor = GetThemeColor( "AppMutedText" )
+            } );
+            return;
         }
 
-        foreach ( var src in sources )
+        var total = countries.Sum( country => country.Count );
+        foreach ( var country in countries.OrderByDescending( country => country.Count ) )
+        {
+            country.Percentage = total > 0 ? (float)country.Count / total : 0;
+        }
+
+        foreach ( var country in countries )
         {
             var grid = new Grid
             {
                 ColumnDefinitions =
                 [
-                    new ColumnDefinition { Width = new GridLength( 62 ) },
+                    new ColumnDefinition { Width = new GridLength( 100 ) },
                     new ColumnDefinition { Width = GridLength.Star },
                     new ColumnDefinition { Width = new GridLength( 38 ) }
                 ]
             };
 
+            var countryName = string.IsNullOrWhiteSpace( country.Country )
+                ? "Unknown"
+                : country.Country;
             var nameLabel = new Label
-                { FontSize = 10, Text = src.Source, VerticalTextAlignment = TextAlignment.Center };
-            var bar = new ProgressBar { Progress = src.Percentage, VerticalOptions = LayoutOptions.Center };
+                { FontSize = 10, Text = countryName, VerticalTextAlignment = TextAlignment.Center };
+            var bar = new ProgressBar { Progress = country.Percentage, VerticalOptions = LayoutOptions.Center };
             var pctLabel = new Label
             {
                 FontSize = 10,
-                Text = $"{(int)(src.Percentage * 100)}%",
+                Text = $"{(int)(country.Percentage * 100)}%",
                 HorizontalTextAlignment = TextAlignment.End,
                 VerticalTextAlignment = TextAlignment.Center
             };
@@ -265,7 +245,7 @@ public partial class AnalyticsPage
             grid.Children.Add( bar );
             grid.Children.Add( pctLabel );
 
-            SourcesLayout.Children.Add( grid );
+            CountriesLayout.Children.Add( grid );
         }
     }
 
@@ -273,18 +253,18 @@ public partial class AnalyticsPage
     {
         ActivityLayout.Children.Clear();
 
-        if ( activities.Count == 0 )
-        {
-            ActivityLayout.Children.Add( new Label
+            if ( activities.Count == 0 )
             {
-                Text = "No recent activity.",
-                FontSize = 11,
-                Margin = new Thickness( 0, 12 ),
-                HorizontalTextAlignment = TextAlignment.Center,
-                TextColor = Color.FromArgb( "#969696" )
-            } );
-            return;
-        }
+                ActivityLayout.Children.Add( new Label
+                {
+                    Text = "No recent activity.",
+                    FontSize = 11,
+                    Margin = new Thickness( 0, 12 ),
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    TextColor = GetThemeColor( "AppMutedText" )
+                } );
+                return;
+            }
 
         for ( var i = 0; i < activities.Count; i++ )
         {
@@ -294,35 +274,48 @@ public partial class AnalyticsPage
                 ColumnDefinitions =
                 [
                     new ColumnDefinition { Width = new GridLength( 26 ) },
-                    new ColumnDefinition { Width = GridLength.Star },
-                    new ColumnDefinition { Width = GridLength.Auto }
+                    new ColumnDefinition { Width = GridLength.Star }
                 ],
-                HeightRequest = 42
+                RowDefinitions =
+                [
+                    new RowDefinition { Height = GridLength.Auto },
+                    new RowDefinition { Height = GridLength.Auto }
+                ],
+                Padding = new Thickness( 0, 8 ),
+                RowSpacing = 2
             };
 
-            var icon = new Label
+            var icon = new Image
             {
-                Text = act.Icon,
-                TextColor = Color.FromArgb( "#FF5A36" ),
-                VerticalTextAlignment = TextAlignment.Center
+                HeightRequest = 18,
+                WidthRequest = 18,
+                Source = act.Type == "click" ? "click.svg" : "clock.svg",
+                VerticalOptions = LayoutOptions.Start
             };
+            icon.Behaviors.Add( new IconTintColorBehavior
+            {
+                TintColor = GetThemeColor( "AppAccentText" )
+            } );
             var desc = new Label
             {
                 FontSize = 11,
+                LineBreakMode = LineBreakMode.WordWrap,
                 Text = act.Description,
-                VerticalTextAlignment = TextAlignment.Center
+                VerticalTextAlignment = TextAlignment.Start
             };
             var time = new Label
             {
                 FontSize = 10,
                 Text = act.RelativeTime,
-                TextColor = Color.FromArgb( "#969696" ),
-                VerticalTextAlignment = TextAlignment.Center
+                TextColor = GetThemeColor( "AppMutedText" ),
+                VerticalTextAlignment = TextAlignment.Start
             };
 
             Grid.SetColumn( icon, 0 );
+            Grid.SetRowSpan( icon, 2 );
             Grid.SetColumn( desc, 1 );
-            Grid.SetColumn( time, 2 );
+            Grid.SetColumn( time, 1 );
+            Grid.SetRow( time, 1 );
 
             grid.Children.Add( icon );
             grid.Children.Add( desc );
@@ -333,7 +326,7 @@ public partial class AnalyticsPage
             if ( i < activities.Count - 1 )
                 ActivityLayout.Children.Add( new BoxView
                 {
-                    BackgroundColor = Color.FromArgb( "#F0F0F0" ),
+                    BackgroundColor = GetThemeColor( "AppDivider" ),
                     HeightRequest = 1
                 } );
         }
@@ -343,8 +336,8 @@ public partial class AnalyticsPage
 
     private sealed class PerformanceChartDrawable : IDrawable
     {
-        private float[] _values = [20, 35, 56, 40, 80, 30, 58];
-        private string[] _labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        private float[] _values = [];
+        private string[] _labels = [];
 
         public void SetData( List<DailyStatModel> daily )
         {
@@ -354,8 +347,16 @@ public partial class AnalyticsPage
             _labels = slice.Select( d => d.Date.ToString( "ddd" ) ).ToArray();
         }
 
+        public void Clear()
+        {
+            _values = [];
+            _labels = [];
+        }
+
         public void Draw( ICanvas canvas, RectF dirtyRect )
         {
+            if ( _values.Length == 0 ) return;
+
             const float left = 28;
             const float top = 8;
             const float bottom = 22;
@@ -363,12 +364,12 @@ public partial class AnalyticsPage
 
             var chartWidth = dirtyRect.Width - left - right;
             var chartHeight = dirtyRect.Height - top - bottom;
-            var maxValue = _values.Length > 0 ? _values.Max() : 80f;
+            var maxValue = _values.Max();
             if ( maxValue == 0 ) maxValue = 1;
 
-            canvas.FontColor = Color.FromArgb( "#969696" );
+            canvas.FontColor = GetThemeColor( "AppMutedText" );
             canvas.FontSize = 8;
-            canvas.StrokeColor = Color.FromArgb( "#ECECEC" );
+            canvas.StrokeColor = GetThemeColor( "AppDivider" );
             canvas.StrokeSize = 1;
 
             for ( var step = 0; step <= 4; step++ )
@@ -378,8 +379,6 @@ public partial class AnalyticsPage
                 canvas.DrawString( ((int)(maxValue * step / 4)).ToString(), 0, y - 5, left - 5, 10,
                     HorizontalAlignment.Right, VerticalAlignment.Center );
             }
-
-            if ( _values.Length == 0 ) return;
 
             var points = new PointF[_values.Length];
             var spacing = _values.Length > 1 ? chartWidth / (_values.Length - 1) : 0;
@@ -393,13 +392,13 @@ public partial class AnalyticsPage
                     HorizontalAlignment.Center, VerticalAlignment.Center );
             }
 
-            canvas.StrokeColor = Color.FromArgb( "#FF5A36" );
+            canvas.StrokeColor = GetThemeColor( "AppAccentText" );
             canvas.StrokeSize = 2;
 
             for ( var index = 0; index < points.Length - 1; index++ )
                 canvas.DrawLine( points[index], points[index + 1] );
 
-            canvas.FillColor = Colors.White;
+            canvas.FillColor = GetThemeColor( "AppBackground" );
 
             foreach ( var point in points )
             {
@@ -437,5 +436,10 @@ public partial class AnalyticsPage
 
         await DisplayAlertAsync( "Category assigned", $"'{category.Name}' is now attached to the link.", "OK" );
         return category;
+    }
+
+    private static Color GetThemeColor( string key )
+    {
+        return (Color)Application.Current!.Resources[key];
     }
 }

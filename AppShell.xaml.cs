@@ -19,7 +19,7 @@ public partial class AppShell : Shell
              target.Contains( "CreateAccount", StringComparison.OrdinalIgnoreCase ) )
             return;
 
-        if ( await ApiClient.HasStoredTokensAsync() )
+        if ( await ApiClient.HasStoredTokensInStorageAsync() )
             return;
 
         if ( _redirectingToSignIn )

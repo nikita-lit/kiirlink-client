@@ -6,11 +6,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
     xmlns:models="clr-namespace:KiirLink.Models"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    BackgroundColor="{DynamicResource AppBackground}"
     Title="Analytics">
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid BackgroundColor="{DynamicResource AppBackground}" RowDefinitions="*,Auto">
         <ScrollView Grid.Row="0">
-            <VerticalStackLayout Padding="24,8,24,18" Spacing="12">
+            <VerticalStackLayout Padding="{StaticResource PagePadding}" Spacing="12">
                 <controls:AppHeader />
 
                 <!--  Top link card  -->
@@ -18,65 +20,52 @@
                     x:Name="TopLinkCard"
                     Category="—"
                     Date="—"
-                    CategoryRequested="OnTopLinkCategoryRequested"
-                    CategoryDeleteRequested="OnTopLinkCategoryDeleteRequested"
+                    ShowActions="False"
+                    ShowFavouriteIndicator="False"
                     Title="—"
-                    Views="—" />
+                    Clicks="—" />
 
-                <!--  Stats: views / clicks / favourites  -->
-                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <!--  Stats: clicks / favourites  -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                     <Border Grid.Column="0" Padding="10" Style="{StaticResource CardBorder}">
                         <VerticalStackLayout Spacing="-1">
                             <Border
-                                BackgroundColor="{StaticResource SoftOrange}"
+                                BackgroundColor="{DynamicResource AppAccentSurface}"
                                 HeightRequest="24"
                                 HorizontalOptions="Start"
                                 StrokeThickness="0"
                                 StrokeShape="RoundRectangle 12"
                                 WidthRequest="24">
-                                <Label
-                                    HorizontalTextAlignment="Center"
-                                    Text="⊙"
-                                    TextColor="{StaticResource BrandOrange}"
-                                    VerticalTextAlignment="Center" />
-                            </Border>
-                            <Label x:Name="ViewsLabel" FontFamily="RadioCanadaBigSemiBold" FontSize="22" Text="—" />
-                            <Label Style="{StaticResource MutedLabel}" Text="views" />
-                        </VerticalStackLayout>
-                    </Border>
-                    <Border Grid.Column="1" Padding="10" Style="{StaticResource CardBorder}">
-                        <VerticalStackLayout Spacing="-1">
-                            <Border
-                                BackgroundColor="{StaticResource SoftOrange}"
-                                HeightRequest="24"
-                                HorizontalOptions="Start"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 12"
-                                WidthRequest="24">
-                                <Label
-                                    HorizontalTextAlignment="Center"
-                                    Text="↗"
-                                    TextColor="{StaticResource BrandOrange}"
-                                    VerticalTextAlignment="Center" />
+                                <Image
+                                    HeightRequest="16"
+                                    Source="click.svg"
+                                    WidthRequest="16">
+                                    <Image.Behaviors>
+                                        <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppAccentText}" />
+                                    </Image.Behaviors>
+                                </Image>
                             </Border>
                             <Label x:Name="ClicksLabel" FontFamily="RadioCanadaBigSemiBold" FontSize="22" Text="—" />
                             <Label Style="{StaticResource MutedLabel}" Text="clicks" />
                         </VerticalStackLayout>
                     </Border>
-                    <Border Grid.Column="2" Padding="10" Style="{StaticResource CardBorder}">
+                    <Border Grid.Column="1" Padding="10" Style="{StaticResource CardBorder}">
                         <VerticalStackLayout Spacing="-1">
                             <Border
-                                BackgroundColor="{StaticResource SoftOrange}"
+                                BackgroundColor="{DynamicResource AppAccentSurface}"
                                 HeightRequest="24"
                                 HorizontalOptions="Start"
                                 StrokeThickness="0"
                                 StrokeShape="RoundRectangle 12"
                                 WidthRequest="24">
-                                <Label
-                                    HorizontalTextAlignment="Center"
-                                    Text="♥"
-                                    TextColor="{StaticResource BrandOrange}"
-                                    VerticalTextAlignment="Center" />
+                                <Image
+                                    HeightRequest="16"
+                                    Source="like.svg"
+                                    WidthRequest="16">
+                                    <Image.Behaviors>
+                                        <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppAccentText}" />
+                                    </Image.Behaviors>
+                                </Image>
                             </Border>
                             <Label x:Name="FavouritesLabel" FontFamily="RadioCanadaBigSemiBold" FontSize="22" Text="—" />
                             <Label Style="{StaticResource MutedLabel}" Text="favourites" />
@@ -84,16 +73,39 @@
                     </Border>
                 </Grid>
 
+                <Border
+                    x:Name="NoStatisticsBanner"
+                    Padding="12"
+                    BackgroundColor="{DynamicResource AppAccentSurface}"
+                    IsVisible="False"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12">
+                    <Label
+                        x:Name="NoStatisticsLabel"
+                        HorizontalTextAlignment="Center"
+                        Style="{StaticResource MutedLabel}"
+                        Text="No statistics are available for this link yet." />
+                </Border>
+
                 <!--  Performance chart  -->
                 <Label Style="{StaticResource SectionTitle}" Text="Performance" />
                 <Border Padding="8" Style="{StaticResource CardBorder}">
-                    <GraphicsView x:Name="PerformanceChart" HeightRequest="132" />
+                    <Grid HeightRequest="132">
+                        <GraphicsView x:Name="PerformanceChart" />
+                        <Label
+                            x:Name="PerformanceEmptyLabel"
+                            HorizontalTextAlignment="Center"
+                            IsVisible="False"
+                            Style="{StaticResource MutedLabel}"
+                            Text="No performance data yet."
+                            VerticalTextAlignment="Center" />
+                    </Grid>
                 </Border>
 
-                <!--  Traffic sources  -->
-                <Label Style="{StaticResource SectionTitle}" Text="Traffic sources" />
-                <Border x:Name="SourcesCard" Padding="12,10" Style="{StaticResource CardBorder}">
-                    <VerticalStackLayout x:Name="SourcesLayout" Spacing="12" />
+                <!--  Countries  -->
+                <Label Style="{StaticResource SectionTitle}" Text="Countries" />
+                <Border x:Name="CountriesCard" Padding="12,10" Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout x:Name="CountriesLayout" Spacing="12" />
                 </Border>
 
                 <!--  Recent activity  -->

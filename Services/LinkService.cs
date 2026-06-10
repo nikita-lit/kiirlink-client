@@ -5,9 +5,9 @@ namespace KiirLink.Services;
 /// <summary>
 /// High-level link operations built on top of <see cref="ApiClient"/>.
 /// </summary>
-public class LinkService( ApiClient api )
+public class LinkService(IApiClient api) : ILinkService
 {
-    public Task<ApiClient.PaginatedLinksResponse> GetLinksPageAsync( int page = 1, int limit = 20,
+    public Task<PaginatedLinksResponse> GetLinksPageAsync( int page = 1, int limit = 20,
         int? categoryId = null )
         => api.GetLinksPageAsync( page, limit, categoryId );
 

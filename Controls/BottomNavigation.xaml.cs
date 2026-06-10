@@ -1,3 +1,6 @@
+using CommunityToolkit.Maui.Behaviors;
+using KiirLink.Services;
+
 namespace KiirLink.Controls;
 
 public partial class BottomNavigation : ContentView
@@ -18,7 +21,15 @@ public partial class BottomNavigation : ContentView
     public BottomNavigation()
     {
         InitializeComponent();
+        ThemeService.ThemeChanged += OnThemeChanged;
         UpdateColors();
+    }
+
+    protected override void OnParentSet()
+    {
+        base.OnParentSet();
+        if (Parent is null)
+            ThemeService.ThemeChanged -= OnThemeChanged;
     }
 
     private static void OnActiveTabChanged( BindableObject bindable, object oldValue, object newValue )
@@ -42,6 +53,20 @@ public partial class BottomNavigation : ContentView
     private static void SetTabIcon( Image icon, string name, bool isActive )
     {
         icon.Source = isActive ? $"{name}_active.png" : $"{name}.png";
+        icon.Behaviors.Clear();
+
+        if ( !isActive )
+        {
+            icon.Behaviors.Add( new IconTintColorBehavior
+            {
+                TintColor = (Color)Application.Current!.Resources["AppMutedText"]
+            } );
+        }
+    }
+
+    private void OnThemeChanged( object? sender, EventArgs e )
+    {
+        UpdateColors();
     }
 
     private static Task NavigateAsync( string route )

@@ -23,6 +23,8 @@
                     VerticalOptions="Center"
                     WidthRequest="29" />
                 <Button
+                    AutomationProperties.IsInAccessibleTree="True"
+                    SemanticProperties.Description="Home"
                     BackgroundColor="Transparent"
                     Clicked="OnHomeClicked"
                     Opacity="0.01" />
@@ -41,6 +43,8 @@
                     VerticalOptions="Center"
                     WidthRequest="29" />
                 <Button
+                    AutomationProperties.IsInAccessibleTree="True"
+                    SemanticProperties.Description="Links"
                     BackgroundColor="Transparent"
                     Clicked="OnLinksClicked"
                     Opacity="0.01" />
@@ -59,6 +63,8 @@
                     VerticalOptions="Center"
                     WidthRequest="29" />
                 <Button
+                    AutomationProperties.IsInAccessibleTree="True"
+                    SemanticProperties.Description="Favourites"
                     BackgroundColor="Transparent"
                     Clicked="OnFavouritesClicked"
                     Opacity="0.01" />
@@ -77,6 +83,8 @@
                     VerticalOptions="Center"
                     WidthRequest="29" />
                 <Button
+                    AutomationProperties.IsInAccessibleTree="True"
+                    SemanticProperties.Description="Profile"
                     BackgroundColor="Transparent"
                     Clicked="OnProfileClicked"
                     Opacity="0.01" />

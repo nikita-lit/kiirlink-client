@@ -11,7 +11,8 @@
             HeightRequest="44"
             HorizontalOptions="Start"
             Source="kiirlink_logo.png"
-            WidthRequest="44" />
+            WidthRequest="44"
+            SemanticProperties.Description="KiirLink logo" />
 
         <HorizontalStackLayout
             Grid.Column="1"
@@ -22,7 +23,7 @@
                 FontFamily="RadioCanadaBigSemiBold"
                 FontSize="20"
                 Text="Kiir"
-                TextColor="{StaticResource BrandText}" />
+                TextColor="{DynamicResource AppText}" />
             <Label
                 FontFamily="RadioCanadaBigSemiBold"
                 FontSize="20"

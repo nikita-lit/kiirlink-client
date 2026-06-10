@@ -3,8 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>net10.0-android</TargetFrameworks>
         <TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('linux'))">$(TargetFrameworks);net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
-        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
-
+        
         <!-- Note for MacCatalyst:
         The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
         When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
@@ -39,24 +38,36 @@
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
-
-        <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
-        <WindowsPackageType>None</WindowsPackageType>
-
+        
         <JavaSdkDirectory Condition="'$(JavaSdkDirectory)' == '' and Exists('/usr/lib/jvm/java-21-temurin-jdk/bin/jar')">/usr/lib/jvm/java-21-temurin-jdk</JavaSdkDirectory>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug' and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+        <AndroidManifest>Platforms\Android\AndroidManifest.Debug.xml</AndroidManifest>
+    </PropertyGroup>
     <ItemGroup>
         <Compile Remove="Test\**"/>
+        <Compile Remove="Tests\**"/>
+        <Compile Remove="Models\**"/>
+        <Compile Remove="Services\ApiException.cs"/>
+        <Compile Remove="Services\AuthService.cs"/>
+        <Compile Remove="Services\LinkService.cs"/>
+        <Compile Remove="Services\ServiceContracts.cs"/>
+        <Compile Remove="Services\UriQueryBuilder.cs"/>
+        <EmbeddedResource Remove="Tests\**"/>
+        <MauiXaml Remove="Tests\**"/>
+        <None Remove="Tests\**"/>
     </ItemGroup>
-
     <ItemGroup>
+        <ProjectReference Include="KiirLink.Core.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="appsettings.json" />
+
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#F2F2F2" BaseSize="256,256" />
         
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#F2F2F2"/>
@@ -71,6 +82,8 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Maui" Version="14.2.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0"/>
         <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.60"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0"/>
     </ItemGroup>

@@ -1,4 +1,7 @@
 using System.Collections.ObjectModel;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Extensions;
+using KiirLink.Controls;
 using KiirLink.Models;
 using KiirLink.Services;
 
@@ -7,6 +10,9 @@ namespace KiirLink.Pages;
 public partial class LinksPage
 {
     private readonly LinkService _linkService;
+    private readonly IConnectivityService _connectivity;
+    private readonly EventHandler _themeChangedHandler;
+    private readonly EventHandler<bool> _connectivityChangedHandler;
 
     private Button? _activeFilter;
     private int _currentPage = 1;
@@ -18,19 +24,38 @@ public partial class LinksPage
     public ObservableCollection<LinkModel> Links { get; } = [];
     public ObservableCollection<CategoryModel> Categories { get; } = [];
 
-    public LinksPage( LinkService linkService )
+    public LinksPage(LinkService linkService, IConnectivityService connectivity)
     {
         InitializeComponent();
         _linkService = linkService;
+        _connectivity = connectivity;
+        _themeChangedHandler = (_, _) => RefreshFilterStyles();
+        _connectivityChangedHandler = (_, online) =>
+            Dispatcher.Dispatch(() => UpdateConnectivityState(online));
         _activeFilter = AllFilter;
         BindingContext = this;
+        RefreshFilterStyles();
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await LoadCategoriesAsync();
-        await LoadLinksAsync();
+        ThemeService.ThemeChanged += _themeChangedHandler;
+        _connectivity.ConnectivityChanged += _connectivityChangedHandler;
+        UpdateConnectivityState(_connectivity.IsOnline);
+        RefreshFilterStyles();
+        if (_connectivity.IsOnline)
+        {
+            await LoadCategoriesAsync();
+            await LoadLinksAsync();
+        }
+    }
+
+    protected override void OnDisappearing()
+    {
+        ThemeService.ThemeChanged -= _themeChangedHandler;
+        _connectivity.ConnectivityChanged -= _connectivityChangedHandler;
+        base.OnDisappearing();
     }
 
     // ── Data loading ─────────────────────────────────────────────────────────
@@ -55,7 +80,8 @@ public partial class LinksPage
                     {
                         Text = cat.Name,
                         CommandParameter = cat.Id.ToString(),
-                        Style = (Style)Application.Current!.Resources["ChipButton"]
+                        Style = (Style)Application.Current!.Resources["ChipButton"],
+                        MinimumWidthRequest = 50,
                     };
                     chip.Clicked += OnFilterClicked;
                     layout.Children.Add( chip );
@@ -64,6 +90,7 @@ public partial class LinksPage
 
             Categories.Clear();
             foreach ( var c in categories ) Categories.Add( c );
+            RefreshFilterStyles();
         }
         catch
         {
@@ -73,6 +100,9 @@ public partial class LinksPage
 
     private async Task LoadLinksAsync()
     {
+        LoadingIndicator.IsVisible = true;
+        LoadingIndicator.IsRunning = true;
+        LoadingSkeleton.IsVisible = true;
         try
         {
             var page = await _linkService.GetLinksPageAsync( _currentPage, PageSize, _selectedCategoryId );
@@ -89,6 +119,12 @@ public partial class LinksPage
         {
             await DisplayAlertAsync( "Error", $"Could not load links: {ex.Message}", "OK" );
         }
+        finally
+        {
+            LoadingIndicator.IsRunning = false;
+            LoadingIndicator.IsVisible = false;
+            LoadingSkeleton.IsVisible = false;
+        }
     }
 
     private void UpdatePopularCard( List<LinkModel> links )
@@ -96,21 +132,19 @@ public partial class LinksPage
         if ( links.Count == 0 )
         {
             PopularCard.IsVisible = false;
-            PopularCardEmpty.IsVisible = true;
             return;
         }
 
-        var top = links.MaxBy( l => l.Views )!;
+        var top = links.MaxBy( l => l.Clicks )!;
         _selectedLinkId = top.Id;
 
-        PopularViews.Text = top.DisplayViews;
+        PopularViews.Text = top.DisplayClicks;
         PopularTitle.Text = top.DisplayTitle;
         PopularUrl.Text = top.OriginalUrl;
         PopularCategory.Text = top.CategoryName ?? string.Empty;
         PopularCategoryBadge.IsVisible = top.CategoryName is not null;
 
         PopularCard.IsVisible = true;
-        PopularCardEmpty.IsVisible = false;
     }
 
     private void UpdatePagination( int totalCount )
@@ -140,14 +174,16 @@ public partial class LinksPage
         var btn = new Button
         {
             Text = text,
-            Style = (Style)Application.Current!.Resources["ChipButton"]
+            Style = (Style)Application.Current!.Resources["ChipButton"],
+            MinimumWidthRequest = 40,
+            FontSize = 15,
         };
 
         if ( active )
         {
-            btn.BackgroundColor = (Color)Application.Current.Resources["SoftOrange"];
-            btn.TextColor = (Color)Application.Current.Resources["BrandOrange"];
-            btn.BorderColor = (Color)Application.Current.Resources["BrandOrange"];
+            btn.BackgroundColor = (Color)Application.Current.Resources["AppAccentSurface"];
+            btn.TextColor = (Color)Application.Current.Resources["AppAccentText"];
+            btn.BorderColor = (Color)Application.Current.Resources["AppAccentStroke"];
         }
 
         btn.Clicked += async ( _, _ ) =>
@@ -168,17 +204,20 @@ public partial class LinksPage
 
     private async void OnManageCategoriesClicked( object? sender, EventArgs e )
     {
-        var action =
-            await DisplayActionSheetAsync( "Categories", "Cancel", null, "Create category", "Delete category" );
-        switch ( action )
-        {
-            case "Create category":
-                await CreateCategoryAsync();
-                break;
-            case "Delete category":
-                await DeleteCategoryAsync();
-                break;
-        }
+        var page = Shell.Current?.CurrentPage;
+        if ( page is null )
+            return;
+        
+        await page.ShowPopupAsync( 
+            new CategoryManagementPopup( _linkService, _connectivity ), 
+            new PopupOptions
+            {
+                Shape = null,
+                Shadow = null,
+            } );
+        
+        await LoadCategoriesAsync();
+        await LoadLinksAsync();
     }
 
     private async Task NavigateToAnalyticsAsync( LinkModel? link = null, int? fallbackLinkId = null )
@@ -340,93 +379,16 @@ public partial class LinksPage
         // Visual state
         if ( _activeFilter is not null )
         {
-            _activeFilter.BackgroundColor = Colors.White;
-            _activeFilter.TextColor = Color.FromArgb( "#343434" );
-            _activeFilter.BorderColor = Color.FromArgb( "#E6E6E6" );
+            RefreshFilterStyles();
         }
-
-        selected.BackgroundColor = Color.FromArgb( "#FFF0EC" );
-        selected.TextColor = Color.FromArgb( "#FF5A36" );
-        selected.BorderColor = Color.FromArgb( "#FF5A36" );
         _activeFilter = selected;
+        RefreshFilterStyles();
 
         // Update filter
         var param = selected.CommandParameter?.ToString();
         _selectedCategoryId = param is "0" or null ? null : int.Parse( param );
         _currentPage = 1;
 
-        await LoadLinksAsync();
-    }
-
-    private async Task CreateCategoryAsync()
-    {
-        var categoryName = await DisplayPromptAsync(
-            "Create category",
-            "Enter a category name.",
-            accept: "Create",
-            cancel: "Cancel",
-            placeholder: "Category name" );
-
-        if ( string.IsNullOrWhiteSpace( categoryName ) )
-            return;
-
-        categoryName = categoryName.Trim();
-
-        try
-        {
-            var category = await _linkService.CreateCategoryAsync( categoryName );
-            if ( category is null )
-            {
-                await DisplayAlertAsync( "Error", "Could not create that category.", "OK" );
-                return;
-            }
-
-            await DisplayAlertAsync( "Created", $"'{category.Name}' has been created.", "OK" );
-            await LoadCategoriesAsync();
-        }
-        catch ( Exception ex )
-        {
-            await DisplayAlertAsync( "Error", $"Could not create category: {ex.Message}", "OK" );
-        }
-    }
-
-    private async Task DeleteCategoryAsync()
-    {
-        var categories = Categories.ToList();
-        if ( categories.Count == 0 )
-        {
-            await DisplayAlertAsync( "No categories", "Create a category first.", "OK" );
-            return;
-        }
-
-        var action = await DisplayActionSheetAsync( "Delete category", "Cancel", null,
-            categories.Select( c => c.Name ).ToArray() );
-        if ( string.IsNullOrWhiteSpace( action ) || action == "Cancel" )
-            return;
-
-        var category =
-            categories.FirstOrDefault( c => string.Equals( c.Name, action, StringComparison.OrdinalIgnoreCase ) );
-        if ( category is null )
-            return;
-
-        var confirm = await DisplayAlertAsync(
-            "Delete category",
-            $"Delete '{category.Name}' from the server?",
-            "Delete",
-            "Cancel" );
-
-        if ( !confirm )
-            return;
-
-        var success = await _linkService.DeleteCategoryAsync( category.Id );
-        if ( !success )
-        {
-            await DisplayAlertAsync( "Error", "Could not delete the category.", "OK" );
-            return;
-        }
-
-        await DisplayAlertAsync( "Deleted", "Category has been deleted.", "OK" );
-        await LoadCategoriesAsync();
         await LoadLinksAsync();
     }
 
@@ -458,5 +420,28 @@ public partial class LinksPage
 
         await DisplayAlertAsync( "Category assigned", $"'{category.Name}' is now attached to the link.", "OK" );
         return category;
+    }
+
+    private void RefreshFilterStyles()
+    {
+        if ( AllFilter.Parent is not HorizontalStackLayout layout )
+            return;
+
+        foreach ( var child in layout.Children.OfType<Button>() )
+            ApplyFilterStyle( child, child == _activeFilter );
+    }
+
+    private static void ApplyFilterStyle( Button button, bool active )
+    {
+        var resources = Application.Current!.Resources;
+        button.BackgroundColor = (Color)resources[active ? "AppAccentSurface" : "AppSurface"];
+        button.TextColor = (Color)resources[active ? "AppAccentText" : "AppText"];
+        button.BorderColor = (Color)resources[active ? "AppAccentStroke" : "AppStroke"];
+    }
+
+    private void UpdateConnectivityState(bool online)
+    {
+        OfflineBanner.IsVisible = !online;
+        LinksCollection.IsEnabled = online;
     }
 }

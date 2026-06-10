@@ -7,24 +7,40 @@ namespace KiirLink.Pages;
 public partial class FavouritesPage
 {
     private readonly LinkService _linkService;
+    private readonly IConnectivityService _connectivity;
+    private readonly EventHandler<bool> _connectivityChangedHandler;
 
     public ObservableCollection<LinkModel> Favourites { get; } = [];
 
-    public FavouritesPage( LinkService linkService )
+    public FavouritesPage(LinkService linkService, IConnectivityService connectivity)
     {
         InitializeComponent();
         _linkService = linkService;
+        _connectivity = connectivity;
+        _connectivityChangedHandler = (_, online) =>
+            Dispatcher.Dispatch(() => UpdateConnectivityState(online));
         BindingContext = this;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await LoadFavouritesAsync();
+        _connectivity.ConnectivityChanged += _connectivityChangedHandler;
+        UpdateConnectivityState(_connectivity.IsOnline);
+        if (_connectivity.IsOnline)
+            await LoadFavouritesAsync();
+    }
+
+    protected override void OnDisappearing()
+    {
+        _connectivity.ConnectivityChanged -= _connectivityChangedHandler;
+        base.OnDisappearing();
     }
 
     private async Task LoadFavouritesAsync()
     {
+        LoadingIndicator.IsVisible = true;
+        LoadingIndicator.IsRunning = true;
         try
         {
             var favourites = await _linkService.GetFavouritesAsync();
@@ -37,6 +53,11 @@ public partial class FavouritesPage
         catch ( Exception ex )
         {
             await DisplayAlertAsync( "Error", $"Could not load favourites: {ex.Message}", "OK" );
+        }
+        finally
+        {
+            LoadingIndicator.IsRunning = false;
+            LoadingIndicator.IsVisible = false;
         }
     }
 
@@ -200,5 +221,11 @@ public partial class FavouritesPage
 
         await DisplayAlertAsync( "Category assigned", $"'{category.Name}' is now attached to the link.", "OK" );
         return category;
+    }
+
+    private void UpdateConnectivityState(bool online)
+    {
+        OfflineBanner.IsVisible = !online;
+        FavouritesCollection.IsEnabled = online;
     }
 }

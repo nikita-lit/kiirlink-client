@@ -6,13 +6,26 @@
 
     <Color x:Key="White">#FFFFFF</Color>
     <Color x:Key="Black">#111111</Color>
+    <Color x:Key="AppBackground">#FFFFFF</Color>
+    <Color x:Key="AppSurface">#FFFFFF</Color>
+    <Color x:Key="AppText">#343434</Color>
+    <Color x:Key="AppMutedText">#666666</Color>
+    <Color x:Key="AppStroke">#E6E6E6</Color>
+    <Color x:Key="AppDivider">#ECECEC</Color>
+    <Color x:Key="AppTrack">#F1F1F1</Color>
+    <Color x:Key="AppShadow">#22000000</Color>
+    <Color x:Key="AppAccentSurface">#FFF0EC</Color>
+    <Color x:Key="AppAccentText">#C83B1D</Color>
+    <Color x:Key="AppAccentStroke">#D94322</Color>
+    <Color x:Key="AppDangerSurface">#FFE7E7</Color>
+    <Color x:Key="AppDangerText">#A52D2D</Color>
+    <Color x:Key="AppCategorySurface">#DDF2DC</Color>
+    <Color x:Key="AppCategoryText">#245E2A</Color>
+    <Color x:Key="AppGoldSurface">#785600</Color>
+    <Color x:Key="AppGoldText">#FFFFFF</Color>
     <Color x:Key="BrandOrange">#FF5A36</Color>
     <Color x:Key="BrandOrangeDark">#F04A2A</Color>
     <Color x:Key="BrandGold">#FFB500</Color>
-    <Color x:Key="BrandText">#343434</Color>
-    <Color x:Key="MutedText">#969696</Color>
-    <Color x:Key="CardStroke">#E6E6E6</Color>
-    <Color x:Key="Divider">#ECECEC</Color>
     <Color x:Key="NavInactive">#BDBDBD</Color>
     <Color x:Key="SoftOrange">#FFF0EC</Color>
     <Color x:Key="SoftRed">#FFE7E7</Color>
@@ -24,6 +37,9 @@
     <Color x:Key="GoldText">#75641A</Color>
     <Color x:Key="SoftPurple">#C8B4EA</Color>
     <Color x:Key="PurpleText">#4E3476</Color>
-    <Color x:Key="TrackGray">#F1F1F1</Color>
-
+    
+    <Color x:Key="SwitchThumbLight">#FFFFFF</Color>
+    <Color x:Key="SwitchThumbDark">#F5F5F5</Color>
+    <Color x:Key="SwitchOffTrackLight">#DADADA</Color>
+    <Color x:Key="SwitchOffTrackDark">#3A3A3A</Color>
 </ResourceDictionary>

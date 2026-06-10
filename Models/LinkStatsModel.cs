@@ -11,6 +11,9 @@ public class LinkStatsModel
 
     [JsonPropertyName( "byDate" )] public List<DailyStatModel> DailyViews { get; set; } = [];
 
+    [JsonPropertyName( "byCountry" )] public List<CountryStatModel> Countries { get; set; } = [];
+
+    // Kept for compatibility with older API responses. The analytics UI no longer displays sources.
     [JsonPropertyName( "bySource" )] public List<TrafficSourceModel> Sources { get; set; } = [];
 }
 
@@ -33,6 +36,15 @@ public class TrafficSourceModel
     [JsonIgnore] public float Percentage { get; set; } // We will calculate this manually
 }
 
+public class CountryStatModel
+{
+    [JsonPropertyName( "country" )] public string Country { get; set; } = string.Empty;
+
+    [JsonPropertyName( "count" )] public int Count { get; set; }
+
+    [JsonIgnore] public float Percentage { get; set; }
+}
+
 public class LinkActivityModel
 {
     [JsonPropertyName( "type" )] public string Type { get; set; } = string.Empty;
@@ -52,13 +64,4 @@ public class LinkActivityModel
             return Timestamp.ToString( "MMM d, yyyy" );
         }
     }
-
-    [JsonIgnore]
-    public string Icon => Type switch
-    {
-        "view" => "⊕",
-        "click" => "▯",
-        "favourite" => "♥",
-        _ => "⊕"
-    };
 }

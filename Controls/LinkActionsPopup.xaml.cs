@@ -16,9 +16,13 @@ public enum LinkActionsPopupAction
 
 public partial class LinkActionsPopup
 {
+    private readonly bool _hasCategory;
+
     public LinkActionsPopup( bool hasCategory, bool isFavourite )
     {
         InitializeComponent();
+        _hasCategory = hasCategory;
+        CategoryButton.Text = hasCategory ? "Delete category" : "Assign category";
         FavouriteButton.Text = isFavourite ? "Remove from favourites" : "Add to favourites";
     }
 
@@ -41,7 +45,9 @@ public partial class LinkActionsPopup
         await CloseWith( LinkActionsPopupAction.ViewAnalytics );
 
     private async void OnAssignCategoryClicked( object? sender, EventArgs e ) =>
-        await CloseWith( LinkActionsPopupAction.AssignCategory );
+        await CloseWith( _hasCategory
+            ? LinkActionsPopupAction.DeleteCategory
+            : LinkActionsPopupAction.AssignCategory );
     
     private async void OnFavouriteClicked( object? sender, EventArgs e ) =>
         await CloseWith( LinkActionsPopupAction.ToggleFavourite );

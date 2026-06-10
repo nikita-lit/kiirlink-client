@@ -5,34 +5,55 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:KiirLink.Controls"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:KiirLink.ViewModels"
+    x:DataType="viewModels:ProfileViewModel"
+    BackgroundColor="{DynamicResource AppBackground}"
     Title="Profile">
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto">
+    <Grid
+        x:Name="PageLayout"
+        BackgroundColor="{DynamicResource AppBackground}"
+        RowDefinitions="Auto,*,Auto,Auto">
         <controls:AppHeader
             Grid.Row="0"
             Margin="24,8,24,0" />
 
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="24,8,24,14" Spacing="10">
+            <VerticalStackLayout Padding="{StaticResource PagePadding}" Spacing="10">
+                <Border IsVisible="{Binding IsOffline}" Style="{StaticResource OfflineBanner}">
+                    <Label HorizontalTextAlignment="Center" Text="No internet connection"
+                           TextColor="{DynamicResource AppDangerText}" />
+                </Border>
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   SemanticProperties.Description="Loading profile" />
                 <Border
                     HeightRequest="100"
                     Padding="16,10"
                     Style="{StaticResource CardBorder}">
                     <Grid ColumnDefinitions="76,*">
-                        <Image
-                            HeightRequest="70"
-                            HorizontalOptions="Start"
-                            Source="profile_apple.png"
-                            VerticalOptions="Center"
-                            WidthRequest="66" />
+                        <Border HeightRequest="70"
+                                WidthRequest="66"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="100" />
+                            </Border.StrokeShape>
+
+                            <Image Source="profile_apple.png"
+                                   Aspect="AspectFill" />
+                        </Border>
+
                         <VerticalStackLayout
                             Grid.Column="1"
                             Spacing="2"
                             VerticalOptions="Center">
-                            <Label x:Name="ProfileNameLabel" FontFamily="RadioCanadaBigSemiBold" FontSize="16"
-                                   Text="Markus Tamm" />
-                            <Label x:Name="ProfileEmailLabel" FontSize="11" Text="markustamm@mail.com"
-                                   TextColor="{StaticResource MutedText}" />
+                            <Label FontFamily="RadioCanadaBigSemiBold" FontSize="16" Text="{Binding DisplayName}" />
+                            <Label
+                                FontSize="11"
+                                Text="{Binding Email}"
+                                TextColor="{DynamicResource AppMutedText}" />
                             <Button
                                 Margin="0,3,0,0"
                                 Clicked="OnEditProfileClicked"
@@ -40,109 +61,129 @@
                                 MinimumHeightRequest="28"
                                 Padding="10,3"
                                 Style="{StaticResource OutlineButton}"
-                                Text="✎  Edit profile" />
+                                Text="Edit profile" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
 
                 <Label Style="{StaticResource SectionTitle}" Text="Account" />
-                <Border Padding="12,0" Style="{StaticResource CardBorder}">
+                <Border Padding="12,6" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
-                            <Image HeightRequest="16" Source="userprofile.png" VerticalOptions="Center"
-                                   WidthRequest="16" />
+                            <Image
+                                x:Name="UserProfileIcon"
+                                HeightRequest="16"
+                                Source="userprofile.png"
+                                VerticalOptions="Center"
+                                WidthRequest="16">
+                                <Image.Behaviors>
+                                    <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
+                                </Image.Behaviors>
+                            </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Username" VerticalTextAlignment="Center" />
-                            <Label x:Name="AccountUsernameLabel" Grid.Column="2" FontSize="10" Text="markustamm"
-                                   TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
+                            <Label
+                                Grid.Column="2"
+                                FontSize="10"
+                                Text="{Binding DisplayName}"
+                                TextColor="{DynamicResource AppMutedText}"
+                                VerticalTextAlignment="Center"
+                                HorizontalTextAlignment="End" />
                         </Grid>
-                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
-                            <Image HeightRequest="16" Source="mail.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Image x:Name="MailIcon" HeightRequest="16" Source="mail.png" VerticalOptions="Center" WidthRequest="16">
+                                <Image.Behaviors>
+                                    <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
+                                </Image.Behaviors>
+                            </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Email" VerticalTextAlignment="Center" />
-                            <Label x:Name="AccountEmailLabel" Grid.Column="2" FontSize="10" Text="markustamm@mail.com"
-                                   TextColor="{StaticResource MutedText}" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
+                            <Label
+                                Grid.Column="2"
+                                FontSize="10"
+                                Text="{Binding Email}"
+                                TextColor="{DynamicResource AppMutedText}"
+                                VerticalTextAlignment="Center"
+                                HorizontalTextAlignment="End" />
                         </Grid>
-                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,14" HeightRequest="32">
-                            <Image HeightRequest="16" Source="lock.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnChangePasswordTapped" />
+                            </Grid.GestureRecognizers>
+                            <Image x:Name="ChangePasswordIcon" HeightRequest="16" Source="lock.png" VerticalOptions="Center" WidthRequest="16">
+                                <Image.Behaviors>
+                                    <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
+                                </Image.Behaviors>
+                            </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Change password" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="›" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                     </VerticalStackLayout>
                 </Border>
 
                 <Label Style="{StaticResource SectionTitle}" Text="Preferences" />
-                <Border Padding="12,0" Style="{StaticResource CardBorder}">
+                <Border Padding="12,6" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
                         <Grid ColumnDefinitions="26,*,Auto" HeightRequest="32">
-                            <Image HeightRequest="16" Source="dark_mode.png" VerticalOptions="Center" WidthRequest="16" />
-                            <Label Grid.Column="1" FontSize="11" Text="Dark mode" VerticalTextAlignment="Center" />
-                            <Switch Grid.Column="2" IsToggled="False" />
+                            <Image x:Name="DarkThemeIcon" HeightRequest="16" Source="dark_mode.png" VerticalOptions="Center" WidthRequest="16">
+                                <Image.Behaviors>
+                                    <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
+                                </Image.Behaviors>
+                            </Image>
+                            <Label Grid.Column="1" FontSize="11" Text="Dark theme" VerticalTextAlignment="Center" />
+                            <Switch x:Name="ThemeSwitch" Grid.Column="2" Toggled="OnThemeToggled" Margin="0, 0, 2, 0" />
                         </Grid>
-                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
-                            <Image HeightRequest="16" Source="language.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Image x:Name="LanguageIcon" HeightRequest="16" Source="language.png" VerticalOptions="Center" WidthRequest="16">
+                                <Image.Behaviors>
+                                    <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
+                                </Image.Behaviors>
+                            </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Language" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="English" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
-                        </Grid>
-                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
-                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="32">
-                            <Image HeightRequest="18" Source="leaderborad.png" VerticalOptions="Center"
-                                   WidthRequest="18" />
-                            <Label Grid.Column="1" FontSize="11" Text="Analytics visibility"
-                                   VerticalTextAlignment="Center" />
-                            <Switch Grid.Column="2" IsToggled="True" />
-                        </Grid>
-                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
-                        <Grid ColumnDefinitions="26,*,Auto" HeightRequest="32">
-                            <Image HeightRequest="16" Source="notifications.png" VerticalOptions="Center"
-                                   WidthRequest="16" />
-                            <Label Grid.Column="1" FontSize="11" Text="Notifications" VerticalTextAlignment="Center" />
-                            <Switch Grid.Column="2" IsToggled="True" />
+                            <Label Grid.Column="2" FontSize="10" Text="English" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                     </VerticalStackLayout>
                 </Border>
 
                 <Label Style="{StaticResource SectionTitle}" Text="Link Settings" />
-                <Border Padding="12,0" Style="{StaticResource CardBorder}">
+                <Border Padding="12,6" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="0">
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
-                            <Image HeightRequest="16" Source="folder.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Image x:Name="FolderIcon" HeightRequest="16" Source="folder.png" VerticalOptions="Center" WidthRequest="16">
+                                <Image.Behaviors>
+                                    <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
+                                </Image.Behaviors>
+                            </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Default category" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="Work" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="Work" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
-                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
-                            <Image HeightRequest="16" Source="clock.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Image x:Name="ClockIcon" HeightRequest="16" Source="clock.png" VerticalOptions="Center" WidthRequest="16">
+                                <Image.Behaviors>
+                                    <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
+                                </Image.Behaviors>
+                            </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Auto-expiration" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="30 days" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="30 days" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
-                        <BoxView BackgroundColor="{StaticResource Divider}" HeightRequest="1" />
+                        <BoxView BackgroundColor="{DynamicResource AppDivider}" HeightRequest="1" />
                         <Grid ColumnDefinitions="26,*,Auto,14" HeightRequest="32">
-                            <Image HeightRequest="16" Source="lock.png" VerticalOptions="Center" WidthRequest="16" />
+                            <Image x:Name="PrivacyIcon" HeightRequest="16" Source="lock.png" VerticalOptions="Center" WidthRequest="16">
+                                <Image.Behaviors>
+                                    <toolkit:IconTintColorBehavior TintColor="{DynamicResource AppText}" />
+                                </Image.Behaviors>
+                            </Image>
                             <Label Grid.Column="1" FontSize="11" Text="Privacy" VerticalTextAlignment="Center" />
-                            <Label Grid.Column="2" FontSize="10" Text="Public" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="›" TextColor="{StaticResource MutedText}"
-                                   VerticalTextAlignment="Center" />
+                            <Label Grid.Column="2" FontSize="10" Text="Public" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text=">" WidthRequest="10" Margin="8, 0, 0, 0" TextColor="{DynamicResource AppMutedText}" VerticalTextAlignment="Center" />
                         </Grid>
                     </VerticalStackLayout>
                 </Border>
-
             </VerticalStackLayout>
         </ScrollView>
 

@@ -9,7 +9,7 @@
     FlyoutBehavior="Disabled"
     Shell.NavBarIsVisible="False"
     Shell.TabBarIsVisible="False"
-    BackgroundColor="{StaticResource White}"
+    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#121212}"
     Title="KiirLink">
 
     <ShellContent

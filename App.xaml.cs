@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using KiirLink.Services;
 
 namespace KiirLink;
 
@@ -7,6 +8,7 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        ThemeService.Initialize();
     }
 
     protected override Window CreateWindow( IActivationState? activationState )

@@ -4,50 +4,56 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
+    <Thickness x:Key="PagePadding">24,8,24,18</Thickness>
+    <Thickness x:Key="CardPadding">14,12</Thickness>
+
     <Style TargetType="ContentPage">
-        <Setter Property="BackgroundColor" Value="{StaticResource White}" />
+        <Setter
+            Property="BackgroundColor"
+            Value="{AppThemeBinding Light=#FFFFFF, Dark=#121212}" />
         <Setter Property="Shell.NavBarIsVisible" Value="False" />
     </Style>
 
     <Style TargetType="Label">
-        <Setter Property="TextColor" Value="{StaticResource Black}" />
+        <Setter Property="TextColor" Value="{DynamicResource AppText}" />
         <Setter Property="FontFamily" Value="RadioCanadaBigRegular" />
         <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontAutoScalingEnabled" Value="True" />
         <Setter Property="LineBreakMode" Value="TailTruncation" />
     </Style>
 
     <Style x:Key="PageTitle" TargetType="Label">
         <Setter Property="FontFamily" Value="RadioCanadaBigSemiBold" />
         <Setter Property="FontSize" Value="22" />
-        <Setter Property="TextColor" Value="{StaticResource BrandText}" />
+        <Setter Property="TextColor" Value="{DynamicResource AppText}" />
     </Style>
 
     <Style x:Key="SectionTitle" TargetType="Label">
         <Setter Property="FontFamily" Value="RadioCanadaBigSemiBold" />
         <Setter Property="FontSize" Value="18" />
-        <Setter Property="TextColor" Value="{StaticResource BrandText}" />
+        <Setter Property="TextColor" Value="{DynamicResource AppText}" />
     </Style>
 
     <Style x:Key="CardTitle" TargetType="Label">
         <Setter Property="FontFamily" Value="RadioCanadaBigSemiBold" />
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="TextColor" Value="{StaticResource Black}" />
+        <Setter Property="TextColor" Value="{DynamicResource AppText}" />
     </Style>
 
     <Style x:Key="MutedLabel" TargetType="Label">
         <Setter Property="FontSize" Value="10" />
-        <Setter Property="TextColor" Value="{StaticResource MutedText}" />
+        <Setter Property="TextColor" Value="{DynamicResource AppMutedText}" />
     </Style>
 
     <Style x:Key="CardBorder" TargetType="Border">
-        <Setter Property="BackgroundColor" Value="{StaticResource White}" />
-        <Setter Property="Stroke" Value="{StaticResource CardStroke}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource AppSurface}" />
+        <Setter Property="Stroke" Value="{DynamicResource AppStroke}" />
         <Setter Property="StrokeThickness" Value="1" />
         <Setter Property="StrokeShape" Value="RoundRectangle 9" />
         <Setter Property="Shadow">
             <Setter.Value>
                 <Shadow
-                    Brush="#22000000"
+                    Brush="{DynamicResource AppShadow}"
                     Offset="0,2"
                     Opacity="0.22"
                     Radius="4" />
@@ -60,54 +66,66 @@
         <Setter Property="TextColor" Value="{StaticResource White}" />
         <Setter Property="FontFamily" Value="RadioCanadaBigSemiBold" />
         <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontAutoScalingEnabled" Value="True" />
         <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="Padding" Value="16,9" />
-        <Setter Property="MinimumHeightRequest" Value="42" />
+        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="MinimumHeightRequest" Value="44" />
         <Setter Property="BorderWidth" Value="0" />
     </Style>
 
     <Style x:Key="OutlineButton" TargetType="Button">
-        <Setter Property="BackgroundColor" Value="{StaticResource White}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource AppSurface}" />
         <Setter Property="TextColor" Value="{StaticResource BrandOrange}" />
         <Setter Property="FontFamily" Value="RadioCanadaBigSemiBold" />
         <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontAutoScalingEnabled" Value="True" />
         <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="Padding" Value="12,7" />
-        <Setter Property="MinimumHeightRequest" Value="36" />
+        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="MinimumHeightRequest" Value="44" />
         <Setter Property="BorderColor" Value="{StaticResource BrandOrange}" />
         <Setter Property="BorderWidth" Value="1" />
     </Style>
 
     <Style x:Key="ChipButton" TargetType="Button">
-        <Setter Property="BackgroundColor" Value="{StaticResource White}" />
-        <Setter Property="TextColor" Value="{StaticResource BrandText}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource AppSurface}" />
+        <Setter Property="TextColor" Value="{DynamicResource AppText}" />
         <Setter Property="FontFamily" Value="RadioCanadaBigSemiBold" />
         <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontAutoScalingEnabled" Value="True" />
         <Setter Property="CornerRadius" Value="9" />
-        <Setter Property="Padding" Value="11,7" />
-        <Setter Property="MinimumHeightRequest" Value="34" />
-        <Setter Property="BorderColor" Value="{StaticResource CardStroke}" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="MinimumHeightRequest" Value="44" />
+        <Setter Property="BorderColor" Value="{DynamicResource AppStroke}" />
         <Setter Property="BorderWidth" Value="1" />
     </Style>
 
     <Style TargetType="Entry">
         <Setter Property="BackgroundColor" Value="Transparent" />
-        <Setter Property="TextColor" Value="{StaticResource BrandText}" />
-        <Setter Property="PlaceholderColor" Value="{StaticResource MutedText}" />
+        <Setter Property="TextColor" Value="{DynamicResource AppText}" />
+        <Setter Property="PlaceholderColor" Value="{DynamicResource AppMutedText}" />
         <Setter Property="FontFamily" Value="RadioCanadaBigRegular" />
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="MinimumHeightRequest" Value="38" />
+        <Setter Property="FontAutoScalingEnabled" Value="True" />
+        <Setter Property="MinimumHeightRequest" Value="44" />
+    </Style>
+
+    <Style x:Key="OfflineBanner" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{DynamicResource AppDangerSurface}" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Stroke" Value="{DynamicResource AppDangerText}" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 8" />
     </Style>
 
     <Style TargetType="Switch">
         <Setter Property="OnColor" Value="{StaticResource BrandOrange}" />
-        <Setter Property="ThumbColor" Value="{StaticResource White}" />
-        <Setter Property="Scale" Value="0.65" />
+        <Setter Property="ThumbColor"
+                Value="{AppThemeBinding Light={StaticResource SwitchThumbLight},
+                                    Dark={StaticResource SwitchThumbDark}}" />
     </Style>
 
     <Style TargetType="ProgressBar">
         <Setter Property="ProgressColor" Value="{StaticResource BrandOrange}" />
-        <Setter Property="BackgroundColor" Value="{StaticResource TrackGray}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource AppTrack}" />
         <Setter Property="HeightRequest" Value="8" />
     </Style>
 

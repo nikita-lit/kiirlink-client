@@ -5,51 +5,64 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    BackgroundColor="Transparent"
+    Padding="0"
     CanBeDismissedByTappingOutsideOfPopup="True">
-    
-    <VerticalStackLayout Spacing="8" WidthRequest="310" Padding="14">
-        <Label
-            FontFamily="RadioCanadaBigSemiBold"
-            FontSize="14"
-            Text="Link actions" />
-        
-        <Button
-            Clicked="OnAnalyticsClicked"
-            ContentLayout="Left,8"
-            Style="{StaticResource OutlineButton}"
-            Text="View analytics" />
-        
-        <Button
-            Clicked="OnCopyShortClicked"
-            ContentLayout="Left,8"
-            Style="{StaticResource OutlineButton}"
-            Text="Copy short link" />
 
-        <Button
-            Clicked="OnCopyOriginalClicked"
-            ContentLayout="Left,8"
-            Style="{StaticResource OutlineButton}"
-            Text="Copy original link" />
+    <Border
+        Padding="14"
+        Stroke="{DynamicResource AppStroke}"
+        StrokeShape="RoundRectangle 14"
+        BackgroundColor="{DynamicResource AppSurface}">
+        <VerticalStackLayout Spacing="8" WidthRequest="340">
+            <Label
+                FontFamily="RadioCanadaBigSemiBold"
+                FontSize="14"
+                Text="Link actions"
+                TextColor="{DynamicResource AppText}" />
 
-        <Button
-            Clicked="OnAssignCategoryClicked"
-            ContentLayout="Left,8"
-            Style="{StaticResource OutlineButton}"
-            Text="Assign category" />
+            <Button
+                Clicked="OnAnalyticsClicked"
+                ContentLayout="Left,8"
+                Style="{StaticResource OutlineButton}"
+                Text="View analytics" />
 
-        <Button
-            x:Name="FavouriteButton"
-            Clicked="OnFavouriteClicked"
-            ContentLayout="Left,8"
-            Style="{StaticResource OutlineButton}"
-            Text="Add to favourites" />
+            <Button
+                Clicked="OnCopyShortClicked"
+                ContentLayout="Left,8"
+                Style="{StaticResource OutlineButton}"
+                Text="Copy short link" />
 
-        <Button
-            BackgroundColor="{StaticResource SoftRed}"
-            Clicked="OnDeleteClicked"
-            ContentLayout="Left,8"
-            Style="{StaticResource OutlineButton}"
-            Text="Delete" />
-    </VerticalStackLayout>
+            <Button
+                Clicked="OnCopyOriginalClicked"
+                ContentLayout="Left,8"
+                Style="{StaticResource OutlineButton}"
+                Text="Copy original link" />
+
+            <Button
+                x:Name="CategoryButton"
+                Clicked="OnAssignCategoryClicked"
+                ContentLayout="Left,8"
+                Style="{StaticResource OutlineButton}"
+                Text="Assign category" />
+
+            <Button
+                x:Name="FavouriteButton"
+                Clicked="OnFavouriteClicked"
+                ContentLayout="Left,8"
+                Style="{StaticResource OutlineButton}"
+                Text="Add to favourites" />
+
+            <Button
+                BackgroundColor="{DynamicResource AppDangerSurface}"
+                BorderColor="{DynamicResource AppDangerStroke}"
+                Clicked="OnDeleteClicked"
+                ContentLayout="Left,8"
+                Style="{StaticResource OutlineButton}"
+                Text="Delete"
+                TextColor="{DynamicResource AppDangerText}" />
+
+        </VerticalStackLayout>
+    </Border>
 
 </toolkit:Popup>
