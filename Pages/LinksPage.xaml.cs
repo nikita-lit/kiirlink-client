@@ -99,7 +99,7 @@ public partial class LinksPage
 
     private async Task LoadLinksAsync()
     {
-        LoadingIndicator.IsVisible = true;
+        LinksCollection.IsVisible = false;
         LoadingIndicator.IsRunning = true;
         LoadingSkeleton.IsVisible = true;
         try
@@ -128,8 +128,8 @@ public partial class LinksPage
         finally
         {
             LoadingIndicator.IsRunning = false;
-            LoadingIndicator.IsVisible = false;
             LoadingSkeleton.IsVisible = false;
+            LinksCollection.IsVisible = true;
         }
     }
 

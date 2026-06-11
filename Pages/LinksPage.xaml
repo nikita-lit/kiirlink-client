@@ -162,19 +162,13 @@
                 </CollectionView.EmptyView>
             </CollectionView>
 
-            <ActivityIndicator
-                x:Name="LoadingIndicator"
-                Grid.Row="5"
-                IsVisible="False"
-                VerticalOptions="Center"
-                SemanticProperties.Description="Loading links" />
-
             <VerticalStackLayout
                 x:Name="LoadingSkeleton"
                 Grid.Row="5"
                 IsVisible="False"
                 Spacing="8"
                 SemanticProperties.Description="Loading link cards">
+
                 <Border Padding="{StaticResource CardPadding}" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="8">
                         <BoxView BackgroundColor="{DynamicResource AppTrack}" HeightRequest="14" WidthRequest="180"
@@ -193,6 +187,12 @@
                                  HorizontalOptions="Start" />
                     </VerticalStackLayout>
                 </Border>
+                
+                <ActivityIndicator
+                    x:Name="LoadingIndicator"
+                    Margin="0, 30, 0, 0"
+                    HorizontalOptions="Center"
+                    SemanticProperties.Description="Loading links" />
             </VerticalStackLayout>
 
             <Border
