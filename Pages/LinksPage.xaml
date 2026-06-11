@@ -135,7 +135,7 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:LinkModel">
                         <controls:LinkCard
-                            CardTapped="OnLinkCardTapped"
+                            CardTapped="OnLinkAnalyticsRequested"
                             AnalyticsRequested="OnLinkAnalyticsRequested"
                             FavouriteToggleRequested="OnLinkFavouriteToggleRequested"
                             CategoryRequested="OnLinkCategoryRequested"

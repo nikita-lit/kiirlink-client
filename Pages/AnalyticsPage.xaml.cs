@@ -7,14 +7,14 @@ namespace KiirLink.Pages;
 
 public partial class AnalyticsPage
 {
-    private readonly LinkService _linkService;
+    private readonly ILinkService _linkService;
     private readonly PerformanceChartDrawable _chartDrawable = new();
 
     // The link whose analytics are shown; updated from LinksPage when a card is tapped.
     public static int SelectedLinkId { get; set; } = -1;
     public static LinkModel? SelectedLink { get; set; }
 
-    public AnalyticsPage( LinkService linkService )
+    public AnalyticsPage(ILinkService linkService)
     {
         InitializeComponent();
         _linkService = linkService;

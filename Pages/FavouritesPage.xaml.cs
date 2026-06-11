@@ -9,13 +9,13 @@ namespace KiirLink.Pages;
 
 public partial class FavouritesPage
 {
-    private readonly LinkService _linkService;
+    private readonly ILinkService _linkService;
     private readonly IConnectivityService _connectivity;
     private readonly EventHandler<bool> _connectivityChangedHandler;
 
     public ObservableCollection<LinkModel> Favourites { get; } = [];
 
-    public FavouritesPage(LinkService linkService, IConnectivityService connectivity)
+    public FavouritesPage(ILinkService linkService, IConnectivityService connectivity)
     {
         InitializeComponent();
         _linkService = linkService;
@@ -72,20 +72,10 @@ public partial class FavouritesPage
         await Shell.Current.GoToAsync( "//Analytics" );
     }
 
-    private async void OnLinkCardTapped( object? sender, TappedEventArgs e )
-    {
-        if ( sender is not LinkCard card ) 
-            return;
-
-        await NavigateToAnalyticsAsync( Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId ) );
-    }
-
     private async void OnLinkAnalyticsRequested( object? sender, EventArgs e )
     {
-        if ( sender is not LinkCard card ) 
-            return;
-
-        await NavigateToAnalyticsAsync( Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId ) );
+        if (sender is LinkCard card)
+            await NavigateToAnalyticsAsync(Favourites.FirstOrDefault(link => link.ResolvedId == card.LinkId));
     }
 
     private async void OnLinkCategoryRequested( object? sender, EventArgs e )

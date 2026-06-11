@@ -7,14 +7,14 @@ namespace KiirLink.Controls;
 
 public partial class CategoryManagementPopup
 {
-    private readonly LinkService _linkService;
+    private readonly ILinkService _linkService;
     private readonly IConnectivityService _connectivity;
     private readonly ObservableCollection<CategoryModel> _categories = [];
     private bool _loaded;
 
     public ObservableCollection<CategoryModel> Categories => _categories;
 
-    public CategoryManagementPopup(LinkService linkService, IConnectivityService connectivity)
+    public CategoryManagementPopup(ILinkService linkService, IConnectivityService connectivity)
     {
         InitializeComponent();
         _linkService = linkService;

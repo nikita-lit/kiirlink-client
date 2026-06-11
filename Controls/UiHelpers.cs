@@ -18,25 +18,32 @@ internal static class UiHelpers
     public static Task ClosePopupAsync<T>(T result) =>
         CurrentPage?.ClosePopupAsync(result) ?? Task.CompletedTask;
 
+    private static Task AlertAsync(Page page, string title, string message) =>
+        page.DisplayAlertAsync(title, message, "OK");
+
+    private static Task ErrorAsync(Page page, string key, params object[] args) =>
+        AlertAsync(
+            page,
+            L("Error"),
+            args.Length == 0 ? L(key) : LocalizationManager.Instance.Format(key, args));
+
+    private static string L(string key) => LocalizationManager.Instance.Get(key);
+
     public static async Task<CategoryModel?> AssignCategoryAsync(
         Page page,
         ILinkService links,
         int linkId,
         IReadOnlyCollection<CategoryModel> categories)
     {
-        var localization = LocalizationManager.Instance;
         if (categories.Count == 0)
         {
-            await page.DisplayAlertAsync(
-                localization.Get("NoCategories"),
-                localization.Get("CreateCategoryFirst"),
-                "OK");
+            await AlertAsync(page, L("NoCategories"), L("CreateCategoryFirst"));
             return null;
         }
 
-        var cancel = localization.Get("Cancel");
+        var cancel = L("Cancel");
         var action = await page.DisplayActionSheetAsync(
-            localization.Get("AssignCategory"),
+            L("AssignCategory"),
             cancel,
             null,
             categories.Select(category => category.Name).ToArray());
@@ -49,17 +56,14 @@ internal static class UiHelpers
 
         if (!await links.AssignCategoryAsync(linkId, category.Id))
         {
-            await page.DisplayAlertAsync(
-                localization.Get("Error"),
-                localization.Get("CouldNotAssignCategory"),
-                "OK");
+            await ErrorAsync(page, "CouldNotAssignCategory");
             return null;
         }
 
-        await page.DisplayAlertAsync(
-            localization.Get("CategoryAssigned"),
-            localization.Format("CategoryAssignedMessage", category.Name),
-            "OK");
+        await AlertAsync(
+            page,
+            L("CategoryAssigned"),
+            LocalizationManager.Instance.Format("CategoryAssignedMessage", category.Name));
         return category;
     }
 
@@ -70,12 +74,11 @@ internal static class UiHelpers
 
     public static async Task<bool> DeleteLinkAsync(Page page, ILinkService links, int linkId, string title)
     {
-        var localization = LocalizationManager.Instance;
         if (!await page.DisplayAlertAsync(
-                localization.Get("DeleteLink"),
-                localization.Format("DeleteLinkConfirmation", title),
-                localization.Get("Delete"),
-                localization.Get("Cancel")))
+                L("DeleteLink"),
+                LocalizationManager.Instance.Format("DeleteLinkConfirmation", title),
+                L("Delete"),
+                L("Cancel")))
             return false;
 
         try
@@ -83,17 +86,11 @@ internal static class UiHelpers
             if (await links.RemoveLinkAsync(linkId))
                 return true;
 
-            await page.DisplayAlertAsync(
-                localization.Get("Error"),
-                localization.Get("CouldNotDeleteLink"),
-                "OK");
+            await ErrorAsync(page, "CouldNotDeleteLink");
         }
         catch (Exception ex)
         {
-            await page.DisplayAlertAsync(
-                localization.Get("Error"),
-                localization.Format("ErrorDetails", ex.Message),
-                "OK");
+            await ErrorAsync(page, "ErrorDetails", ex.Message);
         }
 
         return false;
@@ -105,7 +102,6 @@ internal static class UiHelpers
         int linkId,
         bool favourite)
     {
-        var localization = LocalizationManager.Instance;
         try
         {
             var success = favourite
@@ -114,17 +110,11 @@ internal static class UiHelpers
             if (success)
                 return true;
 
-            await page.DisplayAlertAsync(
-                localization.Get("Error"),
-                localization.Get("CouldNotUpdateFavourite"),
-                "OK");
+            await ErrorAsync(page, "CouldNotUpdateFavourite");
         }
         catch (Exception ex)
         {
-            await page.DisplayAlertAsync(
-                localization.Get("Error"),
-                localization.Format("ErrorDetails", ex.Message),
-                "OK");
+            await ErrorAsync(page, "ErrorDetails", ex.Message);
         }
 
         return false;

@@ -67,11 +67,7 @@ public static class MauiProgram
             });
 
         builder.Services.AddSingleton<IAuthService, AuthService>();
-        builder.Services.AddSingleton<AuthService>(services =>
-            (AuthService)services.GetRequiredService<IAuthService>());
         builder.Services.AddSingleton<ILinkService, LinkService>();
-        builder.Services.AddSingleton<LinkService>(services =>
-            (LinkService)services.GetRequiredService<ILinkService>());
 
         builder.Services.AddTransient<SignInViewModel>();
         builder.Services.AddTransient<CreateAccountViewModel>();

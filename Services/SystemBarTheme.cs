@@ -5,7 +5,7 @@ public static class SystemBarTheme
     public static void Apply(bool dark, Color background)
     {
 #if ANDROID
-        var activity = Microsoft.Maui.ApplicationModel.Platform.CurrentActivity;
+        var activity = Platform.CurrentActivity;
         var window = activity?.Window;
         if (window is null)
             return;

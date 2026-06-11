@@ -9,7 +9,7 @@ namespace KiirLink.Pages;
 
 public partial class LinksPage
 {
-    private readonly LinkService _linkService;
+    private readonly ILinkService _linkService;
     private readonly IConnectivityService _connectivity;
     private readonly EventHandler _themeChangedHandler;
     private readonly EventHandler<bool> _connectivityChangedHandler;
@@ -19,12 +19,11 @@ public partial class LinksPage
     private const int PageSize = 10;
     private int? _selectedCategoryId;
     private int _selectedLinkId;
-    private int _totalLinkCount;
 
     public ObservableCollection<LinkModel> Links { get; } = [];
     public ObservableCollection<CategoryModel> Categories { get; } = [];
 
-    public LinksPage(LinkService linkService, IConnectivityService connectivity)
+    public LinksPage(ILinkService linkService, IConnectivityService connectivity)
     {
         InitializeComponent();
         _linkService = linkService;
@@ -113,13 +112,9 @@ public partial class LinksPage
                 page = await _linkService.GetLinksPageAsync( _currentPage, PageSize, _selectedCategoryId );
             }
 
-            var links = page.Items;
-
-            Links.ReplaceWith(links);
-
-            UpdatePopularCard( links );
-            _totalLinkCount = page.TotalCount;
-            UpdatePagination( _totalLinkCount );
+            Links.ReplaceWith(page.Items);
+            UpdatePopularCard(page.Items);
+            UpdatePagination(page.TotalCount);
         }
         catch ( Exception ex )
         {
@@ -158,24 +153,16 @@ public partial class LinksPage
         PaginationRow.Children.Clear();
 
         // Show prev page if not on first
-        if ( _currentPage > 1 )
-        {
-            var prev = MakePageButton( "‹", _currentPage - 1, false );
-            PaginationRow.Children.Add( prev );
-        }
+        if (_currentPage > 1)
+            PaginationRow.Children.Add(MakePageButton("‹", _currentPage - 1));
 
-        var current = MakePageButton( _currentPage.ToString(), _currentPage, true );
-        PaginationRow.Children.Add( current );
+        PaginationRow.Children.Add(MakePageButton(_currentPage.ToString(), _currentPage, true));
 
-        // Show next only if more items exist after this page.
-        if ( _currentPage * PageSize < totalCount )
-        {
-            var next = MakePageButton( "›", _currentPage + 1, false );
-            PaginationRow.Children.Add( next );
-        }
+        if (_currentPage * PageSize < totalCount)
+            PaginationRow.Children.Add(MakePageButton("›", _currentPage + 1));
     }
 
-    private Button MakePageButton( string text, int page, bool active )
+    private Button MakePageButton(string text, int page, bool active = false)
     {
         var btn = new Button
         {
@@ -262,20 +249,10 @@ public partial class LinksPage
         await NavigateToAnalyticsAsync( Links.FirstOrDefault( l => l.Id == _selectedLinkId ) );
     }
 
-    private async void OnLinkCardTapped( object? sender, TappedEventArgs e )
-    {
-        if ( sender is LinkCard card )
-            await NavigateToAnalyticsAsync( Links.FirstOrDefault( l => l.Id == card.LinkId ), card.LinkId );
-        else
-            await NavigateToAnalyticsAsync();
-    }
-
     private async void OnLinkAnalyticsRequested( object? sender, EventArgs e )
     {
-        if ( sender is not LinkCard card ) 
-            return;
-
-        await NavigateToAnalyticsAsync( Links.FirstOrDefault( l => l.Id == card.LinkId ), card.LinkId );
+        if (sender is LinkCard card)
+            await NavigateToAnalyticsAsync(Links.FirstOrDefault(link => link.Id == card.LinkId), card.LinkId);
     }
 
     private async void OnLinkCategoryRequested( object? sender, EventArgs e )
@@ -324,14 +301,13 @@ public partial class LinksPage
         if ( sender is not Button selected ) 
             return;
         
-        if ( _activeFilter is not null )
-            RefreshFilterStyles();
-        
         _activeFilter = selected;
         RefreshFilterStyles();
         
-        var param = selected.CommandParameter?.ToString();
-        _selectedCategoryId = param is "0" or null ? null : int.Parse( param );
+        _selectedCategoryId = int.TryParse(selected.CommandParameter?.ToString(), out var categoryId) &&
+                              categoryId > 0
+            ? categoryId
+            : null;
         _currentPage = 1;
 
         await LoadLinksAsync();

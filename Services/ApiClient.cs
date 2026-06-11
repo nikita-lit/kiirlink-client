@@ -66,7 +66,7 @@ public class ApiClient : IApiClient
         }
     }
 
-    public static async Task SaveTokensAsync( AccessTokenResponse tokens )
+    private static async Task SaveTokensAsync(AccessTokenResponse tokens)
     {
         await EnsureTokensLoadedAsync();
 
@@ -84,13 +84,13 @@ public class ApiClient : IApiClient
         }
     }
 
-    public static async Task<bool> HasStoredTokensInStorageAsync()
+    private static async Task<bool> HasStoredTokensAsync()
     {
         await EnsureTokensLoadedAsync();
         return _accessToken is not null;
     }
 
-    public static async Task ClearStoredTokensAsync()
+    private static async Task ClearStoredTokensAsync()
     {
         await EnsureTokensLoadedAsync();
 
@@ -108,7 +108,7 @@ public class ApiClient : IApiClient
         }
     }
 
-    Task<bool> IApiClient.HasStoredTokensAsync() => HasStoredTokensInStorageAsync();
+    Task<bool> IApiClient.HasStoredTokensAsync() => HasStoredTokensAsync();
 
     Task IApiClient.ClearTokensAsync() => ClearStoredTokensAsync();
 
@@ -230,6 +230,16 @@ public class ApiClient : IApiClient
             Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json")
         };
 
+    private Task<HttpResponseMessage> SendCredentialsAsync<T>(
+        string path,
+        string email,
+        string password,
+        CancellationToken ct)
+        where T : CredentialsRequest, new() =>
+        SendCoreAsync(
+            JsonRequest(HttpMethod.Post, path, new T { Email = email, Password = password }),
+            ct);
+
     private async Task<T?> SendForResultAsync<T>(HttpMethod method, string path, CancellationToken ct)
     {
         var response = await SendWithRefreshAsync(new HttpRequestMessage(method, path), ct);
@@ -263,13 +273,8 @@ public class ApiClient : IApiClient
     public async Task<(bool Success, string? Error)> RegisterAsync( string email, string password,
         CancellationToken ct = default )
     {
-        var response = await SendCoreAsync(
-            JsonRequest(HttpMethod.Post, "/api/auth/register", new RegisterRequest
-            {
-                Email = email,
-                Password = password
-            }),
-            ct);
+        var response = await SendCredentialsAsync<RegisterRequest>(
+            "/api/auth/register", email, password, ct);
         if ( response.IsSuccessStatusCode )
             return (true, null);
 
@@ -280,17 +285,9 @@ public class ApiClient : IApiClient
     public async Task<(bool Success, string? Error)> LoginAsync( string email, string password,
         CancellationToken ct = default )
     {
-        var response = await SendCoreAsync(
-            JsonRequest(HttpMethod.Post, "/api/auth/login", new LoginRequest
-            {
-                Email = email,
-                Password = password
-            }),
-            ct);
+        var response = await SendCredentialsAsync<LoginRequest>("/api/auth/login", email, password, ct);
         if ( !response.IsSuccessStatusCode )
-        {
             return (false, await AuthErrorAsync(response, AuthOperation.Login, ct));
-        }
 
         var tokens = await DeserializeAsync<AccessTokenResponse>( response, ct );
         if ( tokens is null )
@@ -322,24 +319,19 @@ public class ApiClient : IApiClient
         GetAsync<InfoResponse>("/api/auth/manage/info", ct);
 
     /// <summary>GET /api/links/get?page=&amp;limit=&amp;categoryId=</summary>
-    public async Task<PaginatedLinksResponse> GetLinksPageAsync( int page = 1, int limit = 20, int? categoryId = null,
-        CancellationToken ct = default )
-    {
-        return await GetAsync<PaginatedLinksResponse>(
-                   UriQueryBuilder.Build(
-                       "/api/links/get",
-                       ("page", page),
-                       ("limit", limit),
-                       ("categoryId", categoryId)),
-                   ct)
-               ?? new PaginatedLinksResponse();
-    }
+    public async Task<PaginatedLinksResponse> GetLinksPageAsync(int page = 1, int limit = 20,
+        int? categoryId = null, CancellationToken ct = default) =>
+        await GetAsync<PaginatedLinksResponse>(
+            UriQueryBuilder.Build(
+                "/api/links/get",
+                ("page", page),
+                ("limit", limit),
+                ("categoryId", categoryId)),
+            ct) ?? new PaginatedLinksResponse();
 
-    public async Task<List<LinkModel>> GetLinksAsync( int page = 1, int limit = 20, int? categoryId = null,
-        CancellationToken ct = default )
-    {
-        return (await GetLinksPageAsync(page, limit, categoryId, ct)).Items;
-    }
+    public async Task<List<LinkModel>> GetLinksAsync(int page = 1, int limit = 20,
+        int? categoryId = null, CancellationToken ct = default) =>
+        (await GetLinksPageAsync(page, limit, categoryId, ct)).Items;
 
     /// <summary>POST /api/links/shorten?originalUrl=&amp;expiresAt=&amp;isPublic=</summary>
     public async Task<LinkCreationResult> ShortenLinkAsync( string originalUrl, DateTime? expiresAt = null,
@@ -416,10 +408,8 @@ public class ApiClient : IApiClient
             ct);
 
     /// <summary>POST /api/links/category?categoryName=</summary>
-    public async Task<bool> AddCategoryAsync( string categoryName, CancellationToken ct = default )
-    {
-        return await CreateCategoryAsync(categoryName, ct) is not null;
-    }
+    public async Task<bool> AddCategoryAsync(string categoryName, CancellationToken ct = default) =>
+        await CreateCategoryAsync(categoryName, ct) is not null;
 
     /// <summary>DELETE /api/links/category/{id}</summary>
     public Task<bool> DeleteCategoryAsync(int id, CancellationToken ct = default) =>
