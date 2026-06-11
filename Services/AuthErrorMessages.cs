@@ -18,24 +18,19 @@ public static class AuthErrorMessages
             return "Too many attempts. Wait a moment and try again.";
 
         if (statusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
-        {
             return operation == AuthOperation.Login
                 ? "Incorrect email or password."
                 : "Your session has expired. Sign in again and retry.";
-        }
 
-        var codes = ReadIdentityErrorCodes(responseBody);
-        var messages = codes
+        var messages = ReadIdentityErrorCodes(responseBody)
             .Select(MapIdentityCode)
-            .Where(message => message is not null)
+            .OfType<string>()
             .Distinct()
-            .Cast<string>()
-            .ToList();
+            .ToArray();
 
-        if (messages.Count > 0)
-            return string.Join(Environment.NewLine, messages);
-
-        return operation switch
+        return messages.Length > 0
+            ? string.Join(Environment.NewLine, messages)
+            : operation switch
         {
             AuthOperation.Login => "Incorrect email or password.",
             AuthOperation.Register => "Could not create the account. Check the email and password.",
@@ -64,20 +59,17 @@ public static class AuthErrorMessages
         }
     }
 
-    private static string? MapIdentityCode(string code)
+    private static string? MapIdentityCode(string code) => code switch
     {
-        return code switch
-        {
-            "DuplicateEmail" or "DuplicateUserName" => "An account with this email already exists.",
-            "InvalidEmail" or "InvalidUserName" => "Enter a valid email address.",
-            "PasswordTooShort" => "The password is too short.",
-            "PasswordRequiresDigit" => "The password must contain a number.",
-            "PasswordRequiresLower" => "The password must contain a lowercase letter.",
-            "PasswordRequiresUpper" => "The password must contain an uppercase letter.",
-            "PasswordRequiresNonAlphanumeric" => "The password must contain a special character.",
-            "PasswordRequiresUniqueChars" => "The password must contain more unique characters.",
-            "PasswordMismatch" => "The current password is incorrect.",
-            _ => null
-        };
-    }
+        "DuplicateEmail" or "DuplicateUserName" => "An account with this email already exists.",
+        "InvalidEmail" or "InvalidUserName" => "Enter a valid email address.",
+        "PasswordTooShort" => "The password is too short.",
+        "PasswordRequiresDigit" => "The password must contain a number.",
+        "PasswordRequiresLower" => "The password must contain a lowercase letter.",
+        "PasswordRequiresUpper" => "The password must contain an uppercase letter.",
+        "PasswordRequiresNonAlphanumeric" => "The password must contain a special character.",
+        "PasswordRequiresUniqueChars" => "The password must contain more unique characters.",
+        "PasswordMismatch" => "The current password is incorrect.",
+        _ => null
+    };
 }

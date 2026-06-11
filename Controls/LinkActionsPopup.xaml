@@ -23,14 +23,16 @@
                 TextColor="{DynamicResource AppText}" />
 
             <Button
-                Clicked="OnCopyShortClicked"
+                Clicked="OnActionClicked"
+                CommandParameter="CopyShort"
                 ContentLayout="Left,8"
                 ImageSource="copy.svg"
                 Style="{StaticResource PrimaryButton}"
                 Text="{l:Translate CopyShortLink}" />
 
             <Button
-                Clicked="OnCreateQRCodeClicked"
+                Clicked="OnActionClicked"
+                CommandParameter="CreateQRCode"
                 ContentLayout="Left,8"
                 ImageSource="qr_code.svg"
                 Style="{StaticResource PrimaryButton}"
@@ -42,14 +44,16 @@
                 HeightRequest="1" />
 
             <Button
-                Clicked="OnCopyOriginalClicked"
+                Clicked="OnActionClicked"
+                CommandParameter="CopyOriginal"
                 ContentLayout="Left,8"
                 ImageSource="action_link.svg"
                 Style="{StaticResource OutlineButton}"
                 Text="{l:Translate CopyOriginalLink}" />
 
             <Button
-                Clicked="OnAnalyticsClicked"
+                Clicked="OnActionClicked"
+                CommandParameter="ViewAnalytics"
                 ContentLayout="Left,8"
                 ImageSource="action_analytics.svg"
                 Style="{StaticResource OutlineButton}"
@@ -57,7 +61,8 @@
 
             <Button
                 x:Name="CategoryButton"
-                Clicked="OnAssignCategoryClicked"
+                Clicked="OnActionClicked"
+                CommandParameter="AssignCategory"
                 ContentLayout="Left,8"
                 ImageSource="action_category.svg"
                 Style="{StaticResource OutlineButton}"
@@ -65,7 +70,8 @@
 
             <Button
                 x:Name="FavouriteButton"
-                Clicked="OnFavouriteClicked"
+                Clicked="OnActionClicked"
+                CommandParameter="ToggleFavourite"
                 ContentLayout="Left,8"
                 ImageSource="action_favourite.svg"
                 Style="{StaticResource OutlineButton}"
@@ -79,7 +85,8 @@
             <Button
                 BackgroundColor="{DynamicResource AppDangerSurface}"
                 BorderColor="{DynamicResource AppDangerStroke}"
-                Clicked="OnDeleteClicked"
+                Clicked="OnActionClicked"
+                CommandParameter="Delete"
                 ContentLayout="Left,8"
                 ImageSource="action_delete.svg"
                 Style="{StaticResource OutlineButton}"

@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Behaviors;
+using CommunityToolkit.Maui.Extensions;
 using KiirLink.Models;
 using KiirLink.Services;
 
@@ -7,7 +8,15 @@ namespace KiirLink.Controls;
 
 internal static class UiHelpers
 {
+    public static Page? CurrentPage => Shell.Current?.CurrentPage;
+
     public static PopupOptions PlainPopup() => new() { Shape = null, Shadow = null };
+
+    public static Task ClosePopupAsync() =>
+        CurrentPage?.ClosePopupAsync() ?? Task.CompletedTask;
+
+    public static Task ClosePopupAsync<T>(T result) =>
+        CurrentPage?.ClosePopupAsync(result) ?? Task.CompletedTask;
 
     public static async Task<CategoryModel?> AssignCategoryAsync(
         Page page,
@@ -52,6 +61,73 @@ internal static class UiHelpers
             localization.Format("CategoryAssignedMessage", category.Name),
             "OK");
         return category;
+    }
+
+    public static Task ShowQrCodeAsync(Page page, LinkModel link) =>
+        page.ShowPopupAsync(
+            new QRCodePopup($"{AppHostHelper.BaseUrl}/{link.ShortUrl}"),
+            PlainPopup());
+
+    public static async Task<bool> DeleteLinkAsync(Page page, ILinkService links, int linkId, string title)
+    {
+        var localization = LocalizationManager.Instance;
+        if (!await page.DisplayAlertAsync(
+                localization.Get("DeleteLink"),
+                localization.Format("DeleteLinkConfirmation", title),
+                localization.Get("Delete"),
+                localization.Get("Cancel")))
+            return false;
+
+        try
+        {
+            if (await links.RemoveLinkAsync(linkId))
+                return true;
+
+            await page.DisplayAlertAsync(
+                localization.Get("Error"),
+                localization.Get("CouldNotDeleteLink"),
+                "OK");
+        }
+        catch (Exception ex)
+        {
+            await page.DisplayAlertAsync(
+                localization.Get("Error"),
+                localization.Format("ErrorDetails", ex.Message),
+                "OK");
+        }
+
+        return false;
+    }
+
+    public static async Task<bool> SetFavouriteAsync(
+        Page page,
+        ILinkService links,
+        int linkId,
+        bool favourite)
+    {
+        var localization = LocalizationManager.Instance;
+        try
+        {
+            var success = favourite
+                ? await links.AddFavouriteAsync(linkId)
+                : await links.RemoveFavouriteAsync(linkId);
+            if (success)
+                return true;
+
+            await page.DisplayAlertAsync(
+                localization.Get("Error"),
+                localization.Get("CouldNotUpdateFavourite"),
+                "OK");
+        }
+        catch (Exception ex)
+        {
+            await page.DisplayAlertAsync(
+                localization.Get("Error"),
+                localization.Format("ErrorDetails", ex.Message),
+                "OK");
+        }
+
+        return false;
     }
 
     public static void SetTint(this Image image, Color tint)

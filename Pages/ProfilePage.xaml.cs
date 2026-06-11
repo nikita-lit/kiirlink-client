@@ -54,7 +54,7 @@ public partial class ProfilePage
         DefaultCategoryLabel.Text = _linkPreferences.DefaultCategoryName;
         AutoExpirationLabel.Text = _linkPreferences.AutoExpirationDisplay;
         PrivacyLabel.Text = _linkPreferences.PrivacyDisplay;
-        LanguageLabel.Text = LocalizationManager.Instance.Get(
+        LanguageLabel.Text = L(
             LocalizationManager.Instance.CurrentLanguage switch
             {
                 "ru" => "Russian",
@@ -65,23 +65,22 @@ public partial class ProfilePage
 
     private async void OnLanguageTapped(object? sender, TappedEventArgs e)
     {
-        var localization = LocalizationManager.Instance;
         var choices = new Dictionary<string, string>
         {
-            [localization.Get("English")] = "en",
-            [localization.Get("Russian")] = "ru",
-            [localization.Get("Estonian")] = "et"
+            [L("English")] = "en",
+            [L("Russian")] = "ru",
+            [L("Estonian")] = "et"
         };
 
         var selection = await DisplayActionSheetAsync(
-            localization.Get("SelectLanguage"),
-            localization.Get("Cancel"),
+            L("SelectLanguage"),
+            L("Cancel"),
             null,
             choices.Keys.ToArray());
 
         if (selection is not null && choices.TryGetValue(selection, out var languageCode))
         {
-            localization.SetCulture(languageCode);
+            LocalizationManager.Instance.SetCulture(languageCode);
             SyncLinkPreferences();
         }
     }
@@ -91,11 +90,10 @@ public partial class ProfilePage
         try
         {
             var categories = await _linkService.GetCategoriesAsync();
-            var none = LocalizationManager.Instance.Get("None");
-            var cancel = LocalizationManager.Instance.Get("Cancel");
+            var none = L("None");
+            var cancel = L("Cancel");
             var options = new[] { none }.Concat(categories.Select(category => category.Name)).ToArray();
-            var selection = await DisplayActionSheetAsync(
-                LocalizationManager.Instance.Get("DefaultCategory"), cancel, null, options);
+            var selection = await DisplayActionSheetAsync(L("DefaultCategory"), cancel, null, options);
             if (string.IsNullOrWhiteSpace(selection) || selection == cancel)
                 return;
 
@@ -106,8 +104,7 @@ public partial class ProfilePage
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync(LocalizationManager.Instance.Get("Error"),
-                LocalizationManager.Instance.Format("CouldNotLoadCategoriesProfile", ex.Message), "OK");
+            await DisplayAlertAsync(L("Error"), F("CouldNotLoadCategoriesProfile", ex.Message), "OK");
         }
     }
 
@@ -130,15 +127,15 @@ public partial class ProfilePage
     private async void OnPrivacyTapped(object? sender, TappedEventArgs e)
     {
         var selection = await DisplayActionSheetAsync(
-            LocalizationManager.Instance.Get("DefaultPrivacy"),
-            LocalizationManager.Instance.Get("Cancel"),
+            L("DefaultPrivacy"),
+            L("Cancel"),
             null,
-            LocalizationManager.Instance.Get("Public"),
-            LocalizationManager.Instance.Get("Private"));
+            L("Public"),
+            L("Private"));
         if (selection is null)
             return;
 
-        _linkPreferences.SetPrivacy(selection == LocalizationManager.Instance.Get("Public"));
+        _linkPreferences.SetPrivacy(selection == L("Public"));
         SyncLinkPreferences();
     }
 
@@ -155,19 +152,18 @@ public partial class ProfilePage
         
         if (!result.WasDismissedByTappingOutsideOfPopup && result.Result)
             await DisplayAlertAsync(
-                LocalizationManager.Instance.Get("PasswordChanged"),
-                LocalizationManager.Instance.Get("PasswordChangedMessage"),
+                L("PasswordChanged"),
+                L("PasswordChangedMessage"),
                 "OK");
     }
 
     private async void OnLogoutClicked(object? sender, EventArgs e)
     {
-        var shouldLogout =
-            await DisplayAlertAsync(
-                LocalizationManager.Instance.Get("LogOutTitle"),
-                LocalizationManager.Instance.Get("LogOutConfirmation"),
-                LocalizationManager.Instance.Get("LogOutTitle"),
-                LocalizationManager.Instance.Get("Cancel"));
+        var shouldLogout = await DisplayAlertAsync(
+            L("LogOutTitle"),
+            L("LogOutConfirmation"),
+            L("LogOutTitle"),
+            L("Cancel"));
 
         if (shouldLogout)
             await _viewModel.LogoutAsync();
@@ -196,4 +192,7 @@ public partial class ProfilePage
                  })
             icon.SetTint(tint);
     }
+
+    private static string L(string key) => LocalizationManager.Instance.Get(key);
+    private static string F(string key, params object[] args) => LocalizationManager.Instance.Format(key, args);
 }

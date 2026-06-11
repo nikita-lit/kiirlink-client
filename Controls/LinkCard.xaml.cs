@@ -6,75 +6,21 @@ namespace KiirLink.Controls;
 public partial class LinkCard
 {
     public static readonly BindableProperty TitleProperty =
-        BindableProperty.Create( nameof(Title), typeof(string), typeof(LinkCard), "www.kiirlink.ee/forms" );
-
+        Create(nameof(Title), "www.kiirlink.ee/forms");
     public static readonly BindableProperty UrlProperty =
-        BindableProperty.Create( nameof(Url), typeof(string), typeof(LinkCard),
-            "https://docs.google.com/forms/d/e/..." );
-
-    public static readonly BindableProperty CategoryProperty =
-        BindableProperty.Create( nameof(Category), typeof(string), typeof(LinkCard), string.Empty,
-            propertyChanged: OnCardContentChanged );
-
-    public static readonly BindableProperty ClicksProperty =
-        BindableProperty.Create(
-            nameof(Clicks),
-            typeof(int),
-            typeof(LinkCard),
-            0,
-            propertyChanged: OnCardContentChanged );
-
-    public static readonly BindableProperty DateProperty =
-        BindableProperty.Create( nameof(Date), typeof(string), typeof(LinkCard), "May 12, 2026" );
-
-    public static readonly BindableProperty IsFavouriteProperty =
-        BindableProperty.Create(
-            nameof(IsFavourite),
-            typeof(bool),
-            typeof(LinkCard),
-            false,
-            propertyChanged: OnCardContentChanged );
-
-    public static readonly BindableProperty LinkIdProperty =
-        BindableProperty.Create( nameof(LinkId), typeof(int), typeof(LinkCard), 0 );
-
-    public static readonly BindableProperty ShortUrlProperty =
-        BindableProperty.Create( nameof(ShortUrl), typeof(string), typeof(LinkCard), "" );
-
+        Create(nameof(Url), "https://docs.google.com/forms/d/e/...");
+    public static readonly BindableProperty CategoryProperty = Create(nameof(Category), string.Empty, true);
+    public static readonly BindableProperty ClicksProperty = Create(nameof(Clicks), 0, true);
+    public static readonly BindableProperty DateProperty = Create(nameof(Date), "May 12, 2026");
+    public static readonly BindableProperty IsFavouriteProperty = Create(nameof(IsFavourite), false, true);
+    public static readonly BindableProperty LinkIdProperty = Create(nameof(LinkId), 0);
+    public static readonly BindableProperty ShortUrlProperty = Create(nameof(ShortUrl), string.Empty);
     public static readonly BindableProperty ShowFavouriteIndicatorProperty =
-        BindableProperty.Create(
-            nameof(ShowFavouriteIndicator),
-            typeof(bool),
-            typeof(LinkCard),
-            true,
-            propertyChanged: OnCardContentChanged );
-
-    public static readonly BindableProperty ShowActionsProperty =
-        BindableProperty.Create( nameof(ShowActions), typeof(bool), typeof(LinkCard), true );
-
-    public static readonly BindableProperty IsPublicProperty =
-        BindableProperty.Create(
-            nameof(IsPublic),
-            typeof(bool),
-            typeof(LinkCard),
-            true,
-            propertyChanged: OnCardContentChanged );
-
-    public static readonly BindableProperty ExpirationProperty =
-        BindableProperty.Create(
-            nameof(Expiration),
-            typeof(string),
-            typeof(LinkCard),
-            string.Empty,
-            propertyChanged: OnCardContentChanged );
-
-    public static readonly BindableProperty ExpiresAtProperty =
-        BindableProperty.Create(
-            nameof(ExpiresAt),
-            typeof(DateTime?),
-            typeof(LinkCard),
-            null,
-            propertyChanged: OnCardContentChanged );
+        Create(nameof(ShowFavouriteIndicator), true, true);
+    public static readonly BindableProperty ShowActionsProperty = Create(nameof(ShowActions), true);
+    public static readonly BindableProperty IsPublicProperty = Create(nameof(IsPublic), true, true);
+    public static readonly BindableProperty ExpirationProperty = Create(nameof(Expiration), string.Empty, true);
+    public static readonly BindableProperty ExpiresAtProperty = Create<DateTime?>(nameof(ExpiresAt), null, true);
 
     public bool IsFavourite
     {
@@ -176,6 +122,13 @@ public partial class LinkCard
 
     private T Get<T>(BindableProperty property) => (T)GetValue(property);
     private void Set<T>(BindableProperty property, T value) => SetValue(property, value);
+    private static BindableProperty Create<T>(string name, T value, bool refresh = false) =>
+        BindableProperty.Create(
+            name,
+            typeof(T),
+            typeof(LinkCard),
+            value,
+            propertyChanged: refresh ? OnCardContentChanged : null);
 
     private void OnCardTapped(object? sender, TappedEventArgs e) => CardTapped?.Invoke(this, e);
 
@@ -198,15 +151,14 @@ public partial class LinkCard
 
     private void RefreshVisualState()
     {
-        if ( CategoryBadge is null )
-        {
+        if (CategoryBadge is null)
             return;
-        }
 
         var category = Category?.Trim();
-        var hasCategory = !string.IsNullOrWhiteSpace( category );
-        CategoryLabel.Text = hasCategory ? category : LocalizationManager.Instance.Get("Uncategorized");
-        ClicksLabel.Text = $"{Clicks} {LocalizationManager.Instance.Get("Clicks")}";
+        var hasCategory = !string.IsNullOrWhiteSpace(category);
+        var clicks = L("Clicks");
+        CategoryLabel.Text = hasCategory ? category : L("Uncategorized");
+        ClicksLabel.Text = $"{Clicks} {clicks}";
         CategoryBadge.IsVisible = hasCategory;
         FavouriteIndicator.IsVisible = IsFavourite && ShowFavouriteIndicator;
         PrivateBadge.IsVisible = !IsPublic;
@@ -216,8 +168,7 @@ public partial class LinkCard
         StatusLayout.IsVisible = PrivateBadge.IsVisible || ExpirationBadge.IsVisible;
         SemanticProperties.SetDescription(
             this,
-            $"{Title}. {Clicks} {LocalizationManager.Instance.Get("Clicks")}. {Date}. " +
-            $"{LocalizationManager.Instance.Get(IsPublic ? "Public" : "Private")}. {expiration}. " +
+            $"{Title}. {Clicks} {clicks}. {Date}. {L(IsPublic ? "Public" : "Private")}. {expiration}. " +
             "Tap for analytics; use link actions for more options.");
     }
 
@@ -246,6 +197,8 @@ public partial class LinkCard
     {
         MoreIcon.SetTint((Color)Application.Current!.Resources["AppText"]);
     }
+
+    private static string L(string key) => LocalizationManager.Instance.Get(key);
 
     private async Task OnShowContextMenu( object? sender, EventArgs e )
     {

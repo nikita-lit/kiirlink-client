@@ -1,4 +1,3 @@
-using CommunityToolkit.Maui.Extensions;
 using KiirLink.Services;
 
 namespace KiirLink.Controls;
@@ -13,10 +12,8 @@ public partial class ChangePasswordPopup
         _authService = authService;
     }
 
-    private async void OnCancelClicked(object? sender, EventArgs e)
-    {
-        await CloseAsync(false);
-    }
+    private async void OnCancelClicked(object? sender, EventArgs e) =>
+        await UiHelpers.ClosePopupAsync(false);
 
     private async void OnSaveClicked(object? sender, EventArgs e)
     {
@@ -24,21 +21,16 @@ public partial class ChangePasswordPopup
         var newPassword = NewPasswordEntry.Text ?? string.Empty;
         var confirmation = ConfirmPasswordEntry.Text ?? string.Empty;
 
-        if (string.IsNullOrWhiteSpace(currentPassword))
+        var errorKey = string.IsNullOrWhiteSpace(currentPassword)
+            ? "EnterCurrentPassword"
+            : newPassword.Length < 6
+                ? "PasswordMinimumLength"
+                : newPassword != confirmation
+                    ? "PasswordsDoNotMatch"
+                    : null;
+        if (errorKey is not null)
         {
-            ShowError(LocalizationManager.Instance.Get("EnterCurrentPassword"));
-            return;
-        }
-
-        if (newPassword.Length < 6)
-        {
-            ShowError(LocalizationManager.Instance.Get("PasswordMinimumLength"));
-            return;
-        }
-
-        if (!string.Equals(newPassword, confirmation, StringComparison.Ordinal))
-        {
-            ShowError(LocalizationManager.Instance.Get("PasswordsDoNotMatch"));
+            ShowError(LocalizationManager.Instance.Get(errorKey));
             return;
         }
 
@@ -53,7 +45,7 @@ public partial class ChangePasswordPopup
                 return;
             }
 
-            await CloseAsync(true);
+            await UiHelpers.ClosePopupAsync(true);
         }
         catch (Exception ex)
         {
@@ -78,10 +70,4 @@ public partial class ChangePasswordPopup
         LoadingIndicator.IsVisible = busy;
     }
 
-    private static async Task CloseAsync(bool changed)
-    {
-        var page = Shell.Current?.CurrentPage;
-        if (page is not null)
-            await page.ClosePopupAsync(changed);
-    }
 }

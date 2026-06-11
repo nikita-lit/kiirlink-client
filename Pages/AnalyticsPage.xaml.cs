@@ -1,5 +1,5 @@
-using CommunityToolkit.Maui.Behaviors;
 using Microsoft.Maui.Graphics;
+using KiirLink.Controls;
 using KiirLink.Models;
 using KiirLink.Services;
 
@@ -36,39 +36,43 @@ public partial class AnalyticsPage
         if ( SelectedLink is not null )
             PopulateTopCard( SelectedLink );
 
-        if ( SelectedLinkId <= 0 )
+        if (!await EnsureSelectedLinkAsync())
         {
-            if ( SelectedLink is not null )
-                SelectedLinkId = SelectedLink.ResolvedId;
-            else
-            {
-                try
-                {
-                    var links = await _linkService.GetLinksAsync( 1, 1 );
-                    if ( links.Count > 0 )
-                    {
-                        SelectedLinkId = links[0].Id;
-                        SelectedLink = links[0];
-                        PopulateTopCard( links[0] );
-                    }
-                    else
-                    {
-                        ShowEmpty();
-                        return;
-                    }
-                }
-                catch
-                {
-                    ShowEmpty();
-                    return;
-                }
-            }
+            ShowEmpty();
+            return;
         }
 
         if ( await LoadStatsAsync() )
             await LoadActivityAsync();
         else
             BuildActivityLayout( [] );
+    }
+
+    private async Task<bool> EnsureSelectedLinkAsync()
+    {
+        if (SelectedLinkId > 0)
+            return true;
+
+        if (SelectedLink is not null)
+        {
+            SelectedLinkId = SelectedLink.ResolvedId;
+            return true;
+        }
+
+        try
+        {
+            SelectedLink = (await _linkService.GetLinksAsync(1, 1)).FirstOrDefault();
+            if (SelectedLink is null)
+                return false;
+
+            SelectedLinkId = SelectedLink.Id;
+            PopulateTopCard(SelectedLink);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private async Task<bool> LoadStatsAsync()
@@ -161,25 +165,25 @@ public partial class AnalyticsPage
     private void ResetAnalyticsState()
     {
         NoStatisticsBanner.IsVisible = false;
+        ClearStatistics();
+        BuildActivityLayout([]);
+    }
+
+    private void ClearStatistics()
+    {
         ClicksLabel.Text = "—";
         //FavouritesLabel.Text = "—";
         _chartDrawable.Clear();
         PerformanceChart.Invalidate();
         ShowEmptyPerformance();
         BuildCountriesLayout( [] );
-        BuildActivityLayout( [] );
     }
 
     private void ShowNoStatistics( string message = "No statistics are available for this link yet." )
     {
-        ClicksLabel.Text = "—";
-        //FavouritesLabel.Text = "—";
         NoStatisticsLabel.Text = message;
         NoStatisticsBanner.IsVisible = true;
-        _chartDrawable.Clear();
-        PerformanceChart.Invalidate();
-        ShowEmptyPerformance();
-        BuildCountriesLayout( [] );
+        ClearStatistics();
     }
 
     private void ShowEmptyPerformance()
@@ -196,22 +200,13 @@ public partial class AnalyticsPage
 
         if ( countries.Count == 0 )
         {
-            CountriesLayout.Children.Add( new Label
-            {
-                Text = "No country data yet.",
-                FontSize = 11,
-                Margin = new Thickness( 0, 4 ),
-                HorizontalTextAlignment = TextAlignment.Center,
-                TextColor = GetThemeColor( "AppMutedText" )
-            } );
+            CountriesLayout.Children.Add(EmptyLabel("No country data yet.", 4));
             return;
         }
 
         var total = countries.Sum( country => country.Count );
-        foreach ( var country in countries.OrderByDescending( country => country.Count ) )
-        {
+        foreach (var country in countries)
             country.Percentage = total > 0 ? (float)country.Count / total : 0;
-        }
 
         foreach ( var country in countries )
         {
@@ -225,11 +220,12 @@ public partial class AnalyticsPage
                 ]
             };
 
-            var countryName = string.IsNullOrWhiteSpace( country.Country )
-                ? "Unknown"
-                : country.Country;
             var nameLabel = new Label
-                { FontSize = 10, Text = countryName, VerticalTextAlignment = TextAlignment.Center };
+            {
+                FontSize = 10,
+                Text = string.IsNullOrWhiteSpace(country.Country) ? "Unknown" : country.Country,
+                VerticalTextAlignment = TextAlignment.Center
+            };
             var bar = new ProgressBar { Progress = country.Percentage, VerticalOptions = LayoutOptions.Center };
             var pctLabel = new Label
             {
@@ -255,18 +251,11 @@ public partial class AnalyticsPage
     {
         ActivityLayout.Children.Clear();
 
-            if ( activities.Count == 0 )
-            {
-                ActivityLayout.Children.Add( new Label
-                {
-                    Text = "No recent activity.",
-                    FontSize = 11,
-                    Margin = new Thickness( 0, 12 ),
-                    HorizontalTextAlignment = TextAlignment.Center,
-                    TextColor = GetThemeColor( "AppMutedText" )
-                } );
-                return;
-            }
+        if (activities.Count == 0)
+        {
+            ActivityLayout.Children.Add(EmptyLabel("No recent activity.", 12));
+            return;
+        }
 
         for ( var i = 0; i < activities.Count; i++ )
         {
@@ -294,10 +283,7 @@ public partial class AnalyticsPage
                 Source = act.Type == "click" ? "click.svg" : "clock.svg",
                 VerticalOptions = LayoutOptions.Start
             };
-            icon.Behaviors.Add( new IconTintColorBehavior
-            {
-                TintColor = GetThemeColor( "AppAccentText" )
-            } );
+            icon.SetTint(GetThemeColor("AppAccentText"));
             var desc = new Label
             {
                 FontSize = 11,
@@ -333,6 +319,15 @@ public partial class AnalyticsPage
                 } );
         }
     }
+
+    private static Label EmptyLabel(string text, double verticalMargin) => new()
+    {
+        Text = text,
+        FontSize = 11,
+        Margin = new Thickness(0, verticalMargin),
+        HorizontalTextAlignment = TextAlignment.Center,
+        TextColor = GetThemeColor("AppMutedText")
+    };
 
     // ── Chart drawable ────────────────────────────────────────────────────────
 
@@ -413,8 +408,5 @@ public partial class AnalyticsPage
     private static string L(string key) => LocalizationManager.Instance.Get(key);
     private static string F(string key, params object[] args) => LocalizationManager.Instance.Format(key, args);
 
-    private static Color GetThemeColor( string key )
-    {
-        return (Color)Application.Current!.Resources[key];
-    }
+    private static Color GetThemeColor(string key) => (Color)Application.Current!.Resources[key];
 }

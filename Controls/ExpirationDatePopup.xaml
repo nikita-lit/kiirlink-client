@@ -33,17 +33,20 @@
 
             <Grid ColumnDefinitions="Auto,*,*" ColumnSpacing="8">
                 <Button
-                    Clicked="OnNeverClicked"
+                    Clicked="OnSelectionClicked"
+                    CommandParameter="Never"
                     Style="{StaticResource OutlineButton}"
                     Text="{l:Translate Never}" />
                 <Button
                     Grid.Column="1"
-                    Clicked="OnCancelClicked"
+                    Clicked="OnSelectionClicked"
+                    CommandParameter="Cancel"
                     Style="{StaticResource OutlineButton}"
                     Text="{l:Translate Cancel}" />
                 <Button
                     Grid.Column="2"
-                    Clicked="OnSaveClicked"
+                    Clicked="OnSelectionClicked"
+                    CommandParameter="Save"
                     Style="{StaticResource PrimaryButton}"
                     Text="{l:Translate Save}" />
             </Grid>

@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using CommunityToolkit.Maui.Extensions;
 using KiirLink.Extensions;
 using KiirLink.Models;
 using KiirLink.Services;
@@ -37,11 +36,11 @@ public partial class CategoryManagementPopup
     {
         if (!_connectivity.IsOnline)
         {
-            await Shell.Current!.CurrentPage!.DisplayAlertAsync(
+            await Page.DisplayAlertAsync(
                 L("Offline"),
                 L("ConnectToManageCategories"),
                 "OK");
-            await CloseAsync();
+            await UiHelpers.ClosePopupAsync();
             return;
         }
 
@@ -51,11 +50,11 @@ public partial class CategoryManagementPopup
         }
         catch (Exception ex)
         {
-            await Shell.Current!.CurrentPage!.DisplayAlertAsync(
+            await Page.DisplayAlertAsync(
                 L("Error"),
                 F("CouldNotLoadCategories", ex.Message),
                 "OK");
-            await CloseAsync();
+            await UiHelpers.ClosePopupAsync();
         }
     }
 
@@ -70,7 +69,7 @@ public partial class CategoryManagementPopup
             var created = await _linkService.CreateCategoryAsync(name);
             if (created is null)
             {
-                await Shell.Current!.CurrentPage!.DisplayAlertAsync(
+                await Page.DisplayAlertAsync(
                     L("Error"),
                     L("CouldNotCreateCategory"),
                     "OK");
@@ -82,7 +81,7 @@ public partial class CategoryManagementPopup
         }
         catch (Exception ex)
         {
-            await Shell.Current!.CurrentPage!.DisplayAlertAsync(
+            await Page.DisplayAlertAsync(
                 L("Error"),
                 F("CouldNotCreateCategoryDetails", ex.Message),
                 "OK");
@@ -94,11 +93,7 @@ public partial class CategoryManagementPopup
         if (sender is not Button button || button.CommandParameter is not CategoryModel category)
             return;
 
-        var page = Shell.Current?.CurrentPage;
-        if (page is null)
-            return;
-
-        var confirm = await page.DisplayAlertAsync(
+        var confirm = await Page.DisplayAlertAsync(
             L("DeleteCategory"),
             F("DeleteCategoryConfirmation", category.Name),
             L("Delete"),
@@ -112,7 +107,7 @@ public partial class CategoryManagementPopup
             var success = await _linkService.DeleteCategoryAsync(category.Id);
             if (!success)
             {
-                await page.DisplayAlertAsync(L("Error"), L("CouldNotDeleteCategory"), "OK");
+                await Page.DisplayAlertAsync(L("Error"), L("CouldNotDeleteCategory"), "OK");
                 return;
             }
 
@@ -120,24 +115,14 @@ public partial class CategoryManagementPopup
         }
         catch (Exception ex)
         {
-            await page.DisplayAlertAsync(L("Error"), F("CouldNotDeleteCategoryDetails", ex.Message), "OK");
+            await Page.DisplayAlertAsync(L("Error"), F("CouldNotDeleteCategoryDetails", ex.Message), "OK");
         }
     }
 
-    private async void OnCloseClicked(object? sender, EventArgs e)
-    {
-        await CloseAsync();
-    }
+    private async void OnCloseClicked(object? sender, EventArgs e) =>
+        await UiHelpers.ClosePopupAsync();
 
-    private async Task CloseAsync()
-    {
-        var page = Shell.Current?.CurrentPage;
-        if (page is null)
-            return;
-
-        await page.ClosePopupAsync();
-    }
-
+    private static Page Page => UiHelpers.CurrentPage!;
     private static string L(string key) => LocalizationManager.Instance.Get(key);
     private static string F(string key, params object[] args) => LocalizationManager.Instance.Format(key, args);
 }

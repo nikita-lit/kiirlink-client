@@ -113,80 +113,40 @@ public partial class FavouritesPage
     {
         if ( sender is not LinkCard card ) return;
 
-        try
-        {
-            var success = await _linkService.RemoveFavouriteAsync( card.LinkId );
-            if ( success )
-            {
-                var link = Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId );
-                if ( link is not null )
-                    Favourites.Remove( link );
-                FavCountLabel.Text = Favourites.Count.ToString();
-                await DisplayAlertAsync( L("Removed"), L("RemovedFromFavourites"), "OK" );
-            }
-            else
-            {
-                await DisplayAlertAsync( L("Error"), L("CouldNotUpdateFavourite"), "OK" );
-            }
-        }
-        catch ( Exception ex )
-        {
-            await DisplayAlertAsync( L("Error"), F("ErrorDetails", ex.Message), "OK" );
-        }
+        if (!await UiHelpers.SetFavouriteAsync(this, _linkService, card.LinkId, false))
+            return;
+
+        RemoveFavourite(card.LinkId);
+        await DisplayAlertAsync(L("Removed"), L("RemovedFromFavourites"), "OK");
     }
 
     private async void OnLinkDeleteRequested( object? sender, EventArgs e )
     {
-        if ( sender is not LinkCard card ) 
+        if (sender is not LinkCard card ||
+            !await UiHelpers.DeleteLinkAsync(this, _linkService, card.LinkId, card.Title))
             return;
 
-        var confirm = await DisplayAlertAsync(
-            L("DeleteLink"),
-            F("DeleteLinkConfirmation", card.Title),
-            L("Delete"),
-            L("Cancel") );
-
-        if ( !confirm ) 
-            return;
-
-        try
-        {
-            var success = await _linkService.RemoveLinkAsync( card.LinkId );
-            if ( success )
-            {
-                var link = Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId );
-                if ( link is not null )
-                    Favourites.Remove( link );
-                FavCountLabel.Text = Favourites.Count.ToString();
-                await DisplayAlertAsync( L("Deleted"), L("LinkDeleted"), "OK" );
-            }
-            else
-            {
-                await DisplayAlertAsync( L("Error"), L("CouldNotDeleteLink"), "OK" );
-            }
-        }
-        catch ( Exception ex )
-        {
-            await DisplayAlertAsync( L("Error"), F("ErrorDetails", ex.Message), "OK" );
-        }
+        RemoveFavourite(card.LinkId);
+        await DisplayAlertAsync(L("Deleted"), L("LinkDeleted"), "OK");
     }
 
     private async void OnCreateQRCodeClicked( object? sender, EventArgs e )
     {
-        var page = Shell.Current?.CurrentPage;
-        if ( page is null )
-            return;
-        
-        if ( sender is not LinkCard card ) 
+        if (sender is not LinkCard card || Shell.Current?.CurrentPage is not { } page)
             return;
 
         var link = Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId );
         if ( link is null ) 
             return;
         
-        await page.ShowPopupAsync( 
-            new QRCodePopup( $"{AppHostHelper.BaseUrl}/{link.ShortUrl}" ), 
-            UiHelpers.PlainPopup());
+        await UiHelpers.ShowQrCodeAsync(page, link);
+    }
+
+    private void RemoveFavourite(int linkId)
+    {
+        if (Favourites.FirstOrDefault(link => link.ResolvedId == linkId) is { } link)
+            Favourites.Remove(link);
+        FavCountLabel.Text = Favourites.Count.ToString();
     }
     
     private static string L(string key) => LocalizationManager.Instance.Get(key);

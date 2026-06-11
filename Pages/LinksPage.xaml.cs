@@ -225,20 +225,14 @@ public partial class LinksPage
 
     private async void OnCreateQRCodeClicked( object? sender, EventArgs e )
     {
-        var page = Shell.Current?.CurrentPage;
-        if ( page is null )
-            return;
-        
-        if ( sender is not LinkCard card ) 
+        if (sender is not LinkCard card || Shell.Current?.CurrentPage is not { } page)
             return;
 
         var link = Links.FirstOrDefault( l => l.Id == card.LinkId );
         if ( link is null ) 
             return;
         
-        await page.ShowPopupAsync( 
-            new QRCodePopup( $"{AppHostHelper.BaseUrl}/{link.ShortUrl}" ), 
-            UiHelpers.PlainPopup());
+        await UiHelpers.ShowQrCodeAsync(page, link);
         
         await LoadCategoriesAsync();
         await LoadLinksAsync();
@@ -308,62 +302,21 @@ public partial class LinksPage
         if ( sender is not LinkCard card ) 
             return;
 
-        try
-        {
-            var link = Links.FirstOrDefault( l => l.Id == card.LinkId );
-            if ( link is null ) return;
-
-            bool success;
-            if ( link.IsFavourite )
-            {
-                success = await _linkService.RemoveFavouriteAsync( card.LinkId );
-                if ( success ) link.IsFavourite = false;
-            }
-            else
-            {
-                success = await _linkService.AddFavouriteAsync( card.LinkId );
-                if ( success ) link.IsFavourite = true;
-            }
-
-            if ( !success )
-                await DisplayAlertAsync( L("Error"), L("CouldNotUpdateFavourite"), "OK" );
-        }
-        catch ( Exception ex )
-        {
-            await DisplayAlertAsync( L("Error"), F("ErrorDetails", ex.Message), "OK" );
-        }
+        var link = Links.FirstOrDefault(item => item.Id == card.LinkId);
+        if (link is not null &&
+            await UiHelpers.SetFavouriteAsync(this, _linkService, card.LinkId, !link.IsFavourite))
+            link.IsFavourite = !link.IsFavourite;
     }
 
     private async void OnLinkDeleteRequested( object? sender, EventArgs e )
     {
-        if ( sender is not Controls.LinkCard card ) return;
+        if (sender is not LinkCard card ||
+            !await UiHelpers.DeleteLinkAsync(this, _linkService, card.LinkId, card.Title))
+            return;
 
-        var confirm = await DisplayAlertAsync(
-            L("DeleteLink"),
-            F("DeleteLinkConfirmation", card.Title),
-            L("Delete"),
-            L("Cancel") );
-
-        if ( !confirm ) return;
-
-        try
-        {
-            var success = await _linkService.RemoveLinkAsync( card.LinkId );
-            if ( success )
-            {
-                Links.RemoveAt( Links.IndexOf( Links.FirstOrDefault( l => l.Id == card.LinkId )! ) );
-                await DisplayAlertAsync( L("Deleted"), L("LinkDeleted"), "OK" );
-                await LoadLinksAsync();
-            }
-            else
-            {
-                await DisplayAlertAsync( L("Error"), L("CouldNotDeleteLink"), "OK" );
-            }
-        }
-        catch ( Exception ex )
-        {
-            await DisplayAlertAsync( L("Error"), F("ErrorDetails", ex.Message), "OK" );
-        }
+        Links.Remove(Links.First(link => link.Id == card.LinkId));
+        await DisplayAlertAsync(L("Deleted"), L("LinkDeleted"), "OK");
+        await LoadLinksAsync();
     }
 
     private async void OnFilterClicked( object? sender, EventArgs e )
