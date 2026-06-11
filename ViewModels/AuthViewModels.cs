@@ -3,28 +3,18 @@ using KiirLink.Services;
 
 namespace KiirLink.ViewModels;
 
-public sealed class SignInViewModel : ViewModelBase
+public abstract class AuthViewModelBase(
+    IAuthService auth,
+    IConnectivityService connectivity,
+    INavigationService navigation,
+    IDialogService dialogs) : ViewModelBase(connectivity)
 {
-    private readonly IAuthService _auth;
-    private readonly INavigationService _navigation;
-    private readonly IDialogService _dialogs;
     private string _email = string.Empty;
     private string _password = string.Empty;
 
-    public SignInViewModel(IAuthService auth, IConnectivityService connectivity, INavigationService navigation,
-        IDialogService dialogs) : base(connectivity)
-    {
-        _auth = auth;
-        _navigation = navigation;
-        _dialogs = dialogs;
-        SignInCommand = new AsyncCommand(SignInAsync, () => CanInteract);
-        CreateAccountCommand = new AsyncCommand(() => navigation.GoToAsync("//CreateAccount"));
-        PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName is nameof(CanInteract))
-                SignInCommand.RaiseCanExecuteChanged();
-        };
-    }
+    protected IAuthService Auth { get; } = auth;
+    protected INavigationService Navigation { get; } = navigation;
+    protected IDialogService Dialogs { get; } = dialogs;
 
     public string Email
     {
@@ -36,82 +26,80 @@ public sealed class SignInViewModel : ViewModelBase
     {
         get => _password;
         set => SetProperty(ref _password, value);
+    }
+
+    public async Task CheckAuthenticationAsync()
+    {
+        if (await Auth.IsAuthenticatedAsync())
+            await Navigation.GoToAsync("//Home");
+    }
+
+    protected async Task<bool> HasCredentialsAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password))
+            return true;
+
+        await Dialogs.AlertAsync(L("MissingDetails"), L("EnterEmailPassword"));
+        return false;
+    }
+
+    protected async Task RunAuthAsync(string failureTitle, Func<Task> action)
+    {
+        await RunBusyAsync(action);
+        if (HasError)
+            await Dialogs.AlertAsync(L(failureTitle), ErrorMessage!);
+    }
+
+    protected Task ShowAuthErrorAsync(string title, string? error, string fallback) =>
+        Dialogs.AlertAsync(L(title), LocalizationManager.Instance.LocalizeAuthError(error ?? L(fallback)));
+
+    protected static string L(string key) => LocalizationManager.Instance.Get(key);
+}
+
+public sealed class SignInViewModel : AuthViewModelBase
+{
+    public SignInViewModel(IAuthService auth, IConnectivityService connectivity, INavigationService navigation,
+        IDialogService dialogs) : base(auth, connectivity, navigation, dialogs)
+    {
+        SignInCommand = new AsyncCommand(SignInAsync, () => CanInteract);
+        CreateAccountCommand = new AsyncCommand(() => navigation.GoToAsync("//CreateAccount"));
+        TrackCanInteract(SignInCommand);
     }
 
     public AsyncCommand SignInCommand { get; }
     public ICommand CreateAccountCommand { get; }
 
-    public async Task CheckAuthenticationAsync()
-    {
-        if (await _auth.IsAuthenticatedAsync())
-            await _navigation.GoToAsync("//Home");
-    }
-
     private async Task SignInAsync()
     {
-        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
-        {
-            await _dialogs.AlertAsync(L("MissingDetails"), L("EnterEmailPassword"));
+        if (!await HasCredentialsAsync())
             return;
-        }
 
-        await RunBusyAsync(async () =>
+        await RunAuthAsync("SignInFailed", async () =>
         {
-            var login = await _auth.LoginAsync(Email.Trim(), Password);
+            var login = await Auth.LoginAsync(Email.Trim(), Password);
             if (!login.Success)
             {
-                await _dialogs.AlertAsync(
-                    L("SignInFailed"),
-                    LocalizationManager.Instance.LocalizeAuthError(login.Error ?? L("CouldNotSignIn")));
+                await ShowAuthErrorAsync("SignInFailed", login.Error, "CouldNotSignIn");
                 return;
             }
 
             Email = string.Empty;
             Password = string.Empty;
-            await _navigation.GoToAsync("//Home");
+            await Navigation.GoToAsync("//Home");
         });
-
-        if (HasError)
-            await _dialogs.AlertAsync(L("SignInFailed"), ErrorMessage!);
     }
-
-    private static string L(string key) => LocalizationManager.Instance.Get(key);
 }
 
-public sealed class CreateAccountViewModel : ViewModelBase
+public sealed class CreateAccountViewModel : AuthViewModelBase
 {
-    private readonly IAuthService _auth;
-    private readonly INavigationService _navigation;
-    private readonly IDialogService _dialogs;
-    private string _email = string.Empty;
-    private string _password = string.Empty;
     private string _confirmPassword = string.Empty;
 
     public CreateAccountViewModel(IAuthService auth, IConnectivityService connectivity,
-        INavigationService navigation, IDialogService dialogs) : base(connectivity)
+        INavigationService navigation, IDialogService dialogs) : base(auth, connectivity, navigation, dialogs)
     {
-        _auth = auth;
-        _navigation = navigation;
-        _dialogs = dialogs;
         CreateAccountCommand = new AsyncCommand(CreateAccountAsync, () => CanInteract);
         BackCommand = new AsyncCommand(() => navigation.GoToAsync("//SignIn"));
-        PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName is nameof(CanInteract))
-                CreateAccountCommand.RaiseCanExecuteChanged();
-        };
-    }
-
-    public string Email
-    {
-        get => _email;
-        set => SetProperty(ref _email, value);
-    }
-
-    public string Password
-    {
-        get => _password;
-        set => SetProperty(ref _password, value);
+        TrackCanInteract(CreateAccountCommand);
     }
 
     public string ConfirmPassword
@@ -123,54 +111,38 @@ public sealed class CreateAccountViewModel : ViewModelBase
     public AsyncCommand CreateAccountCommand { get; }
     public ICommand BackCommand { get; }
 
-    public async Task CheckAuthenticationAsync()
-    {
-        if (await _auth.IsAuthenticatedAsync())
-            await _navigation.GoToAsync("//Home");
-    }
-
     private async Task CreateAccountAsync()
     {
-        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
-        {
-            await _dialogs.AlertAsync(L("MissingDetails"), L("EnterEmailPassword"));
+        if (!await HasCredentialsAsync())
             return;
-        }
 
         if (Password != ConfirmPassword)
         {
-            await _dialogs.AlertAsync(L("PasswordConfirmationMismatch"), L("CheckConfirmationPassword"));
+            await Dialogs.AlertAsync(L("PasswordConfirmationMismatch"), L("CheckConfirmationPassword"));
             return;
         }
 
-        await RunBusyAsync(async () =>
+        await RunAuthAsync("CreateAccountFailed", async () =>
         {
-            var register = await _auth.RegisterAsync(Email.Trim(), Password);
+            var register = await Auth.RegisterAsync(Email.Trim(), Password);
             if (!register.Success)
             {
-                await _dialogs.AlertAsync(
-                    L("CreateAccountFailed"),
-                    LocalizationManager.Instance.LocalizeAuthError(register.Error ?? L("CouldNotCreateAccount")));
+                await ShowAuthErrorAsync("CreateAccountFailed", register.Error, "CouldNotCreateAccount");
                 return;
             }
 
-            var login = await _auth.LoginAsync(Email.Trim(), Password);
+            var login = await Auth.LoginAsync(Email.Trim(), Password);
             if (!login.Success)
             {
-                await _dialogs.AlertAsync(L("AccountCreated"), L("AutomaticSignInFailed"));
-                await _navigation.GoToAsync("//SignIn");
+                await Dialogs.AlertAsync(L("AccountCreated"), L("AutomaticSignInFailed"));
+                await Navigation.GoToAsync("//SignIn");
                 return;
             }
 
             Email = string.Empty;
             Password = string.Empty;
             ConfirmPassword = string.Empty;
-            await _navigation.GoToAsync("//Home");
+            await Navigation.GoToAsync("//Home");
         });
-
-        if (HasError)
-            await _dialogs.AlertAsync(L("CreateAccountFailed"), ErrorMessage!);
     }
-
-    private static string L(string key) => LocalizationManager.Instance.Get(key);
 }

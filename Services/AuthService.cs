@@ -9,17 +9,16 @@ public class AuthService(IApiClient api) : IAuthService
 {
     public Task<bool> IsAuthenticatedAsync() => api.HasStoredTokensAsync();
 
-    public async Task<(bool Success, string? Error)> LoginAsync( string email, string password )
-        => await api.LoginAsync( email, password );
+    public Task<(bool Success, string? Error)> LoginAsync(string email, string password) =>
+        api.LoginAsync(email, password);
 
-    public async Task<(bool Success, string? Error)> RegisterAsync( string email, string password )
-        => await api.RegisterAsync( email, password );
+    public Task<(bool Success, string? Error)> RegisterAsync(string email, string password) =>
+        api.RegisterAsync(email, password);
 
-    public Task<(bool Success, string? Error)> ChangePasswordAsync( string oldPassword, string newPassword )
-        => api.ChangePasswordAsync( oldPassword, newPassword );
+    public Task<(bool Success, string? Error)> ChangePasswordAsync(string oldPassword, string newPassword) =>
+        api.ChangePasswordAsync(oldPassword, newPassword);
 
-    public async Task<InfoResponse?> GetProfileAsync()
-        => await api.GetProfileAsync();
+    public Task<InfoResponse?> GetProfileAsync() => api.GetProfileAsync();
 
     public Task LogoutAsync() => api.ClearTokensAsync();
 }

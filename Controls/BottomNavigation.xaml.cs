@@ -1,4 +1,3 @@
-using CommunityToolkit.Maui.Behaviors;
 using KiirLink.Services;
 
 namespace KiirLink.Controls;
@@ -55,13 +54,8 @@ public partial class BottomNavigation : ContentView
         icon.Source = isActive ? $"{name}_active.png" : $"{name}.png";
         icon.Behaviors.Clear();
 
-        if ( !isActive )
-        {
-            icon.Behaviors.Add( new IconTintColorBehavior
-            {
-                TintColor = (Color)Application.Current!.Resources["AppMutedText"]
-            } );
-        }
+        if (!isActive)
+            icon.SetTint((Color)Application.Current!.Resources["AppMutedText"]);
     }
 
     private void OnThemeChanged( object? sender, EventArgs e )
@@ -69,32 +63,12 @@ public partial class BottomNavigation : ContentView
         UpdateColors();
     }
 
-    private static Task NavigateAsync( string route )
-    {
-        return Shell.Current.GoToAsync( $"//{route}" );
-    }
+    private static Task NavigateAsync(object? route) =>
+        Shell.Current.GoToAsync($"//{route}");
 
-    private async void OnHomeTapped( object? sender, TappedEventArgs e ) =>
-        await NavigateAsync( "Home" );
+    private async void OnTabTapped(object? sender, TappedEventArgs e) =>
+        await NavigateAsync(e.Parameter);
 
-    private async void OnHomeClicked( object? sender, EventArgs e ) =>
-        await NavigateAsync( "Home" );
-
-    private async void OnLinksTapped( object? sender, TappedEventArgs e ) =>
-        await NavigateAsync( "Links" );
-
-    private async void OnLinksClicked( object? sender, EventArgs e ) =>
-        await NavigateAsync( "Links" );
-
-    private async void OnFavouritesTapped( object? sender, TappedEventArgs e ) =>
-        await NavigateAsync( "Favourites" );
-
-    private async void OnFavouritesClicked( object? sender, EventArgs e ) =>
-        await NavigateAsync( "Favourites" );
-
-    private async void OnProfileTapped( object? sender, TappedEventArgs e ) =>
-        await NavigateAsync( "Profile" );
-
-    private async void OnProfileClicked( object? sender, EventArgs e ) =>
-        await NavigateAsync( "Profile" );
+    private async void OnTabClicked(object? sender, EventArgs e) =>
+        await NavigateAsync(((Button)sender!).CommandParameter);
 }

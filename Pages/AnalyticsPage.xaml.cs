@@ -8,7 +8,7 @@ namespace KiirLink.Pages;
 public partial class AnalyticsPage
 {
     private readonly LinkService _linkService;
-    private PerformanceChartDrawable _chartDrawable = new();
+    private readonly PerformanceChartDrawable _chartDrawable = new();
 
     // The link whose analytics are shown; updated from LinksPage when a card is tapped.
     public static int SelectedLinkId { get; set; } = -1;
@@ -408,37 +408,6 @@ public partial class AnalyticsPage
                 canvas.DrawCircle( point, 3 );
             }
         }
-    }
-
-    private async Task<CategoryModel?> PromptAssignExistingCategoryAsync( int linkId )
-    {
-        var categories = await _linkService.GetCategoriesAsync();
-        if ( categories.Count == 0 )
-        {
-            await DisplayAlertAsync( L("NoCategories"), L("CreateCategoryFirst"), "OK" );
-            return null;
-        }
-
-        var cancel = L("Cancel");
-        var action = await DisplayActionSheetAsync( L("AssignCategory"), cancel, null,
-            categories.Select( c => c.Name ).ToArray() );
-        if ( string.IsNullOrWhiteSpace( action ) || action == cancel )
-            return null;
-
-        var category =
-            categories.FirstOrDefault( c => string.Equals( c.Name, action, StringComparison.OrdinalIgnoreCase ) );
-        if ( category is null )
-            return null;
-
-        var assigned = await _linkService.AssignCategoryAsync( linkId, category.Id );
-        if ( !assigned )
-        {
-            await DisplayAlertAsync( L("Error"), L("CouldNotAssignCategory"), "OK" );
-            return null;
-        }
-
-        await DisplayAlertAsync( L("CategoryAssigned"), F("CategoryAssignedMessage", category.Name), "OK" );
-        return category;
     }
 
     private static string L(string key) => LocalizationManager.Instance.Get(key);

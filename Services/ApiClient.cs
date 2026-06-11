@@ -222,10 +222,25 @@ public class ApiClient : IApiClient
     private static async Task<T?> DeserializeAsync<T>( HttpResponseMessage response, CancellationToken ct )
     {
         var json = await response.Content.ReadAsStringAsync( ct );
-        if ( string.IsNullOrWhiteSpace( json ) )
-            return default;
+        return string.IsNullOrWhiteSpace(json) ? default : JsonSerializer.Deserialize<T>(json, JsonOptions);
+    }
 
-        return JsonSerializer.Deserialize<T>( json, JsonOptions );
+    private static HttpRequestMessage JsonRequest(HttpMethod method, string path, object body) =>
+        new(method, path)
+        {
+            Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json")
+        };
+
+    private async Task<T?> GetAsync<T>(string path, CancellationToken ct)
+    {
+        var response = await SendWithRefreshAsync(new HttpRequestMessage(HttpMethod.Get, path), ct);
+        return response.IsSuccessStatusCode ? await DeserializeAsync<T>(response, ct) : default;
+    }
+
+    private async Task<bool> SendAsync(HttpMethod method, string path, CancellationToken ct)
+    {
+        var response = await SendWithRefreshAsync(new HttpRequestMessage(method, path), ct);
+        return response.IsSuccessStatusCode;
     }
 
     // Public API methods
@@ -234,13 +249,13 @@ public class ApiClient : IApiClient
     public async Task<(bool Success, string? Error)> RegisterAsync( string email, string password,
         CancellationToken ct = default )
     {
-        var body = JsonSerializer.Serialize( new RegisterRequest { Email = email, Password = password } );
-        var request = new HttpRequestMessage( HttpMethod.Post, "/api/auth/register" )
-        {
-            Content = new StringContent( body, Encoding.UTF8, "application/json" )
-        };
-
-        var response = await SendCoreAsync(request, ct);
+        var response = await SendCoreAsync(
+            JsonRequest(HttpMethod.Post, "/api/auth/register", new RegisterRequest
+            {
+                Email = email,
+                Password = password
+            }),
+            ct);
         if ( response.IsSuccessStatusCode )
             return (true, null);
 
@@ -252,13 +267,13 @@ public class ApiClient : IApiClient
     public async Task<(bool Success, string? Error)> LoginAsync( string email, string password,
         CancellationToken ct = default )
     {
-        var body = JsonSerializer.Serialize( new LoginRequest { Email = email, Password = password } );
-        var request = new HttpRequestMessage( HttpMethod.Post, "/api/auth/login" )
-        {
-            Content = new StringContent( body, Encoding.UTF8, "application/json" )
-        };
-
-        var response = await SendCoreAsync(request, ct);
+        var response = await SendCoreAsync(
+            JsonRequest(HttpMethod.Post, "/api/auth/login", new LoginRequest
+            {
+                Email = email,
+                Password = password
+            }),
+            ct);
         if ( !response.IsSuccessStatusCode )
         {
             var error = await response.Content.ReadAsStringAsync( ct );
@@ -277,17 +292,13 @@ public class ApiClient : IApiClient
     public async Task<(bool Success, string? Error)> ChangePasswordAsync( string oldPassword, string newPassword,
         CancellationToken ct = default )
     {
-        var body = JsonSerializer.Serialize( new ChangePasswordRequest
-        {
-            OldPassword = oldPassword,
-            NewPassword = newPassword
-        } );
-        var request = new HttpRequestMessage( HttpMethod.Post, "/api/auth/manage/info" )
-        {
-            Content = new StringContent( body, Encoding.UTF8, "application/json" )
-        };
-
-        var response = await SendWithRefreshAsync( request, ct );
+        var response = await SendWithRefreshAsync(
+            JsonRequest(HttpMethod.Post, "/api/auth/manage/info", new ChangePasswordRequest
+            {
+                OldPassword = oldPassword,
+                NewPassword = newPassword
+            }),
+            ct);
         if ( response.IsSuccessStatusCode )
             return (true, null);
 
@@ -296,40 +307,27 @@ public class ApiClient : IApiClient
     }
 
     /// <summary>GET /api/auth/manage/info</summary>
-    public async Task<InfoResponse?> GetProfileAsync( CancellationToken ct = default )
-    {
-        var request = new HttpRequestMessage( HttpMethod.Get, "/api/auth/manage/info" );
-        var response = await SendWithRefreshAsync( request, ct );
-        if ( !response.IsSuccessStatusCode )
-            return null;
-
-        return await DeserializeAsync<InfoResponse>( response, ct );
-    }
+    public Task<InfoResponse?> GetProfileAsync(CancellationToken ct = default) =>
+        GetAsync<InfoResponse>("/api/auth/manage/info", ct);
 
     /// <summary>GET /api/links/get?page=&amp;limit=&amp;categoryId=</summary>
     public async Task<PaginatedLinksResponse> GetLinksPageAsync( int page = 1, int limit = 20, int? categoryId = null,
         CancellationToken ct = default )
     {
-        var query = UriQueryBuilder.Build(
-            "/api/links/get",
-            ("page", page),
-            ("limit", limit),
-            ("categoryId", categoryId));
-
-        var request = new HttpRequestMessage( HttpMethod.Get, query );
-        var response = await SendWithRefreshAsync( request, ct );
-        if ( !response.IsSuccessStatusCode )
-            return new PaginatedLinksResponse();
-
-        var data = await DeserializeAsync<PaginatedLinksResponse>( response, ct );
-        return data ?? new PaginatedLinksResponse();
+        return await GetAsync<PaginatedLinksResponse>(
+                   UriQueryBuilder.Build(
+                       "/api/links/get",
+                       ("page", page),
+                       ("limit", limit),
+                       ("categoryId", categoryId)),
+                   ct)
+               ?? new PaginatedLinksResponse();
     }
 
     public async Task<List<LinkModel>> GetLinksAsync( int page = 1, int limit = 20, int? categoryId = null,
         CancellationToken ct = default )
     {
-        var pageData = await GetLinksPageAsync( page, limit, categoryId, ct );
-        return pageData.Items;
+        return (await GetLinksPageAsync(page, limit, categoryId, ct)).Items;
     }
 
     /// <summary>POST /api/links/shorten?originalUrl=&amp;expiresAt=&amp;isPublic=</summary>
@@ -365,84 +363,54 @@ public class ApiClient : IApiClient
     /// <summary>POST /api/links/remove?linkId=</summary>
     public async Task<bool> RemoveLinkAsync( int linkId, CancellationToken ct = default )
     {
-        var request = new HttpRequestMessage(
+        return await SendAsync(
             HttpMethod.Post,
-            UriQueryBuilder.Build("/api/links/remove", ("linkId", linkId)));
-        var response = await SendWithRefreshAsync( request, ct );
-        return response.IsSuccessStatusCode;
+            UriQueryBuilder.Build("/api/links/remove", ("linkId", linkId)),
+            ct);
     }
 
     /// <summary>GET /api/links/{id}/stats</summary>
-    public async Task<LinkStatsModel?> GetLinkStatsAsync( int id, CancellationToken ct = default )
-    {
-        var request = new HttpRequestMessage( HttpMethod.Get, $"/api/links/{id}/stats" );
-        var response = await SendWithRefreshAsync( request, ct );
-        if ( !response.IsSuccessStatusCode )
-            return null;
-
-        return await DeserializeAsync<LinkStatsModel>( response, ct );
-    }
+    public Task<LinkStatsModel?> GetLinkStatsAsync(int id, CancellationToken ct = default) =>
+        GetAsync<LinkStatsModel>($"/api/links/{id}/stats", ct);
 
     /// <summary>GET /api/links/{id}/activity</summary>
-    public async Task<List<LinkActivityModel>> GetLinkActivityAsync( int id, CancellationToken ct = default )
-    {
-        var request = new HttpRequestMessage( HttpMethod.Get, $"/api/links/{id}/activity" );
-        var response = await SendWithRefreshAsync( request, ct );
-        if ( !response.IsSuccessStatusCode )
-            return [];
-
-        return await DeserializeAsync<List<LinkActivityModel>>( response, ct ) ?? [];
-    }
+    public async Task<List<LinkActivityModel>> GetLinkActivityAsync(int id, CancellationToken ct = default) =>
+        await GetAsync<List<LinkActivityModel>>($"/api/links/{id}/activity", ct) ?? [];
 
     /// <summary>GET /api/links/favourites</summary>
-    public async Task<List<LinkModel>> GetFavouritesAsync( CancellationToken ct = default )
-    {
-        var request = new HttpRequestMessage( HttpMethod.Get, "/api/links/favourites" );
-        var response = await SendWithRefreshAsync( request, ct );
-        if ( !response.IsSuccessStatusCode )
-            return [];
-
-        return await DeserializeAsync<List<LinkModel>>( response, ct ) ?? [];
-    }
+    public async Task<List<LinkModel>> GetFavouritesAsync(CancellationToken ct = default) =>
+        await GetAsync<List<LinkModel>>("/api/links/favourites", ct) ?? [];
 
     /// <summary>POST /api/links/favourite?linkId=</summary>
     public async Task<bool> AddFavouriteAsync( int linkId, CancellationToken ct = default )
     {
-        var request = new HttpRequestMessage(
+        return await SendAsync(
             HttpMethod.Post,
-            UriQueryBuilder.Build("/api/links/favourite", ("linkId", linkId)));
-        var response = await SendWithRefreshAsync( request, ct );
-        return response.IsSuccessStatusCode;
+            UriQueryBuilder.Build("/api/links/favourite", ("linkId", linkId)),
+            ct);
     }
 
     /// <summary>POST /api/links/unfavourite?linkId=</summary>
     public async Task<bool> RemoveFavouriteAsync( int linkId, CancellationToken ct = default )
     {
-        var request = new HttpRequestMessage(
+        return await SendAsync(
             HttpMethod.Post,
-            UriQueryBuilder.Build("/api/links/unfavourite", ("linkId", linkId)));
-        var response = await SendWithRefreshAsync( request, ct );
-        return response.IsSuccessStatusCode;
+            UriQueryBuilder.Build("/api/links/unfavourite", ("linkId", linkId)),
+            ct);
     }
 
     /// <summary>GET /api/links/categories</summary>
-    public async Task<List<CategoryModel>> GetCategoriesAsync( CancellationToken ct = default )
-    {
-        var request = new HttpRequestMessage( HttpMethod.Get, "/api/links/categories" );
-        var response = await SendWithRefreshAsync( request, ct );
-        if ( !response.IsSuccessStatusCode )
-            return [];
-
-        return await DeserializeAsync<List<CategoryModel>>( response, ct ) ?? [];
-    }
+    public async Task<List<CategoryModel>> GetCategoriesAsync(CancellationToken ct = default) =>
+        await GetAsync<List<CategoryModel>>("/api/links/categories", ct) ?? [];
 
     /// <summary>POST /api/links/category?categoryName=</summary>
     public async Task<CategoryModel?> CreateCategoryAsync( string categoryName, CancellationToken ct = default )
     {
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            UriQueryBuilder.Build("/api/links/category", ("categoryName", categoryName)));
-        var response = await SendWithRefreshAsync( request, ct );
+        var response = await SendWithRefreshAsync(
+            new HttpRequestMessage(
+                HttpMethod.Post,
+                UriQueryBuilder.Build("/api/links/category", ("categoryName", categoryName))),
+            ct);
         if ( !response.IsSuccessStatusCode )
             return null;
 
@@ -452,25 +420,21 @@ public class ApiClient : IApiClient
     /// <summary>POST /api/links/category?categoryName=</summary>
     public async Task<bool> AddCategoryAsync( string categoryName, CancellationToken ct = default )
     {
-        var category = await CreateCategoryAsync( categoryName, ct );
-        return category is not null;
+        return await CreateCategoryAsync(categoryName, ct) is not null;
     }
 
     /// <summary>DELETE /api/links/category/{id}</summary>
     public async Task<bool> DeleteCategoryAsync( int id, CancellationToken ct = default )
     {
-        var request = new HttpRequestMessage( HttpMethod.Delete, $"/api/links/category/{id}" );
-        var response = await SendWithRefreshAsync( request, ct );
-        return response.IsSuccessStatusCode;
+        return await SendAsync(HttpMethod.Delete, $"/api/links/category/{id}", ct);
     }
 
     /// <summary>PUT /api/links/{id}/category?categoryId=</summary>
     public async Task<bool> AssignCategoryAsync( int linkId, int? categoryId, CancellationToken ct = default )
     {
-        var query = UriQueryBuilder.Build($"/api/links/{linkId}/category", ("categoryId", categoryId));
-
-        var request = new HttpRequestMessage( HttpMethod.Put, query );
-        var response = await SendWithRefreshAsync( request, ct );
-        return response.IsSuccessStatusCode;
+        return await SendAsync(
+            HttpMethod.Put,
+            UriQueryBuilder.Build($"/api/links/{linkId}/category", ("categoryId", categoryId)),
+            ct);
     }
 }

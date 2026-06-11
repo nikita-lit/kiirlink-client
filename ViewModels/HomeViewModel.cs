@@ -19,11 +19,7 @@ public sealed class HomeViewModel : ViewModelBase
         _dialogs = dialogs;
         _preferences = preferences;
         CreateLinkCommand = new AsyncCommand(CreateLinkAsync, () => CanInteract);
-        PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName is nameof(CanInteract))
-                CreateLinkCommand.RaiseCanExecuteChanged();
-        };
+        TrackCanInteract(CreateLinkCommand);
     }
 
     public string OriginalUrl

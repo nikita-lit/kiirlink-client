@@ -13,7 +13,7 @@
         <Grid ColumnDefinitions="*,*,*,*" HeightRequest="34">
             <Grid Grid.Column="0">
                 <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnHomeTapped" />
+                    <TapGestureRecognizer CommandParameter="Home" Tapped="OnTabTapped" />
                 </Grid.GestureRecognizers>
                 <Image
                     x:Name="HomeIcon"
@@ -27,13 +27,14 @@
                     AutomationProperties.IsInAccessibleTree="True"
                     SemanticProperties.Description="{l:Translate Home}"
                     BackgroundColor="Transparent"
-                    Clicked="OnHomeClicked"
+                    Clicked="OnTabClicked"
+                    CommandParameter="Home"
                     Opacity="0.01" />
             </Grid>
 
             <Grid Grid.Column="1">
                 <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnLinksTapped" />
+                    <TapGestureRecognizer CommandParameter="Links" Tapped="OnTabTapped" />
                 </Grid.GestureRecognizers>
                 <Image
                     x:Name="LinksIcon"
@@ -47,13 +48,14 @@
                     AutomationProperties.IsInAccessibleTree="True"
                     SemanticProperties.Description="{l:Translate Links}"
                     BackgroundColor="Transparent"
-                    Clicked="OnLinksClicked"
+                    Clicked="OnTabClicked"
+                    CommandParameter="Links"
                     Opacity="0.01" />
             </Grid>
 
             <Grid Grid.Column="2">
                 <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnFavouritesTapped" />
+                    <TapGestureRecognizer CommandParameter="Favourites" Tapped="OnTabTapped" />
                 </Grid.GestureRecognizers>
                 <Image
                     x:Name="FavouritesIcon"
@@ -67,13 +69,14 @@
                     AutomationProperties.IsInAccessibleTree="True"
                     SemanticProperties.Description="{l:Translate Favourites}"
                     BackgroundColor="Transparent"
-                    Clicked="OnFavouritesClicked"
+                    Clicked="OnTabClicked"
+                    CommandParameter="Favourites"
                     Opacity="0.01" />
             </Grid>
 
             <Grid Grid.Column="3">
                 <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnProfileTapped" />
+                    <TapGestureRecognizer CommandParameter="Profile" Tapped="OnTabTapped" />
                 </Grid.GestureRecognizers>
                 <Image
                     x:Name="ProfileIcon"
@@ -87,7 +90,8 @@
                     AutomationProperties.IsInAccessibleTree="True"
                     SemanticProperties.Description="{l:Translate Profile}"
                     BackgroundColor="Transparent"
-                    Clicked="OnProfileClicked"
+                    Clicked="OnTabClicked"
+                    CommandParameter="Profile"
                     Opacity="0.01" />
             </Grid>
         </Grid>

@@ -75,6 +75,13 @@ public abstract class ViewModelBase : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    protected void TrackCanInteract(AsyncCommand command) =>
+        PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is nameof(CanInteract))
+                command.RaiseCanExecuteChanged();
+        };
+
     protected async Task RunBusyAsync(Func<Task> action)
     {
         if (IsBusy)

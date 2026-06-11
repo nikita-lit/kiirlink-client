@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using KiirLink.Controls;
+using KiirLink.Extensions;
 using KiirLink.Models;
 using KiirLink.Services;
 
@@ -88,8 +88,7 @@ public partial class LinksPage
                 }
             }
 
-            Categories.Clear();
-            foreach ( var c in categories ) Categories.Add( c );
+            Categories.ReplaceWith(categories);
             RefreshFilterStyles();
         }
         catch
@@ -116,8 +115,7 @@ public partial class LinksPage
 
             var links = page.Items;
 
-            Links.Clear();
-            foreach ( var link in links ) Links.Add( link );
+            Links.ReplaceWith(links);
 
             UpdatePopularCard( links );
             _totalLinkCount = page.TotalCount;
@@ -219,11 +217,7 @@ public partial class LinksPage
         
         await page.ShowPopupAsync( 
             new CategoryManagementPopup( _linkService, _connectivity ), 
-            new PopupOptions
-            {
-                Shape = null,
-                Shadow = null,
-            } );
+            UiHelpers.PlainPopup());
         
         await LoadCategoriesAsync();
         await LoadLinksAsync();
@@ -244,11 +238,7 @@ public partial class LinksPage
         
         await page.ShowPopupAsync( 
             new QRCodePopup( $"{AppHostHelper.BaseUrl}/{link.ShortUrl}" ), 
-            new PopupOptions
-            {
-                Shape = null,
-                Shadow = null,
-            } );
+            UiHelpers.PlainPopup());
         
         await LoadCategoriesAsync();
         await LoadLinksAsync();
@@ -303,7 +293,7 @@ public partial class LinksPage
         if ( link is null ) 
             return;
 
-        var category = await PromptAssignExistingCategoryAsync( link.Id );
+        var category = await UiHelpers.AssignCategoryAsync(this, _linkService, link.Id, Categories);
         if ( category is null )
             return;
 
@@ -392,37 +382,6 @@ public partial class LinksPage
         _currentPage = 1;
 
         await LoadLinksAsync();
-    }
-
-    private async Task<CategoryModel?> PromptAssignExistingCategoryAsync( int linkId )
-    {
-        var categories = Categories.ToList();
-        if ( categories.Count == 0 )
-        {
-            await DisplayAlertAsync( L("NoCategories"), L("CreateCategoryFirst"), "OK" );
-            return null;
-        }
-
-        var cancel = L("Cancel");
-        var action = await DisplayActionSheetAsync( L("AssignCategory"), cancel, null,
-            categories.Select( c => c.Name ).ToArray() );
-        if ( string.IsNullOrWhiteSpace( action ) || action == cancel )
-            return null;
-
-        var category =
-            categories.FirstOrDefault( c => string.Equals( c.Name, action, StringComparison.OrdinalIgnoreCase ) );
-        if ( category is null )
-            return null;
-
-        var assigned = await _linkService.AssignCategoryAsync( linkId, category.Id );
-        if ( !assigned )
-        {
-            await DisplayAlertAsync( L("Error"), L("CouldNotAssignCategory"), "OK" );
-            return null;
-        }
-
-        await DisplayAlertAsync( L("CategoryAssigned"), F("CategoryAssignedMessage", category.Name), "OK" );
-        return category;
     }
 
     private static string L(string key) => LocalizationManager.Instance.Get(key);

@@ -3,15 +3,35 @@ namespace KiirLink.Services;
 public static class ThemeService
 {
     private const string ThemePreferenceKey = "theme_is_dark";
+    private static readonly IReadOnlyDictionary<string, (string Light, string Dark)> Colors =
+        new Dictionary<string, (string, string)>
+        {
+            ["AppBackground"] = ("#FFFFFF", "#121212"),
+            ["AppSurface"] = ("#FFFFFF", "#1C1C1C"),
+            ["AppText"] = ("#343434", "#F2F2F2"),
+            ["AppMutedText"] = ("#666666", "#BDBDBD"),
+            ["AppStroke"] = ("#E6E6E6", "#3A3A3A"),
+            ["AppDivider"] = ("#ECECEC", "#2B2B2B"),
+            ["AppTrack"] = ("#F1F1F1", "#242424"),
+            ["AppShadow"] = ("#22000000", "#66000000"),
+            ["AppAccentSurface"] = ("#FFF0EC", "#2A1A14"),
+            ["AppAccentText"] = ("#C83B1D", "#FFB299"),
+            ["AppAccentStroke"] = ("#D94322", "#FF8A66"),
+            ["AppDangerSurface"] = ("#FFE7E7", "#331313"),
+            ["AppDangerText"] = ("#A52D2D", "#FFB0B0"),
+            ["AppDangerStroke"] = ("#A52D2D", "#CC6A6A"),
+            ["AppCategorySurface"] = ("#DDF2DC", "#18351B"),
+            ["AppCategoryText"] = ("#245E2A", "#A7E4AA"),
+            ["AppGoldSurface"] = ("#785600", "#E2A900"),
+            ["AppGoldText"] = ("#FFFFFF", "#181200")
+        };
     private static bool _initialized;
 
     public static event EventHandler? ThemeChanged;
 
     public static bool HasStoredPreference => Preferences.Default.ContainsKey(ThemePreferenceKey);
 
-    public static bool IsDark => HasStoredPreference
-        ? Preferences.Default.Get(ThemePreferenceKey, false)
-        : false;
+    public static bool IsDark => Preferences.Default.Get(ThemePreferenceKey, false);
 
     public static void Initialize()
     {
@@ -19,18 +39,9 @@ public static class ThemeService
         if (app is null || _initialized)
             return;
 
-        if (HasStoredPreference)
-        {
-            ApplyTheme(Preferences.Default.Get(ThemePreferenceKey, false));
-            app.UserAppTheme = Preferences.Default.Get(ThemePreferenceKey, false) ? AppTheme.Dark : AppTheme.Light;
-        }
-        else
-        {
-            // Default to a light theme on first launch so the app does not inherit
-            // a system dark mode background unless the user explicitly enables it.
-            ApplyTheme(false);
-            app.UserAppTheme = AppTheme.Light;
-        }
+        var dark = HasStoredPreference && IsDark;
+        ApplyTheme(dark);
+        app.UserAppTheme = dark ? AppTheme.Dark : AppTheme.Light;
 
         _initialized = true;
     }
@@ -52,33 +63,10 @@ public static class ThemeService
         if (resources is null)
             return;
 
-        var background = Color.FromArgb(dark ? "#121212" : "#FFFFFF");
-        var surface = Color.FromArgb(dark ? "#1C1C1C" : "#FFFFFF");
-        var text = Color.FromArgb(dark ? "#F2F2F2" : "#343434");
-        var mutedText = Color.FromArgb(dark ? "#BDBDBD" : "#666666");
-        var stroke = Color.FromArgb(dark ? "#3A3A3A" : "#E6E6E6");
-        var divider = Color.FromArgb(dark ? "#2B2B2B" : "#ECECEC");
-        var track = Color.FromArgb(dark ? "#242424" : "#F1F1F1");
+        foreach (var (key, colors) in Colors)
+            resources[key] = Color.FromArgb(dark ? colors.Dark : colors.Light);
 
-        resources["AppBackground"] = background;
-        resources["AppSurface"] = surface;
-        resources["AppText"] = text;
-        resources["AppMutedText"] = mutedText;
-        resources["AppStroke"] = stroke;
-        resources["AppDivider"] = divider;
-        resources["AppTrack"] = track;
-        resources["AppShadow"] = Color.FromArgb(dark ? "#66000000" : "#22000000");
-        resources["AppAccentSurface"] = Color.FromArgb(dark ? "#2A1A14" : "#FFF0EC");
-        resources["AppAccentText"] = Color.FromArgb(dark ? "#FFB299" : "#C83B1D");
-        resources["AppAccentStroke"] = Color.FromArgb(dark ? "#FF8A66" : "#D94322");
-        resources["AppDangerSurface"] = Color.FromArgb(dark ? "#331313" : "#FFE7E7");
-        resources["AppDangerText"] = Color.FromArgb(dark ? "#FFB0B0" : "#A52D2D");
-        resources["AppDangerStroke"] = Color.FromArgb(dark ? "#CC6A6A" : "#A52D2D");
-        resources["AppCategorySurface"] = Color.FromArgb(dark ? "#18351B" : "#DDF2DC");
-        resources["AppCategoryText"] = Color.FromArgb(dark ? "#A7E4AA" : "#245E2A");
-        resources["AppGoldSurface"] = Color.FromArgb(dark ? "#E2A900" : "#785600");
-        resources["AppGoldText"] = Color.FromArgb(dark ? "#181200" : "#FFFFFF");
-
+        var background = (Color)resources["AppBackground"];
         SystemBarTheme.Apply(dark, background);
         ThemeChanged?.Invoke(null, EventArgs.Empty);
 

@@ -1,6 +1,4 @@
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Maui.Behaviors;
 using KiirLink.Services;
 
 namespace KiirLink.Controls;
@@ -35,7 +33,7 @@ public partial class LinkCard
             typeof(bool),
             typeof(LinkCard),
             false,
-            propertyChanged: OnIsFavouriteChanged );
+            propertyChanged: OnCardContentChanged );
 
     public static readonly BindableProperty LinkIdProperty =
         BindableProperty.Create( nameof(LinkId), typeof(int), typeof(LinkCard), 0 );
@@ -80,80 +78,80 @@ public partial class LinkCard
 
     public bool IsFavourite
     {
-        get => (bool)GetValue( IsFavouriteProperty );
-        set => SetValue( IsFavouriteProperty, value );
+        get => Get<bool>(IsFavouriteProperty);
+        set => Set(IsFavouriteProperty, value);
     }
 
     public int LinkId
     {
-        get => (int)GetValue( LinkIdProperty );
-        set => SetValue( LinkIdProperty, value );
+        get => Get<int>(LinkIdProperty);
+        set => Set(LinkIdProperty, value);
     }
 
     public string ShortUrl
     {
-        get => (string)GetValue( ShortUrlProperty );
-        set => SetValue( ShortUrlProperty, value );
+        get => Get<string>(ShortUrlProperty);
+        set => Set(ShortUrlProperty, value);
     }
 
     public bool ShowFavouriteIndicator
     {
-        get => (bool)GetValue( ShowFavouriteIndicatorProperty );
-        set => SetValue( ShowFavouriteIndicatorProperty, value );
+        get => Get<bool>(ShowFavouriteIndicatorProperty);
+        set => Set(ShowFavouriteIndicatorProperty, value);
     }
 
     public bool ShowActions
     {
-        get => (bool)GetValue( ShowActionsProperty );
-        set => SetValue( ShowActionsProperty, value );
+        get => Get<bool>(ShowActionsProperty);
+        set => Set(ShowActionsProperty, value);
     }
 
     public bool IsPublic
     {
-        get => (bool)GetValue( IsPublicProperty );
-        set => SetValue( IsPublicProperty, value );
+        get => Get<bool>(IsPublicProperty);
+        set => Set(IsPublicProperty, value);
     }
 
     public string Expiration
     {
-        get => (string)GetValue( ExpirationProperty );
-        set => SetValue( ExpirationProperty, value );
+        get => Get<string>(ExpirationProperty);
+        set => Set(ExpirationProperty, value);
     }
 
     public DateTime? ExpiresAt
     {
-        get => (DateTime?)GetValue( ExpiresAtProperty );
-        set => SetValue( ExpiresAtProperty, value );
+        get => Get<DateTime?>(ExpiresAtProperty);
+        set => Set(ExpiresAtProperty, value);
     }
 
     public string Title
     {
-        get => (string)GetValue( TitleProperty );
-        set => SetValue( TitleProperty, value );
+        get => Get<string>(TitleProperty);
+        set => Set(TitleProperty, value);
     }
 
     public string Url
     {
-        get => (string)GetValue( UrlProperty );
-        set => SetValue( UrlProperty, value );
+        get => Get<string>(UrlProperty);
+        set => Set(UrlProperty, value);
     }
 
     public string Category
     {
-        get => (string)GetValue( CategoryProperty );
-        set => SetValue( CategoryProperty, value );
+        get => Get<string>(CategoryProperty);
+        set => Set(CategoryProperty, value);
     }
 
     public int Clicks
     {
-        get => (int)GetValue( ClicksProperty );
-        set => SetValue( ClicksProperty, value );
+        get => Get<int>(ClicksProperty);
+        set => Set(ClicksProperty, value);
     }
 
     public string Date
     {
-        get => (string)GetValue( DateProperty );
-        set => SetValue( DateProperty, value );
+        get => Get<string>(DateProperty);
+        set => Set(DateProperty, value);
     }
 
     public event EventHandler<TappedEventArgs>? CardTapped;
@@ -176,15 +174,13 @@ public partial class LinkCard
         ApplyThemeToIcons();
     }
 
-    private void OnCardTapped( object? sender, TappedEventArgs e )
-    {
-        CardTapped?.Invoke( this, e );
-    }
+    private T Get<T>(BindableProperty property) => (T)GetValue(property);
+    private void Set<T>(BindableProperty property, T value) => SetValue(property, value);
 
-    private async void OnMoreIconTapped( object? sender, TappedEventArgs e )
-    {
-        await OnShowContextMenu( sender, e );
-    }
+    private void OnCardTapped(object? sender, TappedEventArgs e) => CardTapped?.Invoke(this, e);
+
+    private async void OnMoreIconTapped(object? sender, TappedEventArgs e) =>
+        await OnShowContextMenu(sender, e);
 
     protected override void OnHandlerChanging( HandlerChangingEventArgs args )
     {
@@ -197,15 +193,8 @@ public partial class LinkCard
         base.OnHandlerChanging( args );
     }
 
-    private static void OnIsFavouriteChanged( BindableObject bindable, object oldValue, object newValue )
-    {
+    private static void OnCardContentChanged(BindableObject bindable, object oldValue, object newValue) =>
         ((LinkCard)bindable).RefreshVisualState();
-    }
-
-    private static void OnCardContentChanged( BindableObject bindable, object oldValue, object newValue )
-    {
-        ((LinkCard)bindable).RefreshVisualState();
-    }
 
     private void RefreshVisualState()
     {
@@ -255,19 +244,7 @@ public partial class LinkCard
 
     private void ApplyThemeToIcons()
     {
-        SetIconTint( MoreIcon, (Color)Application.Current!.Resources["AppText"] );
-    }
-
-    private static void SetIconTint( Image image, Color tint )
-    {
-        var behavior = image.Behaviors.OfType<IconTintColorBehavior>().FirstOrDefault();
-        if ( behavior is null )
-        {
-            behavior = new IconTintColorBehavior();
-            image.Behaviors.Add( behavior );
-        }
-
-        behavior.TintColor = tint;
+        MoreIcon.SetTint((Color)Application.Current!.Resources["AppText"]);
     }
 
     private async Task OnShowContextMenu( object? sender, EventArgs e )
@@ -279,11 +256,7 @@ public partial class LinkCard
         var popup = new LinkActionsPopup( IsFavourite );
         var result = await page.ShowPopupAsync<LinkActionsPopupAction>(
             popup,
-            new PopupOptions
-            {
-                Shape = null,
-                Shadow = null,
-            } );
+            UiHelpers.PlainPopup());
 
         if ( result.WasDismissedByTappingOutsideOfPopup )
             return;

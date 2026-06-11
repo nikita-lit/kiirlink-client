@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using KiirLink.Extensions;
 using KiirLink.Models;
 using KiirLink.Services;
 
@@ -47,14 +48,9 @@ public sealed class LinksViewModel : ViewModelBase
             var linksTask = _links.GetLinksPageAsync(_currentPage, PageSize, _selectedCategoryId);
             await Task.WhenAll(categoriesTask, linksTask);
 
-            Categories.Clear();
-            foreach (var category in await categoriesTask)
-                Categories.Add(category);
-
+            Categories.ReplaceWith(await categoriesTask);
             var page = await linksTask;
-            Links.Clear();
-            foreach (var link in page.Items)
-                Links.Add(link);
+            Links.ReplaceWith(page.Items);
 
             _totalCount = page.TotalCount;
             PopularLink = page.Items.MaxBy(link => link.Clicks);
@@ -89,10 +85,7 @@ public sealed class FavouritesViewModel : ViewModelBase
 
         await RunBusyAsync(async () =>
         {
-            var favourites = await _links.GetFavouritesAsync();
-            Favourites.Clear();
-            foreach (var link in favourites)
-                Favourites.Add(link);
+            Favourites.ReplaceWith(await _links.GetFavouritesAsync());
             OnPropertyChanged(nameof(Count));
         });
     }

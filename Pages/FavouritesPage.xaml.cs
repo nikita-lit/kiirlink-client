@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using KiirLink.Controls;
+using KiirLink.Extensions;
 using KiirLink.Models;
 using KiirLink.Services;
 
@@ -48,8 +48,7 @@ public partial class FavouritesPage
         {
             var favourites = await _linkService.GetFavouritesAsync();
 
-            Favourites.Clear();
-            foreach ( var link in favourites ) Favourites.Add( link );
+            Favourites.ReplaceWith(favourites);
 
             FavCountLabel.Text = favourites.Count.ToString();
         }
@@ -97,7 +96,11 @@ public partial class FavouritesPage
         var link = Favourites.FirstOrDefault( l => l.ResolvedId == card.LinkId );
         if ( link is null ) return;
 
-        var category = await PromptAssignExistingCategoryAsync( link.ResolvedId );
+        var category = await UiHelpers.AssignCategoryAsync(
+            this,
+            _linkService,
+            link.ResolvedId,
+            await _linkService.GetCategoriesAsync());
         if ( category is null )
             return;
 
@@ -183,45 +186,9 @@ public partial class FavouritesPage
         
         await page.ShowPopupAsync( 
             new QRCodePopup( $"{AppHostHelper.BaseUrl}/{link.ShortUrl}" ), 
-            new PopupOptions
-            {
-                Shape = null,
-                Shadow = null,
-            } );
+            UiHelpers.PlainPopup());
     }
     
-    private async Task<CategoryModel?> PromptAssignExistingCategoryAsync( int linkId )
-    {
-        var categories = await _linkService.GetCategoriesAsync();
-        if ( categories.Count == 0 )
-        {
-            await DisplayAlertAsync( L("NoCategories"), L("CreateCategoryFirst"), "OK" );
-            return null;
-        }
-
-        var cancel = L("Cancel");
-        var action = await DisplayActionSheetAsync( L("AssignCategory"), cancel, null,
-            categories.Select( c => c.Name ).ToArray() );
-        if ( string.IsNullOrWhiteSpace( action ) || action == cancel )
-            return null;
-
-        var category =
-            categories.FirstOrDefault( c => string.Equals( c.Name, action, StringComparison.OrdinalIgnoreCase ) );
-        
-        if ( category is null )
-            return null;
-
-        var assigned = await _linkService.AssignCategoryAsync( linkId, category.Id );
-        if ( !assigned )
-        {
-            await DisplayAlertAsync( L("Error"), L("CouldNotAssignCategory"), "OK" );
-            return null;
-        }
-
-        await DisplayAlertAsync( L("CategoryAssigned"), F("CategoryAssignedMessage", category.Name), "OK" );
-        return category;
-    }
-
     private static string L(string key) => LocalizationManager.Instance.Get(key);
     private static string F(string key, params object[] args) => LocalizationManager.Instance.Format(key, args);
 

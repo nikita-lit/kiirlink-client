@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Maui.Extensions;
+using KiirLink.Extensions;
 using KiirLink.Models;
 using KiirLink.Services;
 
@@ -46,10 +47,7 @@ public partial class CategoryManagementPopup
 
         try
         {
-            var categories = await _linkService.GetCategoriesAsync();
-            _categories.Clear();
-            foreach (var category in categories)
-                _categories.Add(category);
+            _categories.ReplaceWith(await _linkService.GetCategoriesAsync());
         }
         catch (Exception ex)
         {

@@ -1,4 +1,3 @@
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using KiirLink.Controls;
 using KiirLink.Services;
@@ -116,11 +115,7 @@ public partial class ProfilePage
     {
         var result = await this.ShowPopupAsync<ExpirationDateSelection>(
             new ExpirationDatePopup(_linkPreferences.AutoExpirationDate),
-            new PopupOptions
-            {
-                Shape = null,
-                Shadow = null
-            });
+            UiHelpers.PlainPopup());
         if (result.WasDismissedByTappingOutsideOfPopup || result.Result is null)
             return;
 
@@ -156,11 +151,7 @@ public partial class ProfilePage
     {
         var result = await this.ShowPopupAsync<bool>(
             new ChangePasswordPopup(_authService), 
-            new PopupOptions
-        {
-            Shape = null,
-            Shadow = null,
-        } );
+            UiHelpers.PlainPopup());
         
         if (!result.WasDismissedByTappingOutsideOfPopup && result.Result)
             await DisplayAlertAsync(
@@ -198,25 +189,11 @@ public partial class ProfilePage
     private void ApplyThemeToIcons()
     {
         var tint = (Color)Application.Current!.Resources["AppText"];
-        SetIconTint(UserProfileIcon, tint);
-        SetIconTint(MailIcon, tint);
-        SetIconTint(ChangePasswordIcon, tint);
-        SetIconTint(DarkThemeIcon, tint);
-        SetIconTint(LanguageIcon, tint);
-        SetIconTint(FolderIcon, tint);
-        SetIconTint(ClockIcon, tint);
-        SetIconTint(PrivacyIcon, tint);
-    }
-
-    private static void SetIconTint(Image image, Color tint)
-    {
-        var behavior = image.Behaviors.OfType<CommunityToolkit.Maui.Behaviors.IconTintColorBehavior>().FirstOrDefault();
-        if (behavior is null)
-        {
-            behavior = new CommunityToolkit.Maui.Behaviors.IconTintColorBehavior();
-            image.Behaviors.Add(behavior);
-        }
-
-        behavior.TintColor = tint;
+        foreach (var icon in new[]
+                 {
+                     UserProfileIcon, MailIcon, ChangePasswordIcon, DarkThemeIcon,
+                     LanguageIcon, FolderIcon, ClockIcon, PrivacyIcon
+                 })
+            icon.SetTint(tint);
     }
 }
