@@ -52,19 +52,11 @@
     <ItemGroup>
         <Compile Remove="Test\**"/>
         <Compile Remove="Tests\**"/>
-        <Compile Remove="Models\**"/>
-        <Compile Remove="Services\ApiException.cs"/>
-        <Compile Remove="Services\AuthService.cs"/>
-        <Compile Remove="Services\LinkService.cs"/>
-        <Compile Remove="Services\ServiceContracts.cs"/>
-        <Compile Remove="Services\UriQueryBuilder.cs"/>
         <EmbeddedResource Remove="Tests\**"/>
         <MauiXaml Remove="Tests\**"/>
         <None Remove="Tests\**"/>
     </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="KiirLink.Core.csproj" />
-    </ItemGroup>
+
     <ItemGroup>
         <EmbeddedResource Include="appsettings.json" />
 

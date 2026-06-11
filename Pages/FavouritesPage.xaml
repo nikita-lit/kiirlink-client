@@ -60,7 +60,7 @@
                     <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models1:LinkModel">
+                    <DataTemplate x:DataType="models:LinkModel">
                         <controls:LinkCard
                             CardTapped="OnLinkCardTapped"
                             AnalyticsRequested="OnLinkAnalyticsRequested"
