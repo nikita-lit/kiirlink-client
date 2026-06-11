@@ -5,16 +5,16 @@ namespace KiirLink.ViewModels;
 
 public sealed class HomeViewModel : ViewModelBase
 {
-    private readonly ILinkService _links;
+    private readonly ApiClient _api;
     private readonly INavigationService _navigation;
     private readonly IDialogService _dialogs;
     private readonly LinkPreferencesService _preferences;
     private string _originalUrl = string.Empty;
 
-    public HomeViewModel(ILinkService links, IConnectivityService connectivity, INavigationService navigation,
+    public HomeViewModel(ApiClient api, IConnectivityService connectivity, INavigationService navigation,
         IDialogService dialogs, LinkPreferencesService preferences) : base(connectivity)
     {
-        _links = links;
+        _api = api;
         _navigation = navigation;
         _dialogs = dialogs;
         _preferences = preferences;
@@ -52,7 +52,7 @@ public sealed class HomeViewModel : ViewModelBase
         await RunBusyAsync(async () =>
         {
             var expiresAt = LinkExpiration.EndOfSelectedDayUtc(_preferences.AutoExpirationDate);
-            var result = await _links.ShortenLinkAsync(
+            var result = await _api.ShortenLinkAsync(
                 originalUrl,
                 expiresAt,
                 _preferences.IsPublic,

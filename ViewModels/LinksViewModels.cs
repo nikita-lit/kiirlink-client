@@ -8,15 +8,15 @@ namespace KiirLink.ViewModels;
 public sealed class LinksViewModel : ViewModelBase
 {
     private const int PageSize = 10;
-    private readonly ILinkService _links;
+    private readonly ApiClient _api;
     private int _currentPage = 1;
     private int _totalCount;
     private int? _selectedCategoryId;
     private LinkModel? _popularLink;
 
-    public LinksViewModel(ILinkService links, IConnectivityService connectivity) : base(connectivity)
+    public LinksViewModel(ApiClient api, IConnectivityService connectivity) : base(connectivity)
     {
-        _links = links;
+        _api = api;
     }
 
     public ObservableCollection<LinkModel> Links { get; } = [];
@@ -44,8 +44,8 @@ public sealed class LinksViewModel : ViewModelBase
 
         await RunBusyAsync(async () =>
         {
-            var categoriesTask = _links.GetCategoriesAsync();
-            var linksTask = _links.GetLinksPageAsync(_currentPage, PageSize, _selectedCategoryId);
+            var categoriesTask = _api.GetCategoriesAsync();
+            var linksTask = _api.GetLinksPageAsync(_currentPage, PageSize, _selectedCategoryId);
             await Task.WhenAll(categoriesTask, linksTask);
 
             Categories.ReplaceWith(await categoriesTask);
@@ -68,11 +68,11 @@ public sealed class LinksViewModel : ViewModelBase
 
 public sealed class FavouritesViewModel : ViewModelBase
 {
-    private readonly ILinkService _links;
+    private readonly ApiClient _api;
 
-    public FavouritesViewModel(ILinkService links, IConnectivityService connectivity) : base(connectivity)
+    public FavouritesViewModel(ApiClient api, IConnectivityService connectivity) : base(connectivity)
     {
-        _links = links;
+        _api = api;
     }
 
     public ObservableCollection<LinkModel> Favourites { get; } = [];
@@ -85,7 +85,7 @@ public sealed class FavouritesViewModel : ViewModelBase
 
         await RunBusyAsync(async () =>
         {
-            Favourites.ReplaceWith(await _links.GetFavouritesAsync());
+            Favourites.ReplaceWith(await _api.GetFavouritesAsync());
             OnPropertyChanged(nameof(Count));
         });
     }

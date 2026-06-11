@@ -4,13 +4,13 @@ namespace KiirLink;
 
 public partial class AppShell : Shell
 {
-    private readonly IAuthService _auth;
+    private readonly ApiClient _api;
     private bool _redirectingToSignIn;
 
-    public AppShell(IAuthService auth)
+    public AppShell(ApiClient api)
     {
         InitializeComponent();
-        _auth = auth;
+        _api = api;
         Navigating += OnNavigating;
     }
 
@@ -21,7 +21,7 @@ public partial class AppShell : Shell
              target.Contains( "CreateAccount", StringComparison.OrdinalIgnoreCase ) )
             return;
 
-        if (await _auth.IsAuthenticatedAsync() || _redirectingToSignIn)
+        if (await _api.HasStoredTokensAsync() || _redirectingToSignIn)
             return;
 
         _redirectingToSignIn = true;

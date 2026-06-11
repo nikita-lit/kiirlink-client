@@ -9,7 +9,7 @@ namespace KiirLink.Pages;
 
 public partial class LinksPage
 {
-    private readonly ILinkService _linkService;
+    private readonly ApiClient _api;
     private readonly IConnectivityService _connectivity;
     private readonly EventHandler _themeChangedHandler;
     private readonly EventHandler<bool> _connectivityChangedHandler;
@@ -19,14 +19,15 @@ public partial class LinksPage
     private const int PageSize = 10;
     private int? _selectedCategoryId;
     private int _selectedLinkId;
+    private bool _isLinkActionsPopupOpen;
 
     public ObservableCollection<LinkModel> Links { get; } = [];
     public ObservableCollection<CategoryModel> Categories { get; } = [];
 
-    public LinksPage(ILinkService linkService, IConnectivityService connectivity)
+    public LinksPage(ApiClient api, IConnectivityService connectivity)
     {
         InitializeComponent();
-        _linkService = linkService;
+        _api = api;
         _connectivity = connectivity;
         _themeChangedHandler = (_, _) => RefreshFilterStyles();
         _connectivityChangedHandler = (_, online) =>
@@ -43,7 +44,7 @@ public partial class LinksPage
         _connectivity.ConnectivityChanged += _connectivityChangedHandler;
         UpdateConnectivityState(_connectivity.IsOnline);
         RefreshFilterStyles();
-        if (_connectivity.IsOnline)
+        if (_connectivity.IsOnline && !_isLinkActionsPopupOpen)
         {
             await LoadCategoriesAsync();
             await LoadLinksAsync();
@@ -63,7 +64,7 @@ public partial class LinksPage
     {
         try
         {
-            var categories = await _linkService.GetCategoriesAsync();
+            var categories = await _api.GetCategoriesAsync();
 
             // Keep "All" button, remove old category chips
             var layout = AllFilter.Parent as HorizontalStackLayout;
@@ -103,13 +104,13 @@ public partial class LinksPage
         LoadingSkeleton.IsVisible = true;
         try
         {
-            var page = await _linkService.GetLinksPageAsync( _currentPage, PageSize, _selectedCategoryId );
+            var page = await _api.GetLinksPageAsync( _currentPage, PageSize, _selectedCategoryId );
             var lastPage = page.GetLastPage( PageSize );
 
             if ( _currentPage > lastPage )
             {
                 _currentPage = lastPage;
-                page = await _linkService.GetLinksPageAsync( _currentPage, PageSize, _selectedCategoryId );
+                page = await _api.GetLinksPageAsync( _currentPage, PageSize, _selectedCategoryId );
             }
 
             Links.ReplaceWith(page.Items);
@@ -198,12 +199,12 @@ public partial class LinksPage
 
     private async void OnManageCategoriesClicked( object? sender, EventArgs e )
     {
-        var page = Shell.Current?.CurrentPage;
+        var page = UiHelpers.CurrentPage;
         if ( page is null )
             return;
         
         await page.ShowPopupAsync( 
-            new CategoryManagementPopup( _linkService, _connectivity ), 
+            new CategoryManagementPopup(_api, _connectivity),
             UiHelpers.PlainPopup());
         
         await LoadCategoriesAsync();
@@ -212,7 +213,7 @@ public partial class LinksPage
 
     private async void OnCreateQRCodeClicked( object? sender, EventArgs e )
     {
-        if (sender is not LinkCard card || Shell.Current?.CurrentPage is not { } page)
+        if (sender is not LinkCard card || UiHelpers.CurrentPage is not { } page)
             return;
 
         var link = Links.FirstOrDefault( l => l.Id == card.LinkId );
@@ -264,7 +265,7 @@ public partial class LinksPage
         if ( link is null ) 
             return;
 
-        var category = await UiHelpers.AssignCategoryAsync(this, _linkService, link.Id, Categories);
+        var category = await UiHelpers.AssignCategoryAsync(this, _api, link.Id, Categories);
         if ( category is null )
             return;
 
@@ -281,20 +282,23 @@ public partial class LinksPage
 
         var link = Links.FirstOrDefault(item => item.Id == card.LinkId);
         if (link is not null &&
-            await UiHelpers.SetFavouriteAsync(this, _linkService, card.LinkId, !link.IsFavourite))
+            await UiHelpers.SetFavouriteAsync(this, _api, card.LinkId, !link.IsFavourite))
             link.IsFavourite = !link.IsFavourite;
     }
 
     private async void OnLinkDeleteRequested( object? sender, EventArgs e )
     {
         if (sender is not LinkCard card ||
-            !await UiHelpers.DeleteLinkAsync(this, _linkService, card.LinkId, card.Title))
+            !await UiHelpers.DeleteLinkAsync(this, _api, card.LinkId, card.Title))
             return;
 
         Links.Remove(Links.First(link => link.Id == card.LinkId));
         await DisplayAlertAsync(L("Deleted"), L("LinkDeleted"), "OK");
         await LoadLinksAsync();
     }
+
+    private void OnLinkActionsPopupVisibilityChanged(object? sender, bool isOpen) =>
+        _isLinkActionsPopupOpen = isOpen;
 
     private async void OnFilterClicked( object? sender, EventArgs e )
     {

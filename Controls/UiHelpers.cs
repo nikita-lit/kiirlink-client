@@ -31,7 +31,7 @@ internal static class UiHelpers
 
     public static async Task<CategoryModel?> AssignCategoryAsync(
         Page page,
-        ILinkService links,
+        ApiClient api,
         int linkId,
         IReadOnlyCollection<CategoryModel> categories)
     {
@@ -54,7 +54,7 @@ internal static class UiHelpers
         if (category is null)
             return null;
 
-        if (!await links.AssignCategoryAsync(linkId, category.Id))
+        if (!await api.AssignCategoryAsync(linkId, category.Id))
         {
             await ErrorAsync(page, "CouldNotAssignCategory");
             return null;
@@ -72,7 +72,7 @@ internal static class UiHelpers
             new QRCodePopup($"{AppHostHelper.BaseUrl}/{link.ShortUrl}"),
             PlainPopup());
 
-    public static async Task<bool> DeleteLinkAsync(Page page, ILinkService links, int linkId, string title)
+    public static async Task<bool> DeleteLinkAsync(Page page, ApiClient api, int linkId, string title)
     {
         if (!await page.DisplayAlertAsync(
                 L("DeleteLink"),
@@ -83,7 +83,7 @@ internal static class UiHelpers
 
         try
         {
-            if (await links.RemoveLinkAsync(linkId))
+            if (await api.RemoveLinkAsync(linkId))
                 return true;
 
             await ErrorAsync(page, "CouldNotDeleteLink");
@@ -98,15 +98,15 @@ internal static class UiHelpers
 
     public static async Task<bool> SetFavouriteAsync(
         Page page,
-        ILinkService links,
+        ApiClient api,
         int linkId,
         bool favourite)
     {
         try
         {
             var success = favourite
-                ? await links.AddFavouriteAsync(linkId)
-                : await links.RemoveFavouriteAsync(linkId);
+                ? await api.AddFavouriteAsync(linkId)
+                : await api.RemoveFavouriteAsync(linkId);
             if (success)
                 return true;
 

@@ -19,8 +19,6 @@
   <ItemGroup>
     <Compile Include="..\Models\*.cs" Link="Models\%(Filename)%(Extension)" />
     <Compile Include="..\Services\AuthErrorMessages.cs" Link="Services\AuthErrorMessages.cs" />
-    <Compile Include="..\Services\AuthService.cs" Link="Services\AuthService.cs" />
-    <Compile Include="..\Services\LinkService.cs" Link="Services\LinkService.cs" />
     <Compile Include="..\Services\ServiceContracts.cs" Link="Services\ServiceContracts.cs" />
     <Compile Include="..\Services\UriQueryBuilder.cs" Link="Services\UriQueryBuilder.cs" />
   </ItemGroup>

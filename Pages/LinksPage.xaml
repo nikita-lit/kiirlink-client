@@ -141,6 +141,7 @@
                             CategoryRequested="OnLinkCategoryRequested"
                             DeleteRequested="OnLinkDeleteRequested"
                             QRCodeRequested="OnCreateQRCodeClicked"
+                            ActionsPopupVisibilityChanged="OnLinkActionsPopupVisibilityChanged"
                             Category="{Binding CategoryName}"
                             Date="{Binding DisplayDate}"
                             ExpiresAt="{Binding ExpiresAt}"

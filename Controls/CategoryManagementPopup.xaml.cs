@@ -7,17 +7,17 @@ namespace KiirLink.Controls;
 
 public partial class CategoryManagementPopup
 {
-    private readonly ILinkService _linkService;
+    private readonly ApiClient _api;
     private readonly IConnectivityService _connectivity;
     private readonly ObservableCollection<CategoryModel> _categories = [];
     private bool _loaded;
 
     public ObservableCollection<CategoryModel> Categories => _categories;
 
-    public CategoryManagementPopup(ILinkService linkService, IConnectivityService connectivity)
+    public CategoryManagementPopup(ApiClient api, IConnectivityService connectivity)
     {
         InitializeComponent();
-        _linkService = linkService;
+        _api = api;
         _connectivity = connectivity;
         BindingContext = this;
         Loaded += OnLoaded;
@@ -46,7 +46,7 @@ public partial class CategoryManagementPopup
 
         try
         {
-            _categories.ReplaceWith(await _linkService.GetCategoriesAsync());
+            _categories.ReplaceWith(await _api.GetCategoriesAsync());
         }
         catch (Exception ex)
         {
@@ -66,7 +66,7 @@ public partial class CategoryManagementPopup
 
         try
         {
-            var created = await _linkService.CreateCategoryAsync(name);
+            var created = await _api.CreateCategoryAsync(name);
             if (created is null)
             {
                 await Page.DisplayAlertAsync(
@@ -104,7 +104,7 @@ public partial class CategoryManagementPopup
 
         try
         {
-            var success = await _linkService.DeleteCategoryAsync(category.Id);
+            var success = await _api.DeleteCategoryAsync(category.Id);
             if (!success)
             {
                 await Page.DisplayAlertAsync(L("Error"), L("CouldNotDeleteCategory"), "OK");

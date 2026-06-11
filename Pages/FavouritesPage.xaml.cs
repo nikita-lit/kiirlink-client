@@ -9,16 +9,17 @@ namespace KiirLink.Pages;
 
 public partial class FavouritesPage
 {
-    private readonly ILinkService _linkService;
+    private readonly ApiClient _api;
     private readonly IConnectivityService _connectivity;
     private readonly EventHandler<bool> _connectivityChangedHandler;
+    private bool _isLinkActionsPopupOpen;
 
     public ObservableCollection<LinkModel> Favourites { get; } = [];
 
-    public FavouritesPage(ILinkService linkService, IConnectivityService connectivity)
+    public FavouritesPage(ApiClient api, IConnectivityService connectivity)
     {
         InitializeComponent();
-        _linkService = linkService;
+        _api = api;
         _connectivity = connectivity;
         _connectivityChangedHandler = (_, online) =>
             Dispatcher.Dispatch(() => UpdateConnectivityState(online));
@@ -30,7 +31,7 @@ public partial class FavouritesPage
         base.OnAppearing();
         _connectivity.ConnectivityChanged += _connectivityChangedHandler;
         UpdateConnectivityState(_connectivity.IsOnline);
-        if (_connectivity.IsOnline)
+        if (_connectivity.IsOnline && !_isLinkActionsPopupOpen)
             await LoadFavouritesAsync();
     }
 
@@ -46,7 +47,7 @@ public partial class FavouritesPage
         LoadingIndicator.IsRunning = true;
         try
         {
-            var favourites = await _linkService.GetFavouritesAsync();
+            var favourites = await _api.GetFavouritesAsync();
 
             Favourites.ReplaceWith(favourites);
 
@@ -88,9 +89,9 @@ public partial class FavouritesPage
 
         var category = await UiHelpers.AssignCategoryAsync(
             this,
-            _linkService,
+            _api,
             link.ResolvedId,
-            await _linkService.GetCategoriesAsync());
+            await _api.GetCategoriesAsync());
         if ( category is null )
             return;
 
@@ -103,7 +104,7 @@ public partial class FavouritesPage
     {
         if ( sender is not LinkCard card ) return;
 
-        if (!await UiHelpers.SetFavouriteAsync(this, _linkService, card.LinkId, false))
+        if (!await UiHelpers.SetFavouriteAsync(this, _api, card.LinkId, false))
             return;
 
         RemoveFavourite(card.LinkId);
@@ -113,7 +114,7 @@ public partial class FavouritesPage
     private async void OnLinkDeleteRequested( object? sender, EventArgs e )
     {
         if (sender is not LinkCard card ||
-            !await UiHelpers.DeleteLinkAsync(this, _linkService, card.LinkId, card.Title))
+            !await UiHelpers.DeleteLinkAsync(this, _api, card.LinkId, card.Title))
             return;
 
         RemoveFavourite(card.LinkId);
@@ -138,6 +139,9 @@ public partial class FavouritesPage
             Favourites.Remove(link);
         FavCountLabel.Text = Favourites.Count.ToString();
     }
+
+    private void OnLinkActionsPopupVisibilityChanged(object? sender, bool isOpen) =>
+        _isLinkActionsPopupOpen = isOpen;
     
     private static string L(string key) => LocalizationManager.Instance.Get(key);
     private static string F(string key, params object[] args) => LocalizationManager.Instance.Format(key, args);

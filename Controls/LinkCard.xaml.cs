@@ -106,6 +106,7 @@ public partial class LinkCard
     public event EventHandler? CategoryRequested;
     public event EventHandler? QRCodeRequested;
     public event EventHandler? DeleteRequested;
+    public event EventHandler<bool>? ActionsPopupVisibilityChanged;
     private readonly EventHandler _themeChangedHandler;
     private readonly EventHandler _cultureChangedHandler;
 
@@ -207,44 +208,52 @@ public partial class LinkCard
             return;
 
         var popup = new LinkActionsPopup( IsFavourite );
-        var result = await page.ShowPopupAsync<LinkActionsPopupAction>(
-            popup,
-            UiHelpers.PlainPopup());
-
-        if ( result.WasDismissedByTappingOutsideOfPopup )
-            return;
-
-        var action = result.Result;
-
-        switch ( action )
+        ActionsPopupVisibilityChanged?.Invoke(this, true);
+        try
         {
-            case LinkActionsPopupAction.OpenOriginal:
-                if ( !string.IsNullOrWhiteSpace( Url ) )
-                    await Launcher.Default.OpenAsync( Url );
-                break;
-            case LinkActionsPopupAction.CopyShort:
-                if ( !string.IsNullOrWhiteSpace( ShortUrl ) )
-                    await Clipboard.Default.SetTextAsync( $"{AppHostHelper.BaseUrl}/{ShortUrl}" );
-                break;
-            case LinkActionsPopupAction.CopyOriginal:
-                if ( !string.IsNullOrWhiteSpace( Url ) )
-                    await Clipboard.Default.SetTextAsync( Url );
-                break;
-            case LinkActionsPopupAction.ViewAnalytics:
-                AnalyticsRequested?.Invoke( this, EventArgs.Empty );
-                break;
-            case LinkActionsPopupAction.AssignCategory:
-                CategoryRequested?.Invoke( this, EventArgs.Empty );
-                break;
-            case LinkActionsPopupAction.CreateQRCode:
-                QRCodeRequested?.Invoke( this, EventArgs.Empty );
-                break;
-            case LinkActionsPopupAction.ToggleFavourite:
-                FavouriteToggleRequested?.Invoke( this, EventArgs.Empty );
-                break;
-            case LinkActionsPopupAction.Delete:
-                DeleteRequested?.Invoke( this, EventArgs.Empty );
-                break;
+            var result = await page.ShowPopupAsync<LinkActionsPopupAction>(
+                popup,
+                UiHelpers.PlainPopup());
+
+            if ( result.WasDismissedByTappingOutsideOfPopup )
+                return;
+
+            var action = result.Result;
+
+            switch ( action )
+            {
+                case LinkActionsPopupAction.OpenOriginal:
+                    if ( !string.IsNullOrWhiteSpace( Url ) )
+                        await Launcher.Default.OpenAsync( Url );
+                    break;
+                case LinkActionsPopupAction.CopyShort:
+                    if ( !string.IsNullOrWhiteSpace( ShortUrl ) )
+                        await Clipboard.Default.SetTextAsync( $"{AppHostHelper.BaseUrl}/{ShortUrl}" );
+                    break;
+                case LinkActionsPopupAction.CopyOriginal:
+                    if ( !string.IsNullOrWhiteSpace( Url ) )
+                        await Clipboard.Default.SetTextAsync( Url );
+                    break;
+                case LinkActionsPopupAction.ViewAnalytics:
+                    AnalyticsRequested?.Invoke( this, EventArgs.Empty );
+                    break;
+                case LinkActionsPopupAction.AssignCategory:
+                    CategoryRequested?.Invoke( this, EventArgs.Empty );
+                    break;
+                case LinkActionsPopupAction.CreateQRCode:
+                    QRCodeRequested?.Invoke( this, EventArgs.Empty );
+                    break;
+                case LinkActionsPopupAction.ToggleFavourite:
+                    FavouriteToggleRequested?.Invoke( this, EventArgs.Empty );
+                    break;
+                case LinkActionsPopupAction.Delete:
+                    DeleteRequested?.Invoke( this, EventArgs.Empty );
+                    break;
+            }
+        }
+        finally
+        {
+            ActionsPopupVisibilityChanged?.Invoke(this, false);
         }
     }
 }

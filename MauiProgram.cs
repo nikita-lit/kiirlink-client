@@ -43,7 +43,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<LinkPreferencesService>();
         builder.Services
-            .AddHttpClient<IApiClient, ApiClient>((services, client) =>
+            .AddHttpClient<ApiClient>((services, client) =>
             {
                 var options = services.GetRequiredService<IOptions<ApiOptions>>().Value;
                 AppHostHelper.SetOptions( options );
@@ -65,9 +65,6 @@ public static class MauiProgram
                 options.TotalRequestTimeout.Timeout = TimeSpan.FromTicks(
                     attemptTimeout.Ticks * (retryCount + 1) + TimeSpan.FromSeconds(5).Ticks);
             });
-
-        builder.Services.AddSingleton<IAuthService, AuthService>();
-        builder.Services.AddSingleton<ILinkService, LinkService>();
 
         builder.Services.AddTransient<SignInViewModel>();
         builder.Services.AddTransient<CreateAccountViewModel>();

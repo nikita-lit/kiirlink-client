@@ -4,12 +4,12 @@ namespace KiirLink.Controls;
 
 public partial class ChangePasswordPopup
 {
-    private readonly IAuthService _authService;
+    private readonly ApiClient _api;
 
-    public ChangePasswordPopup(IAuthService authService)
+    public ChangePasswordPopup(ApiClient api)
     {
         InitializeComponent();
-        _authService = authService;
+        _api = api;
     }
 
     private async void OnCancelClicked(object? sender, EventArgs e) =>
@@ -37,7 +37,7 @@ public partial class ChangePasswordPopup
         SetBusy(true);
         try
         {
-            var result = await _authService.ChangePasswordAsync(currentPassword, newPassword);
+            var result = await _api.ChangePasswordAsync(currentPassword, newPassword);
             if (!result.Success)
             {
                 ShowError(LocalizationManager.Instance.LocalizeAuthError(

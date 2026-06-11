@@ -4,15 +4,15 @@ namespace KiirLink.ViewModels;
 
 public sealed class ProfileViewModel : ViewModelBase
 {
-    private readonly IAuthService _auth;
+    private readonly ApiClient _api;
     private readonly INavigationService _navigation;
     private string _displayName = "KiirLink user";
     private string _email = string.Empty;
 
-    public ProfileViewModel(IAuthService auth, IConnectivityService connectivity, INavigationService navigation)
+    public ProfileViewModel(ApiClient api, IConnectivityService connectivity, INavigationService navigation)
         : base(connectivity)
     {
-        _auth = auth;
+        _api = api;
         _navigation = navigation;
     }
 
@@ -35,7 +35,7 @@ public sealed class ProfileViewModel : ViewModelBase
 
         await RunBusyAsync(async () =>
         {
-            var profile = await _auth.GetProfileAsync();
+            var profile = await _api.GetProfileAsync();
             if (profile is null)
                 return;
 
@@ -46,7 +46,7 @@ public sealed class ProfileViewModel : ViewModelBase
 
     public async Task LogoutAsync()
     {
-        await _auth.LogoutAsync();
+        await _api.ClearTokensAsync();
         await _navigation.GoToAsync("//SignIn");
     }
 }

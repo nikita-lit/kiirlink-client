@@ -7,17 +7,17 @@ namespace KiirLink.Pages;
 
 public partial class AnalyticsPage
 {
-    private readonly ILinkService _linkService;
+    private readonly ApiClient _api;
     private readonly PerformanceChartDrawable _chartDrawable = new();
 
     // The link whose analytics are shown; updated from LinksPage when a card is tapped.
     public static int SelectedLinkId { get; set; } = -1;
     public static LinkModel? SelectedLink { get; set; }
 
-    public AnalyticsPage(ILinkService linkService)
+    public AnalyticsPage(ApiClient api)
     {
         InitializeComponent();
-        _linkService = linkService;
+        _api = api;
         PerformanceChart.Drawable = _chartDrawable;
     }
 
@@ -61,7 +61,7 @@ public partial class AnalyticsPage
 
         try
         {
-            SelectedLink = (await _linkService.GetLinksAsync(1, 1)).FirstOrDefault();
+            SelectedLink = (await _api.GetLinksAsync(1, 1)).FirstOrDefault();
             if (SelectedLink is null)
                 return false;
 
@@ -79,13 +79,13 @@ public partial class AnalyticsPage
     {
         try
         {
-            var stats = await _linkService.GetLinkStatsAsync( SelectedLinkId );
+            var stats = await _api.GetLinkStatsAsync(SelectedLinkId);
 
             if ( stats is null || !AnalyticsDataState.HasStatistics( stats ) )
             {
                 if ( SelectedLink is null )
                 {
-                    var links = await _linkService.GetLinksAsync( 1, 20 );
+                    var links = await _api.GetLinksAsync(1, 20);
                     var link = links.FirstOrDefault( l => l.ResolvedId == SelectedLinkId )
                                ?? links.FirstOrDefault();
 
@@ -133,7 +133,7 @@ public partial class AnalyticsPage
     {
         try
         {
-            var activity = await _linkService.GetLinkActivityAsync( SelectedLinkId );
+            var activity = await _api.GetLinkActivityAsync(SelectedLinkId);
             BuildActivityLayout( activity );
         }
         catch

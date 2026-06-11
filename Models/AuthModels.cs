@@ -2,19 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace KiirLink.Models;
 
-public abstract class CredentialsRequest
+public sealed class CredentialsRequest
 {
     [JsonPropertyName( "email" )] public string Email { get; set; } = string.Empty;
 
     [JsonPropertyName( "password" )] public string Password { get; set; } = string.Empty;
-}
-
-public sealed class LoginRequest : CredentialsRequest
-{
-}
-
-public sealed class RegisterRequest : CredentialsRequest
-{
 }
 
 public class ChangePasswordRequest

@@ -4,7 +4,7 @@ using KiirLink.Services;
 namespace KiirLink.ViewModels;
 
 public abstract class AuthViewModelBase(
-    IAuthService auth,
+    ApiClient api,
     IConnectivityService connectivity,
     INavigationService navigation,
     IDialogService dialogs) : ViewModelBase(connectivity)
@@ -12,7 +12,7 @@ public abstract class AuthViewModelBase(
     private string _email = string.Empty;
     private string _password = string.Empty;
 
-    protected IAuthService Auth { get; } = auth;
+    protected ApiClient Api { get; } = api;
     protected INavigationService Navigation { get; } = navigation;
     protected IDialogService Dialogs { get; } = dialogs;
 
@@ -30,7 +30,7 @@ public abstract class AuthViewModelBase(
 
     public async Task CheckAuthenticationAsync()
     {
-        if (await Auth.IsAuthenticatedAsync())
+        if (await Api.HasStoredTokensAsync())
             await Navigation.GoToAsync("//Home");
     }
 
@@ -58,8 +58,8 @@ public abstract class AuthViewModelBase(
 
 public sealed class SignInViewModel : AuthViewModelBase
 {
-    public SignInViewModel(IAuthService auth, IConnectivityService connectivity, INavigationService navigation,
-        IDialogService dialogs) : base(auth, connectivity, navigation, dialogs)
+    public SignInViewModel(ApiClient api, IConnectivityService connectivity, INavigationService navigation,
+        IDialogService dialogs) : base(api, connectivity, navigation, dialogs)
     {
         SignInCommand = new AsyncCommand(SignInAsync, () => CanInteract);
         CreateAccountCommand = new AsyncCommand(() => navigation.GoToAsync("//CreateAccount"));
@@ -76,7 +76,7 @@ public sealed class SignInViewModel : AuthViewModelBase
 
         await RunAuthAsync("SignInFailed", async () =>
         {
-            var login = await Auth.LoginAsync(Email.Trim(), Password);
+            var login = await Api.LoginAsync(Email.Trim(), Password);
             if (!login.Success)
             {
                 await ShowAuthErrorAsync("SignInFailed", login.Error, "CouldNotSignIn");
@@ -94,8 +94,8 @@ public sealed class CreateAccountViewModel : AuthViewModelBase
 {
     private string _confirmPassword = string.Empty;
 
-    public CreateAccountViewModel(IAuthService auth, IConnectivityService connectivity,
-        INavigationService navigation, IDialogService dialogs) : base(auth, connectivity, navigation, dialogs)
+    public CreateAccountViewModel(ApiClient api, IConnectivityService connectivity,
+        INavigationService navigation, IDialogService dialogs) : base(api, connectivity, navigation, dialogs)
     {
         CreateAccountCommand = new AsyncCommand(CreateAccountAsync, () => CanInteract);
         BackCommand = new AsyncCommand(() => navigation.GoToAsync("//SignIn"));
@@ -124,14 +124,14 @@ public sealed class CreateAccountViewModel : AuthViewModelBase
 
         await RunAuthAsync("CreateAccountFailed", async () =>
         {
-            var register = await Auth.RegisterAsync(Email.Trim(), Password);
+            var register = await Api.RegisterAsync(Email.Trim(), Password);
             if (!register.Success)
             {
                 await ShowAuthErrorAsync("CreateAccountFailed", register.Error, "CouldNotCreateAccount");
                 return;
             }
 
-            var login = await Auth.LoginAsync(Email.Trim(), Password);
+            var login = await Api.LoginAsync(Email.Trim(), Password);
             if (!login.Success)
             {
                 await Dialogs.AlertAsync(L("AccountCreated"), L("AutomaticSignInFailed"));

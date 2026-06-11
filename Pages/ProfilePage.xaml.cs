@@ -8,19 +8,17 @@ namespace KiirLink.Pages;
 public partial class ProfilePage
 {
     private readonly ProfileViewModel _viewModel;
-    private readonly IAuthService _authService;
-    private readonly ILinkService _linkService;
+    private readonly ApiClient _api;
     private readonly LinkPreferencesService _linkPreferences;
     private bool _syncingThemeSwitch;
     private readonly EventHandler _themeChangedHandler;
 
-    public ProfilePage(ProfileViewModel viewModel, IAuthService authService, ILinkService linkService,
+    public ProfilePage(ProfileViewModel viewModel, ApiClient api,
         LinkPreferencesService linkPreferences)
     {
         InitializeComponent();
         _viewModel = viewModel;
-        _authService = authService;
-        _linkService = linkService;
+        _api = api;
         _linkPreferences = linkPreferences;
         BindingContext = viewModel;
         _themeChangedHandler = (_, _) => ApplyThemeToIcons();
@@ -89,7 +87,7 @@ public partial class ProfilePage
     {
         try
         {
-            var categories = await _linkService.GetCategoriesAsync();
+            var categories = await _api.GetCategoriesAsync();
             var none = L("None");
             var cancel = L("Cancel");
             var options = new[] { none }.Concat(categories.Select(category => category.Name)).ToArray();
@@ -147,7 +145,7 @@ public partial class ProfilePage
     private async void OnChangePasswordTapped(object? sender, TappedEventArgs e)
     {
         var result = await this.ShowPopupAsync<bool>(
-            new ChangePasswordPopup(_authService), 
+            new ChangePasswordPopup(_api),
             UiHelpers.PlainPopup());
         
         if (!result.WasDismissedByTappingOutsideOfPopup && result.Result)
